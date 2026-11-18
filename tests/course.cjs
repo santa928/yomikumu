@@ -42,7 +42,8 @@ async function run() {
       "class", "linked-css", "rule-order", "specific-rule", "inherited-size", "root-size",
       "card", "padding", "outer-space", "border-width", "link-area", "narrow-card",
       "bio-lines", "name-colors", "picked-mark", "shared-ink", "author-pair",
-      "flex-parent", "along-axis", "across-axis", "wrap-works", "flex-guide", "layout", "responsive",
+      "flex-parent", "along-axis", "across-axis", "wrap-works", "flex-guide", "layout",
+      "equal-tracks", "fitting-tracks", "grid-lines", "grid-catalog", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -265,6 +266,40 @@ async function run() {
     assert.ok(works[0] === works[1] && works[2] === works[3] && works[0] < works[2]);
     await flexPreview.getByRole("link", { name: "受付へ" }).click();
     await flexPreview.locator("h2:target").filter({ hasText: "受付" }).waitFor();
+    const gridCases = [
+      ["equal-tracks", ".gallery{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}", "等幅の三列", ".gallery{display:grid;gap:8px;grid-template-columns:1fr 1fr 1fr}"],
+      ["fitting-tracks", ".gallery{display:grid;gap:8px;grid-template-columns:1fr 1fr}", "広い棚に三枚", ".gallery{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}"],
+      ["grid-lines", ".gallery{display:grid;grid-template-columns:1fr 1fr}.pick{grid-column:1/2}", "右端の線", ".gallery{display:grid;grid-template-columns:1fr 1fr}.pick{grid-column:1/-1}"],
+    ];
+    for (const [id, wrong, message, alternate] of gridCases) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
+    const catalog = units.find((unit) => unit.id === "grid-catalog");
+    await open("grid-catalog/write");
+    const catalogHtml = page.getByRole("textbox", { name: "HTML", exact: true });
+    const catalogCss = page.getByRole("textbox", { name: "CSS", exact: true });
+    await catalogHtml.fill(catalog.answer);
+    await catalogCss.fill(catalog.answerCss.replace("display: flex", "display: block"));
+    await confirm.click();
+    await says("内側の .actions");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.equal(await catalogCss.inputValue(), catalog.answerCss.replace("display: flex", "display: block"));
+    const extraWork = '<article><h3>月の舟</h3><div class="actions"><a href="#notes">メモ</a><a href="#desk">受付</a></div></article>';
+    await catalogHtml.fill(catalog.answer.replace('</div>\n<h2 id="notes">', extraWork + '</div>\n<h2 id="notes">'));
+    await catalogCss.fill(catalog.answerCss.replace("auto-fit", "auto-fill"));
+    await confirm.click();
+    await says("できました。条件を満たしています");
+    const shelf = page.frameLocator("main iframe").first();
+    assert.equal(await shelf.locator(".gallery article").count(), 5);
+    await shelf.locator(".gallery article").last().getByRole("link", { name: "受付" }).click();
+    await shelf.locator("#desk:target").waitFor();
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -433,6 +468,8 @@ async function run() {
       "flex-parent": [".bar", "column"], "along-axis": ["justify-content", "space-between"],
       "across-axis": ["align-items", "center"], "wrap-works": ["wrap", "flex-basis"],
       "flex-guide": ["aria-current", "窓辺"],
+      "equal-tracks": ["3", "1fr"], "fitting-tracks": ["auto-fit", "100px"],
+      "grid-lines": [".pick", "3"], "grid-catalog": ["gallery", "星の紙"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
