@@ -2,9 +2,13 @@ import { chromium } from "playwright";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { routeChecks } from "./routes.mjs";
+import { clientChecks } from "./client.mjs";
+import { refreshChecks } from "./refresh.mjs";
+import { signupChecks } from "./signup.mjs";
+import { guideChecks } from "./guide.mjs";
 
 const step = process.argv[2];
-const suites = { ...routeChecks };
+const suites = { ...routeChecks, ...clientChecks, ...refreshChecks, ...signupChecks, ...guideChecks };
 if (!Object.hasOwn(suites, step)) {
   console.error("確かめる単元を選びます。 " + Object.keys(suites).join(" / "));
   process.exit(2);

@@ -12,6 +12,16 @@ export default async function Library({ searchParams }) {
         <li key={book.id}><Link href={"/books/" + book.id}>{book.title}</Link></li>
       ))}</ul> : <p>この種類の本はありません。</p>}
       <p><a href="/api/books">同じ本をJSONで読む</a></p>
+      <nav aria-label="実習の入口">
+        <h2>実習の入口</h2>
+        <ul>
+          <li><Link href="/client-lab">お気に入りの栞を試す</Link></li>
+          <li><Link href="/data-lab">読書原稿の版を変える</Link></li>
+          <li><Link href="/signup-lab">読書会に申し込む</Link></li>
+          <li><Link href="/travel">旅の案内を見る</Link></li>
+          <li><Link href="/meetings">読書会の日程を見る</Link></li>
+        </ul>
+      </nav>
     </>
   );
 }
