@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();
-    await page.goto("file:///course/dom/index.html#elements/1");
+    await page.goto((process.env.DOM_URL || "file:///course/dom/index.html") + "#elements/1");
     const code = page.getByRole("textbox", {name:"JavaScript"});
     for (const loop of ["while (true) {}", "for (;;) continue;", "do ; while (true)"]) {
       await code.fill(loop);

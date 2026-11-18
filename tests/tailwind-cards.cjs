@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
-const url = pathToFileURL(path.resolve(__dirname, "../tailwind/index.html")).href;
+const url = process.env.TAILWIND_URL || pathToFileURL(path.resolve(__dirname, "../tailwind/index.html")).href;
 
 (async () => {
   const browser = await chromium.launch();
