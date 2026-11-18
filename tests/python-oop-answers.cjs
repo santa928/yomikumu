@@ -18,3 +18,12 @@ module.exports[64] = [
   [["Fare(5)", "Fare(rate=5)"], ["return self.policy.price(days)", "return 4 * days"], ["return self.policy.price(days)", "charge = self.policy.price\n        return charge(days)"]],
   [["t.policy = Flat()", "replacement = Flat()\nt.policy = replacement"], ["self.dest.append(value)", "self.dest = [value]"], ["self.dest.append(value)", "self.dest.extend([value])"]],
 ];
+
+module.exports[65] = [
+  [["return self._pages", "return int(self._pages)"], ["return self._pages * 2", "return self._pages"], ["return self._pages * 2", "return 2 * self.pages"]],
+  [["if value < 0:", "if not value >= 0:"], ["value > 10", "value >= 10"], ["value < 0 or value > 10", "not 0 <= value <= 10"]],
+  [["print(book.pages)", "stored = book.pages\nprint(stored)"], ["print(book.pages)", "print(-1)"], ["book.pages = 8", "new_value = 8\nbook.pages = new_value"]],
+  [["return len(self.titles)", "return sum(1 for title in self.titles)"], ["return len(self.marks)", "return '3'"], ["return len(self.marks)", "return sum(1 for mark in self.marks)"]],
+  [["'記録' + str(len(self))", "'記録{}'.format(len(self))"], ["'件数=' + str(len(self))", "len(self)"], ["'件数=' + str(len(self))", "'件数={}'.format(len(self))"]],
+  [["Log(self.marks[:])", "Log(list(self.marks))"], ["Log(self.marks[:])", "Log(self.marks)"], ["Log(self.marks[:])", "Log(list(self.marks))"]],
+];
