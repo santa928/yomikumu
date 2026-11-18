@@ -36,7 +36,7 @@ function showCodeOutput(host, result, sign) {
   if (result.output.length || !sign) {
     const example = node("figure", undefined, "code-result");
     example.append(node("figcaption", "コンソール"));
-    const kinds = { number: "数", string: "文字", boolean: "真偽", undefined: "未定義" };
+    const kinds = { number: "数", string: "文字", boolean: "真偽", undefined: "未定義", array: "配列", object: "オブジェクト", null: "null" };
     const lines = result.output.map(row => row.map(v => v.text + "（" + (kinds[v.type] || v.type) + "）").join("　"));
     example.append(node("pre", lines.length ? lines.join("\n") : "出力はありません。"));
     host.append(example);
@@ -57,7 +57,9 @@ function scoreProblem(ex, result, start) {
   const expected = ex.expected(start);
   for (const [index, value] of expected.entries()) {
     const row = result.output[index];
-    if (row?.length !== 1 || row[0].type !== typeof value || row[0].text !== String(value))
+    const type = Array.isArray(value) ? "array" : typeof value;
+    const text = type === "array" ? JSON.stringify(value) : String(value);
+    if (row?.length !== 1 || row[0].type !== type || row[0].text !== text)
       return ex.hints[index] || ex.hints.at(-1);
   }
   if (result.output.length !== expected.length) return ex.extraHint || "必要な値は出ました。指定された行数だけを表示しましょう。";
