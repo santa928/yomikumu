@@ -22,6 +22,7 @@ services:
       - ./harbor.png:/usr/share/nginx/html/harbor.png:ro
       - ./moon.png:/usr/share/nginx/html/moon.png:ro
       - ./keyboard.js:/usr/share/nginx/html/keyboard.js:ro
+      - ./profile-project.js:/usr/share/nginx/html/profile-project.js:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro
