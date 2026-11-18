@@ -35,3 +35,11 @@ module.exports[66] = [
   [["@logged\ndef plus(x):\n    return x + 1", "def plus(x):\n    return 1 + x\nplus = logged(plus)"], ["@logged\ndef minus", "def minus"], ["return n * 2", "return n + n"]],
   [["@wraps(fn)", "@wraps(wrapped=fn)"], ["    @wraps(fn)\n", ""], ["return fn(*args, **kwargs)", "result = fn(*args, **kwargs)\n        return result"]],
 ];
+
+module.exports[67] = [
+  [["mark('赤')", "mark(label='赤')"], ["night = mark('夜')", "night = morning"], ["night = mark('夜')", "night = mark(label='夜')"]],
+  [["tracked = plan(pages)", "job = pages\ntracked = plan(job)"], ["b = night(title)", "b = a"], ["b = night(title)", "target = title\nb = night(target)"]],
+  [["print(tracked(5))", "value = tracked(5)\nprint(value)"], ["tracked('海')", "mark('朝')(title)('海')"], ["print(tracked('月'))\nprint(tracked('海'))", "for name in ['月', '海']:\n    print(tracked(name))"]],
+  [["b = red(pages)", "b = red(fn=pages)"], ["    history = []\n    def decorate(fn):", "    def decorate(fn):\n        history = []"], ["return fn(*args, **kwargs)", "result = fn(*args, **kwargs)\n            return result"]],
+  [["except ValueError:", "except ValueError as error:"], ["                raise\n", "                return 0\n"], ["history.append(label + '成功')", "history.extend([label + '成功'])"]],
+];
