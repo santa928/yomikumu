@@ -34,7 +34,11 @@ async function run() {
         answer: l.exercise.answer,
       })),
     );
-    const expectedIds = ["first-edit", "structure", "link", "word-language", "page-names", "class", "card", "padding", "layout", "responsive"];
+    const expectedIds = [
+      "first-edit", "structure", "link", "word-language", "page-names",
+      "heading-levels", "material-list", "making-steps", "page-regions", "work-section", "word-emphasis",
+      "class", "card", "padding", "layout", "responsive",
+    ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
     await page.getByRole("button", { name: "次の作品を表示" }).click();
@@ -73,6 +77,28 @@ async function run() {
           .filter({ hasText: "作者ノート" })
           .waitFor({ timeout: 3000 });
       }
+    }
+    const exhibitionCases = [
+      ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
+      ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
+      ["making-steps", "<ol><li>切る</li><li>結ぶ</li><li>穴をあける</li></ol>", "この順", "<ol><li>切る</li><li>印を付ける</li><li>穴をあける</li><li>結ぶ</li></ol>"],
+      ["page-regions", "<header><h1>窓辺の作品展</h1></header><main><h2>展示内容</h2><p>木版画を二枚展示します。</p><footer><p>問い合わせは図書室へ。</p></footer></main>", "本文はできました", "<div><header><h1>窓辺の作品展</h1></header><main><section><h2>展示内容</h2><p>木版画を二枚展示します。</p></section></main><footer><p>問い合わせは図書室へ。</p></footer></div>"],
+      ["work-section", "<section><h2>木の作品</h2><article><h3>小さな舟</h3></article><p>枝を削りました。</p></section>", "同じ article", "<main><section><h2>木の作品</h2><article><header><h3>小さな舟</h3></header><p>枝を削りました。</p></article></section></main>"],
+      ["word-emphasis", "<p><strong>足元にご注意</strong>ください。</p><p>原画は<em>今日だけ</em>です。</p>", "今日」だけ", "<section><p><strong>足元にご注意</strong>ください。</p><p>原画は<span><em>今日</em></span>だけです。</p></section>"],
+    ];
+    for (const [id, wrong, message, alternate] of exhibitionCases) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      if (id === "page-regions") {
+        await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+        await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+        assert.equal(await page.getByRole("textbox").inputValue(), wrong);
+      }
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
     }
     // 読む達成と書く達成が独立して残り、途中の解答にも個別の案内がある。
     await open("structure/write");
@@ -208,6 +234,8 @@ async function run() {
     await touch.getByRole("status").filter({ hasText: "行き先の id" }).waitFor();
     const buildSolutions = {
       "first-edit": ["雨の港"], "word-language": ["lang", "en"], "page-names": ["夜の作品集", "星の切符"],
+      "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
+      "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
       card: [".card", "border"], padding: ["8px", "16px"], layout: ["1fr 1fr", "gap"],
       responsive: ["min-width", "1fr 1fr"],

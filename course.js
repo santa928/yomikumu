@@ -270,6 +270,7 @@ const lessons = [
       review: 1,
     },
   },
+  ...exhibitionLessons,
   {
     id: "class",
     title: "指定した文字に色を付ける",
