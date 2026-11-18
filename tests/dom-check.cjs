@@ -4,22 +4,29 @@ const { chromium } = require("playwright");
 const { pathToFileURL } = require("node:url");
 const path = require("node:path");
 
-async function verifyDom(id, answers, demo) {
+async function verifyDom(id, answers, demo, course = "dom") {
   const browser = await chromium.launch();
   try {
     const pc = await browser.newPage();
     const phone = await browser.newPage({ viewport: { width: 375, height: 780 }, hasTouch: true });
-    const base = process.env.DOM_URL || pathToFileURL(path.resolve(__dirname, "../dom/index.html")).href;
+    const base = process.env.DOM_URL || pathToFileURL(path.resolve(__dirname, "../" + course + "/index.html")).href;
     await pc.goto(base + "#" + id);
     await demo(pc.frameLocator('iframe[title="操作できる完成例"]'));
     for (const [i, [primary, alternative, typical]] of answers.entries()) {
       const route = base + "#" + id + "/" + (i + 1);
       await Promise.all([pc.goto(route), phone.goto(route)]);
-      const editor = pc.getByRole("textbox", { name: "JavaScript" });
+      const editor = pc.locator("main textarea").first();
       await editor.waitFor();
-      const feedback = pc.locator('section').filter({ has: editor }).getByRole("status").filter({ visible: true });
+      const feedback = pc.locator("main section").last().getByRole("status").filter({ visible: true });
       const run = pc.getByRole("button", { name: "実行して確かめる" });
-      if (typical !== undefined) await editor.fill(typical);
+      const multi = await pc.locator("main textarea").count() > 1;
+      async function fillCode(source) {
+        if (!multi) return editor.fill(source);
+        const files = await pc.evaluate(text => splitReactFiles(text), source);
+        for (const [name, content] of Object.entries(files))
+          await pc.getByRole("textbox", { name, exact:true }).fill(content);
+      }
+      if (typical !== undefined) await fillCode(typical);
       await run.click();
       await feedback.filter({ hasText: /項目を確認|実行で止まりました/ }).waitFor();
       const model = await pc.evaluate(([id, index]) => {
@@ -28,7 +35,7 @@ async function verifyDom(id, answers, demo) {
         return template.replace(/《(\d+)》/g, (_, n) => slots[n-1][0]);
       }, [id, i]);
       for (const answer of [primary ?? model, alternative]) {
-        await editor.fill(answer);
+        await fillCode(answer);
         await run.click();
         await feedback.filter({ hasText: "できました" }).waitFor();
       }
@@ -36,7 +43,11 @@ async function verifyDom(id, answers, demo) {
       await pc.getByRole("link", { name: "書きかけの課題へ戻る" }).click();
       await pc.waitForFunction(() => document.activeElement.tagName === "TEXTAREA");
       await pc.reload();
-      assert.equal(await editor.inputValue(), alternative);
+      if (multi) {
+        const files = await pc.evaluate(text => splitReactFiles(text), alternative);
+        for (const [name, content] of Object.entries(files))
+          assert.equal(await pc.getByRole("textbox",{name,exact:true}).inputValue(), content);
+      } else assert.equal(await editor.inputValue(), alternative);
       const correct = await phone.evaluate(([id, i]) => domUnits.find(u => u.id === id).steps[i].correct, [id, i]);
       const options = phone.locator('input[name="prediction"]');
       assert.equal(await options.count(), 4);
@@ -47,7 +58,7 @@ async function verifyDom(id, answers, demo) {
         await section.getByRole("status").filter({ hasText: match }).waitFor();
       }
       assert.equal(await phone.getByRole("combobox").inputValue(), "build");
-      assert.equal(await phone.getByRole("textbox", { name: "JavaScript" }).count(), 0);
+      assert.equal(await phone.locator("main textarea:visible").count(), 0);
       const fields = phone.getByRole("group").filter({ has: phone.locator('input[name^="piece-"]') });
       const slots = await phone.evaluate(([id, i]) => (domUnits.find(u=>u.id===id).steps[i].build || domBuilders[id][i]).slice(1), [id, i]);
       const buildResult = phone.locator("section").last().getByRole("status").filter({visible:true});
