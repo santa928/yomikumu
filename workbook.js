@@ -138,7 +138,7 @@ function home() {
   content.append(
     link(
       resume ? "前回の続きへ →" : "最初のスライドへ →",
-      resume ? state.last : "structure/1",
+      resume ? state.last : unitRoute(lessons[0].id),
       "next",
     ),
   );
@@ -195,14 +195,28 @@ function slidePage(lesson, position) {
   content.append(examples);
   if (slide.before) makePreview(examples, slide.html, slide.before, "変更前");
   for (const width of slide.widths || [undefined]) {
-    makePreview(
+    const ready = makePreview(
       examples,
       slide.html,
       slide.css || "",
       width ? "幅" + width + "px" : slide.before ? "変更後" : "ブラウザでの表示",
       width,
       slide.previewHeight,
+      slide.showTitle,
     );
+    if (slide.nextWork) {
+      ready.then((doc) => {
+        if (!examples.isConnected) return;
+        const name = doc.querySelector("h1");
+        const first = name.textContent;
+        const toggle = button("次の作品を表示", () => {
+          const next = name.textContent === first;
+          name.textContent = next ? slide.nextWork : first;
+          toggle.textContent = next ? "最初の作品に戻す" : "次の作品を表示";
+        });
+        examples.append(toggle);
+      });
+    }
   }
   if (slide.before) content.append(details("変更前のコード", fields(slide.html, slide.before)));
   const source = fields(slide.html, slide.css);
@@ -300,14 +314,14 @@ const projectExample = {
   css: "body { color: #284537; }\narticle { border: 1px solid; padding: 12px; }\n.shelf { display: grid; gap: 12px; }\n@media (min-width: 600px) {\n  .shelf { grid-template-columns: 1fr 1fr; }\n}",
 };
 
-function practicePreview(host, id, field, html, css) {
+function practicePreview(host, id, exercise, html, css) {
   host.replaceChildren();
-  const cssText = field === "declaration"
+  const cssText = exercise.field === "declaration"
     ? ".label { display:inline-block; border:1px solid; " + css + " }"
     : css;
   const widths = id === "studio" || id === "responsive" ? [360, 720] : [undefined];
   return Promise.all(widths.map((width) =>
-    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width),
+    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle),
   ));
 }
 
@@ -326,7 +340,8 @@ function buildPage(lesson) {
     return code.replace(/[①②]/g, (mark) => pieces[marks.indexOf(mark)] || mark);
   }
   heading(lesson.title, "タップでコードを組む", ex.task);
-  content.append(node("p", "①と②に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
+  const blanks = marks.slice(0, slots.length).join("と");
+  content.append(node("p", blanks + "に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
   snippet.textContent = assembled();
   slots.forEach(([label, ...options], i) => {
     const group = node("fieldset");
@@ -355,7 +370,7 @@ function buildPage(lesson) {
   async function check() {
     const at = ++revision;
     const result = assembled();
-    const docs = await practicePreview(preview, id, ex.field,
+    const docs = await practicePreview(preview, id, ex,
       ex.field === "html" ? result : ex.html, ex.field === "html" ? ex.css : result);
     if (at !== revision || !preview.isConnected) return;
     const problem = exerciseResult(id, docs);
@@ -384,7 +399,7 @@ function workshop(lesson) {
   let manuscriptButton;
   let revision = 0;
   function refresh() {
-    return practicePreview(preview, id, ex.field, html, css);
+    return practicePreview(preview, id, ex, html, css);
   }
   function change(key, value) {
     if (key === "html") html = value;

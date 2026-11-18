@@ -29,8 +29,14 @@ function exerciseResult(id, docs) {
   const doc = docs[0];
   const style = (node) => doc.defaultView.getComputedStyle(node);
   switch (id) {
+    case "first-edit":
+      if (doc.querySelector("h1")?.textContent.trim() !== "雨の港")
+        return "HTML欄の <h1> と </h1> の間に「雨の港」を入れてみましょう。";
+      break;
     case "structure": {
       const title = doc.querySelector("h1");
+      if (title?.querySelector("p"))
+        return "紹介文まで見出しの内側に入っています。作品名の直後で </h1> を閉じてみましょう。";
       if (title?.textContent.trim() !== "夜の図書室")
         return "まず「夜の図書室」をページの見出しにしましょう。";
       const matches = [...doc.querySelectorAll("p")].some(
@@ -42,6 +48,19 @@ function exerciseResult(id, docs) {
       if (!matches) return "ページ名はできました。見出しの外、その下に紹介文の段落を置きましょう。";
       break;
     }
+    case "word-language": {
+      const name = [...doc.querySelectorAll("p")].find((p) => p.textContent.trim() === "Blue Harbor");
+      if (!name) return "作品名の段落には「Blue Harbor」をそのまま残しましょう。";
+      if (!/^en(?:-|$)/i.test(name.closest("[lang]")?.lang || ""))
+        return '作品名はできました。英語の段落に lang="en" を付けましょう。';
+      break;
+    }
+    case "page-names":
+      if (doc.title !== "夜の作品集")
+        return "タブに表示したい「夜の作品集」を、title の開始タグと終了タグの間に書きましょう。";
+      if (doc.querySelector("h1")?.textContent.trim() !== "星の切符")
+        return "タブの名前はできました。本文の h1 の内側を「星の切符」にしましょう。";
+      break;
     case "link": {
       const link = [...doc.querySelectorAll("a")].find(
         (a) => a.textContent.trim() === "作者ノートへ",

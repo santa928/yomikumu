@@ -28,12 +28,16 @@ function safeMarkup(source) {
   }
   const container = document.createElement("div");
   for (const node of template.content.childNodes) copy(node, container);
-  return container.innerHTML;
+  return {
+    body: container.innerHTML,
+    title: template.content.querySelector("title")?.textContent.trim(),
+  };
 }
 
-function pageSource(html, css, title = "作品紹介") {
+function pageSource(html, css, fallbackTitle = "作品紹介") {
+  const page = safeMarkup(html);
   const safeTitle = document.createElement("span");
-  safeTitle.textContent = title;
+  safeTitle.textContent = page.title || fallbackTitle;
   return (
     '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
@@ -43,12 +47,12 @@ function pageSource(html, css, title = "作品紹介") {
     "</title>\n<style>\n" +
     css.replaceAll("<", "\\3c ") +
     "\n</style>\n</head>\n<body>\n" +
-    safeMarkup(html) +
+    page.body +
     "\n</body>\n</html>"
   );
 }
 
-function makePreview(host, html, css, label, width, maxHeight = 310) {
+function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false) {
   const frame = document.createElement("iframe");
   frame.title = label;
   frame.setAttribute("sandbox", "allow-same-origin");
@@ -67,6 +71,7 @@ function makePreview(host, html, css, label, width, maxHeight = 310) {
       "load",
       () => {
         const doc = frame.contentDocument;
+        if (showTitle) caption.textContent = "タブのタイトル　" + (doc.title || "（未入力）");
         // srcdoc の相対URLは親ページを基準にする。作品内のリンクを同じ見本の文書に向ける。
         for (const anchor of doc.querySelectorAll('a[href^="#"]')) {
           anchor.href = "about:srcdoc" + anchor.getAttribute("href");
@@ -88,7 +93,7 @@ function makePreview(host, html, css, label, width, maxHeight = 310) {
       { once: true },
     ),
   );
-  frame.srcdoc = pageSource(html, css);
+  frame.srcdoc = pageSource(html, css, showTitle ? "" : "作品紹介");
   view.append(frame);
   return ready;
 }
