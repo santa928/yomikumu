@@ -1,0 +1,23 @@
+#content { max-width: 52rem; margin: auto; padding: 1.4rem clamp(1rem,4vw,2.5rem) 4rem; }
+#content h1 { line-height: 1.4; font-size: clamp(1.55rem,4vw,2.4rem); }
+#content h2 { font-size: 1.25rem; }
+#content h3 { font-size: 1rem; margin-bottom: .35rem; }
+#content nav details { margin-top: .5rem; }
+#position { color: #4b624e; font-size: .9rem; margin-bottom: .4rem; }
+#content section { margin: 1.3rem 0; padding: clamp(.8rem,3vw,1.4rem); border: 1px solid #c1cdbd; background: #fffdf6; border-radius: .4rem; }
+#content label, #content legend { display: block; font-weight: 700; }
+#content pre, #provided { white-space: pre-wrap; overflow-wrap: anywhere; background: #edf1e9; border-left: .22rem solid #62836c; padding: .7rem 1rem; line-height: 1.65; min-height: 2.6rem; }
+#content textarea, #line { display: block; width: 100%; font: 1rem/1.55 ui-monospace, monospace; padding: .55rem; color: #152e25; background: #fff; border: 1px solid #64796b; border-radius: .25rem; }
+#content textarea[readonly] { background: #f6f5ef; }
+#content button, #steps a { font: inherit; cursor: pointer; color: #204633; border: 1px solid #859a87; background: #fafaf3; padding: .55rem .8rem; border-radius: .25rem; margin: .2rem .3rem .2rem 0; min-height: 44px; max-width: 100%; overflow-wrap: anywhere; }
+#content button[aria-pressed=true], #content #run, #steps .next { background: #285740; color: white; }
+#content button:disabled { opacity: .55; cursor: default; }
+#method, #hint, #waiting, .environment { margin: 1rem 0; }
+#quiz { border: none; border-top: 1px solid #bfccbe; padding: .8rem 0 0; }
+#pieces button { font: .9rem/1.55 ui-monospace, monospace; white-space: pre-wrap; text-align: left; }
+#content summary { cursor: pointer; text-decoration: underline; text-underline-offset: .22em; }
+#steps { display: flex; flex-wrap: wrap; gap: .35rem; margin: 1.4rem 0; }
+#steps a { display: inline-flex; align-items: center; }
+.note { font-size: .9rem; }
+#quiz-result, #status { font-weight: 650; }
+#checks p { white-space: pre-wrap; }
