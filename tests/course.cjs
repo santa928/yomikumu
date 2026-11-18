@@ -7,6 +7,7 @@ const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 const { verifyJavaScript } = require("./javascript.cjs");
 const { verifyChoices } = require("./choices.cjs");
+const { verifyFunctions } = require("./functions.cjs");
 const base = process.env.COURSE_URL || pathToFileURL(path.resolve(__dirname, "../index.html")).href;
 
 async function run() {
@@ -690,6 +691,7 @@ async function run() {
     assert.deepEqual(errors, []);
     await verifyJavaScript(browser, base);
     await verifyChoices(browser, base);
+    await verifyFunctions(browser, base);
     console.log(
       expectedIds.length + "単元のスライド・四択・記述・組み立て、ページ内移動、下書き復帰、部分正解と別解、卒業制作、書き出しと引き継ぎが通りました。",
     );

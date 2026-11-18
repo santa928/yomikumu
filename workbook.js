@@ -455,6 +455,7 @@ function buildPage(lesson) {
   heading(lesson.title, "タップでコードを組む", ex.build.task || ex.task);
   const blanks = marks.slice(0, slots.length).join("と");
   content.append(node("p", blanks + "に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
+  if (ex.calls) content.append(details("続けて実行する確認用コード", node("pre", ex.calls)));
   snippet.textContent = assembled(ex.build.excerpt);
   slots.forEach(([label, ...options], i) => {
     const group = node("fieldset");

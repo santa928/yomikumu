@@ -51,6 +51,8 @@ function executionMessage(result) {
 }
 
 function scoreProblem(ex, result, start) {
+  if (ex.returnsValue && result.output.some(row => row.some(v => v.type === "undefined")))
+    return "呼び出した場所で数を受け取れていません。関数の中で、計算した数を return で返しましょう。";
   if (ex.judge) return ex.judge(result, start);
   const expected = ex.expected(start);
   for (const [index, value] of expected.entries()) {
@@ -63,15 +65,22 @@ function scoreProblem(ex, result, start) {
     return "表示はできました。開始点を受け取る ticket には const で名前を付けましょう。";
   if (ex.binding?.offset !== undefined && (result.binding.constant || result.binding.value !== start + ex.binding.offset))
     return "二行の表示はできました。score 自体にも、増やした後の数を残しましょう。";
+  if (ex.arrowName && !result.binding.arrow) return "二倍の数を返せました。今回は double を n => 式 の形に書き換えてみましょう。";
   return "";
 }
 
 async function checkScoreCode(ex, code, start, host, current) {
   const inputs = ex.variableStart ? [...new Set([start, ...(ex.inputs || [2, 5])])] : [start];
   for (const [index, input] of inputs.entries()) {
-    const result = await executeCode(code, input, ex.binding?.name);
+    const program = ex.calls ? code + "\n;\n" + ex.calls : code;
+    const result = await executeCode(program, input, ex.binding?.name || ex.arrowName);
     if (!current()) return "";
-    if (!result.ok) return executionMessage(result);
+    if (!result.ok) {
+      if (ex.calls && result.line > code.split("\n").length)
+        return "確認用の呼び出しで止まりました。用意する関数の名前と、その関数が返す値を確かめましょう。 " + result.error;
+      if (ex.scopeHint && result.error.includes("ReferenceError")) return executionMessage(result) + " " + ex.scopeHint;
+      return executionMessage(result);
+    }
     if (index === 0) showCodeOutput(host, result, ex.sign);
     const problem = scoreProblem(ex, result, input);
     if (problem) return (index ? (ex.inputLabel || "開始点") + "を" + input + "に変えた場合も確かめましょう。 " : "") + problem;
@@ -171,6 +180,7 @@ function scoreWorkshop(lesson) {
     resetResult();
     updateUnit(id, { js: code, note: "" });
   }));
+  if (ex.calls) content.append(details("続けて実行する確認用コード", node("pre", ex.calls)));
   if (ex.variableStart) actions.append(label);
   actions.append(run, stop);
   content.append(actions, message, output, details("ヒント", node("p", ex.hint)),

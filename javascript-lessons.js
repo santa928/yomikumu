@@ -93,4 +93,5 @@ const javascriptLessons = [
     },
   },
   ...javascriptChoiceLessons,
+  ...javascriptFunctionLessons,
 ];
