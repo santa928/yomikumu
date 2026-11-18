@@ -35,6 +35,33 @@ const pathCourses = {
     feedback: ["そうです。同じ余白をTailwindで付けて、二つの結果を見比べます。", "margin は紙の外側を空けます。内側を変える例を試してみましょう。"],
     review: ["CSSの余白を試す", "#padding/1"],
   },
+  typescript: {
+    title: "TypeScript", page: "typescript/index.html", catalog: "typescript/index.html", start: "typescript/index.html#infer/slide",
+    project: "得点と問題の形を決めたクイズ。入力ミスを見つけた行に戻り、直してから実行します。",
+    first: "JavaScriptで数や問題を扱ったら、得点に入れた値を一か所変えてみます。",
+    question: "1点に2点を足したいとき、最初に用意する値はどちら？",
+    choices: ["数の1", "文字の「1」"], correct: 0,
+    feedback: ["そうです。型を決めておくと文字との取り違えを実行前に発見できます。", "文字は題名に使えます。得点は数として足します。"],
+    review: ["JavaScriptで数と文字を比べる", "#js-console/1"],
+  },
+  "python-practice": {
+    title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo", start: "python/index.html#59/1/slide",
+    project: "読書記録から欲しいものを選んで集計します。順に読む処理や、読んだ後に資源を閉じる処理へ進めます。",
+    first: "基礎でリストを順に読んだら、まず読書時間を分から時間に変えます。",
+    question: "30分と60分をどちらも時間に変えると、記録は何件になりますか。",
+    choices: ["1件", "2件"], correct: 1,
+    feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。最初の練習でそれぞれを変換してみましょう。"],
+    review: ["Pythonのリストを読み直す", "python/index.html#56/1/slide"],
+  },
+  react: {
+    title: "React", page: "react/index.html", catalog: "react/index.html", start: "react/index.html#components",
+    project: "同じ作品カードを二か所で使う小さな展示。作品ごとの見出しと紹介文を渡して表示します。",
+    first: "関数を呼んで値を渡せるようになったら、最初のカードの作品名を一か所だけ変えます。",
+    question: "二つの作品に同じ形のカードを使うとき、作品ごとに渡すものは？",
+    choices: ["表示する作品名と紹介文", "ページの枠線を引く手順のコピー"], correct: 0,
+    feedback: ["そうです。一つの部品に違う原稿を渡して確かめましょう。", "同じ構造は部品にまとめられます。それぞれの原稿を分けて渡しましょう。"],
+    review: ["関数に値を渡す練習", "#javascript"],
+  },
   dom: {
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
     project: "作品クイズに得点と再挑戦を付けます。ヒントを閉じるとキーボードで回答の続きへ戻れます。",
@@ -124,13 +151,14 @@ function learningPaths(part) {
   nav.children[web ? 1 : python ? 2 : 0].setAttribute("aria-current", "page");
   if (web) {
     heading("Web制作", "自分の作品をページにしよう", "最初はHTMLで作品名を書きます。スマホではスライドを読んでタップで組み、PCではコードを書いて結果を見られます。");
-    for (const course of ["html", "javascript", "dom", "tailwind"]) {
+    for (const course of ["html", "javascript", "dom", "typescript", "react", "tailwind"]) {
       if (pathCourses[course]) content.append(courseEntry(course, saved.positions));
     }
     content.append(details("この先で作るもの", node("p", "JavaScriptの次はTypeScriptで問題の型を決め、Reactでクイズ画面を作り、Next.jsで複数ページのサイトにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
   } else if (python) {
     heading("Python", "読書の記録を集計しよう", "Web制作の経験は必要ありません。最初はPythonで一行の文字を表示し、次に入力した名前で表示を変えます。");
     content.append(courseEntry("python", saved.positions));
+    content.append(courseEntry("python-practice", saved.positions));
     content.append(details("基礎の後に選べること", node("p", "Python実践では記録を一件ずつ加工します。Python OOPでは本ごとに別々の状態を持つ貸出の仕組みを作ります。")));
   } else {
     heading("学習パス", "作りたいものから始めよう", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");

@@ -45,6 +45,8 @@ services:
       - ./python:/usr/share/nginx/html/python:ro
       - ./dom:/usr/share/nginx/html/dom:ro
       - ./tailwind:/usr/share/nginx/html/tailwind:ro
+      - ./typescript:/usr/share/nginx/html/typescript:ro
+      - ./react:/usr/share/nginx/html/react:ro
   test:
     profiles: ["test"]
     build: ./tests
