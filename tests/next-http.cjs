@@ -9,7 +9,7 @@ const { chromium } = require("playwright");
   const folder = process.env.NEXT_TEST_KIT;
   if (!folder || (await fs.readFile(path.join(folder, ".yomikumu-test-scratch"), "utf8")) !== "temporary test copy")
     throw Error("教材から書き出したテスト専用コピーを指定してください。");
-  const base = process.env.BOOK_URL || "http://127.0.0.1:3000";
+  const base = process.env.BOOK_URL || "http://localhost:3000";
   const { routeChecks } = await import(pathToFileURL(path.join(folder, "check/routes.mjs")).href);
   const browser = await chromium.launch();
   try {
@@ -33,6 +33,7 @@ const { chromium } = require("playwright");
       dynamic: 'import MissingBook from "../../not-found";import {books} from "../../../library/books";export default async function Book(p){const {id}=await p.params;for(const b of books)if(b.id===id)return <h1>{b.title}</h1>;return <MissingBook/>;}',
     };
     for (const lesson of lessons) {
+      if (process.env.NEXT_CHECK_STEP && lesson.id !== process.env.NEXT_CHECK_STEP) continue;
       const filename = path.join(folder, lesson.file);
       const original = await fs.readFile(filename, "utf8");
       assert.equal(original, lesson.answer, "画面から書き出した答えを検査します");

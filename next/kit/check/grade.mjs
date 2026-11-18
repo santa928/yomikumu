@@ -10,7 +10,7 @@ if (!Object.hasOwn(suites, step)) {
   process.exit(2);
 }
 const exercise = suites[step];
-const base = process.env.BOOK_URL || "http://127.0.0.1:3000";
+const base = process.env.BOOK_URL || "http://localhost:3000";
 const sourceDir = process.env.SOURCE_DIR || "/source";
 const reportDir = process.env.REPORT_DIR || "/reports";
 const source = await readFile(join(sourceDir, exercise.file), "utf8");
