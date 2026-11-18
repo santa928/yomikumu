@@ -146,6 +146,7 @@ function renderFiles(place, files = {}, editable) {
 }
 function showExercise(demo) {
   $("task-heading").textContent = demo ? "完成例を動かす" : view === "guide" ? "見本を一か所変える" : "自分で解く";
+  $("input-note").textContent = chapter.engine === "cpython" ? "この章は端末内のCPythonで実行します。入力は実行前に一行ずつ用意してください。最初の実行時にこの章用の実行ファイルを読み込みます。" : "足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。";
   $("input").value = draft.input ?? (demo ? task.input : task.cases[0].input) ?? "";
   $("source").labels[0].textContent = (task.targetFile || "main.py") + " のコード";
   const companion = task.targetFile ? { "main.py": task.main } : task.files;
@@ -235,7 +236,7 @@ async function execute(grade) {
   let matches = 0;
   for (const test of cases) {
     $("status").textContent = grade ? "採点中　" + test.label : "実行中…";
-    execution = runPython({ source, files, before: test.before || "", observe: test.observe, afterError: test.afterError, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
+    execution = runPython({ engine: chapter.engine, source, files, before: test.before || "", observe: test.observe, afterError: test.afterError, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
       $("output").textContent = output;
       $("status").textContent = "入力を待っています。";
       $("waiting").hidden = false; $("line").value = ""; $("line").focus();
