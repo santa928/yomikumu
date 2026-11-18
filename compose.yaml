@@ -39,6 +39,10 @@ services:
       - ./progress.js:/usr/share/nginx/html/progress.js:ro
       - ./grading.js:/usr/share/nginx/html/grading.js:ro
       - ./workbook.js:/usr/share/nginx/html/workbook.js:ro
+      - ./path-location.js:/usr/share/nginx/html/path-location.js:ro
+      - ./path-progress.js:/usr/share/nginx/html/path-progress.js:ro
+      - ./learning-paths.js:/usr/share/nginx/html/learning-paths.js:ro
+      - ./python:/usr/share/nginx/html/python:ro
   test:
     profiles: ["test"]
     build: ./tests

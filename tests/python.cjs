@@ -98,6 +98,6 @@ module.exports = { verifyPython };
 if (require.main === module) {
   (async () => {
     const browser = await chromium.launch({ args: ["--no-sandbox"] });
-    try { await verifyPython(browser, undefined, process.argv[2]); } finally { await browser.close(); }
+    try { await verifyPython(browser, process.env.PYTHON_URL, process.argv[2]); } finally { await browser.close(); }
   })().catch(error => { console.error(error); process.exitCode = 1; });
 }

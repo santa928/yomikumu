@@ -56,6 +56,7 @@ function unitRoute(id, part = 1) {
 }
 
 function navFor(active) {
+  nav.classList.remove("path-nav");
   const isJs = active === "javascript" || javascriptLessons.some(l => l.id === active);
   document.querySelector(".mast span").textContent = isJs ? "JavaScript 入門" : "HTML / CSS 入門";
   const group = node("details", undefined, "chapter-menu");
@@ -81,11 +82,14 @@ function transfer() {
   const controls = node("div", undefined, "transfer");
   const status = statusMessage();
   const exportButton = button("進捗を書き出す", () => {
-    downloadFile(
-      "yomikumu-progress.json",
-      JSON.stringify(readProgress(), null, 2),
-      "application/json",
-    );
+    try {
+      downloadFile("yomikumu-progress.json",
+        JSON.stringify({ ...readProgress(), paths: savedPath(), courses: exportStores() }, null, 2),
+        "application/json");
+    } catch {
+      status.textContent = "端末のコース記録を読めず、書き出せませんでした。";
+      return;
+    }
     status.textContent = "進捗と下書きをファイルに書き出しました。";
   });
   const label = node("label", "別の端末の進捗を読み込む");
@@ -100,19 +104,34 @@ function transfer() {
     const file = input.files[0];
     if (!file) return;
     try {
-      const incoming = validatedProgress(JSON.parse(await file.text()));
-      const count = Object.keys(incoming.units).length;
+      const data = JSON.parse(await file.text());
+      const incoming = validatedProgress(data);
+      const paths = data.paths === undefined ? null : YomikumuPaths.validate(data.paths);
+      const stores = validatedStores(data.courses ?? {});
+      const count = Object.keys(incoming.units).length +
+        Object.entries(stores).reduce((total, [course, record]) =>
+          total + Object.keys(record[courseStores[course].groups[0]]).length, 0);
       status.textContent =
         count +
         "件の記録があります。読み込むと、この端末の同じ単元はファイルの記録に置き換わります。";
       confirm.append(
         button("この記録を読み込む", () => {
           const local = readProgress();
+          try { restoreStores(stores); }
+          catch {
+            status.textContent = "進捗を保存できませんでした。この端末の空き容量と保存設定を確認してください。";
+            return;
+          }
           writeProgress({
             ...local,
             last: incoming.last || local.last,
             units: { ...local.units, ...incoming.units },
           });
+          if (paths) YomikumuPaths.restore(paths);
+          else if (incoming.last) {
+            const js = javascriptLessons.some(unit => unit.id === incoming.last.split("/")[0]);
+            YomikumuPaths.remember(js ? "javascript" : "html", incoming.last);
+          }
           render();
           const result = document.getElementById("transfer-status");
           result.closest("details").open = true;
@@ -140,11 +159,12 @@ function home(isJs = false) {
       "作品名をひとつ書くところから始めます。最後は自分の作品を並べ、完成したページを持ち出せます。",
   );
   const state = readProgress();
-  const resume = state.last && (!isJs || units.some(l => l.id === state.last.split("/")[0]));
+  const course = isJs ? "javascript" : "html";
+  const resume = savedPath().positions[course];
   content.append(
     link(
       resume ? "前回の続きへ →" : "最初のスライドへ →",
-      resume ? state.last : unitRoute(units[0].id),
+      resume || unitRoute(units[0].id),
       "next",
     ),
   );
@@ -645,7 +665,8 @@ function render() {
   else if (["quiz", "write", "type", "build"].includes(origin))
     revisit = { lesson: id, route: unitRoute(id, origin) };
   const lesson = allLessons.find((item) => item.id === id);
-  navFor(id);
+  const pathPage = id === "paths" || id === "";
+  if (!pathPage) navFor(id);
   if (lesson) {
     const valid =
       raw === "quiz" ||
@@ -664,13 +685,17 @@ function render() {
   } else if (id === "studio") {
     currentRoute = raw === "edit" ? "studio/edit" : "studio";
     workshop(null);
+  } else if (pathPage) {
+    currentRoute = "paths";
+    learningPaths(raw);
   } else {
     currentRoute = id === "javascript" ? "javascript" : "home";
     home(currentRoute === "javascript");
   }
-  if (currentRoute !== "home" && currentRoute !== "javascript") {
+  if (lesson || id === "studio") {
     const state = readProgress();
     state.last = revisit ? currentRoute + "/" + origin : currentRoute;
+    YomikumuPaths.remember(javascriptLessons.includes(lesson) ? "javascript" : "html", state.last);
     writeProgress(state);
   }
 }

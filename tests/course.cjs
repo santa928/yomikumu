@@ -12,6 +12,8 @@ const { verifyCounters } = require("./counters.cjs");
 const { verifyCards } = require("./cards.cjs");
 const { verifyTransforms } = require("./transforms.cjs");
 const { verifyModules } = require("./modules.cjs");
+const { verifyPaths } = require("./paths.cjs");
+const { verifyPython } = require("./python.cjs");
 const base = process.env.COURSE_URL || pathToFileURL(path.resolve(__dirname, "../index.html")).href;
 
 async function run() {
@@ -583,7 +585,7 @@ async function run() {
     const original = await (await progressFile).path();
     const phone = await browser.newPage({ viewport: { width: 375, height: 812 } });
     phone.on("pageerror", (err) => errors.push(err.message));
-    await phone.goto(base);
+    await phone.goto(base + "#home");
     await phone.getByText("進捗と下書きの引き継ぎ", { exact: true }).click();
     const upload = phone.locator('input[type="file"]');
     await upload.setInputFiles({
@@ -700,6 +702,8 @@ async function run() {
     await verifyCards(browser, base);
     await verifyTransforms(browser, base);
     await verifyModules(browser, base);
+    await verifyPaths(browser, base);
+    await verifyPython(browser, new URL("python/index.html", base).href);
     console.log(
       expectedIds.length + "単元のスライド・四択・記述・組み立て、ページ内移動、下書き復帰、部分正解と別解、卒業制作、書き出しと引き継ぎが通りました。",
     );
