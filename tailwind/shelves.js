@@ -1,8 +1,8 @@
 "use strict";
 
 readingChapters.push({
-  title: "幅で並びを変え、共通の色で読書棚を作る",
-  intro: "二冊の紹介を開き、細い棚と広い棚で位置を比べましょう。最後に自分の二冊をパソコンでビルドして開きます。",
+  title: "画面幅に合わせてカードを並べ、文字色をそろえる",
+  intro: "見本の幅を切り替え、2枚のカードが縦並びから横並びに変わるところを確かめます。最後は作ったページを保存し、PCのブラウザで開きます。",
   sample: "shelf/index.html", widths: true
 });
 partLabels.theme = "テーマ";
@@ -12,34 +12,34 @@ const plum = "@theme { --color-river: #613e57; }";
 const dusk = "@theme { --color-dusk: #613e57; }";
 const shelfSteps = [
   {
-    id: "column", title: "狭い棚で二冊を上から読む",
+    id: "column", title: "画面が狭いときにカードを縦に並べる",
     why: "幅が小さいとき、横並びでは紹介文の折り返しが増えます。flex は並べる仕組み。flex-col を足すと並ぶ方向が縦になります。",
     example: { part: "shelf", before: "flex", after: "flex flex-col" },
     result: "二冊目が一冊目の下に来ます。上から順に読めます。",
-    prompt: "小さな棚では flex を使って二冊を縦一列にし、カード間を 0.5rem 空けてください。",
+    prompt: "flex を使って2枚のカードを縦一列に並べ、間を 0.5rem 空けてください。",
     fields: [{ part: "shelf", solution: "flex flex-col gap-2", options: ["gap-4", "flex", "flex-row", "gap-2", "flex-col"] }],
     checks: [
       { part: "shelf", properties: ["display", "flexDirection"], hint: "二冊を包む親を flex の縦並びにします。" },
       { part: "shelf", properties: ["rowGap"], hint: "二冊の間を 0.5rem 空けましょう。" }
     ],
-    quiz: ["flex の棚に flex-col を足すと、二冊目はどこへ？", ["一冊目の上", "一冊目の下", "画面の右外", "同じ位置"], 1, "col は column、上から下に並ぶ方向です。"]
+    quiz: ["2枚を囲む要素の class が flex のとき、flex-col を足すと2枚目はどこに表示されますか？", ["一冊目の上", "一冊目の下", "画面の右外", "同じ位置"], 1, "col は column、上から下に並ぶ方向です。"]
   },
   {
-    id: "wide", title: "広いときだけ棚を横並びにする",
-    why: "狭い棚の縦並びを残し、入る幅になったら横にします。flex-row は横並び。sm: は幅が 40rem（この設定で640px）以上の場合だけ後ろの指定を効かせる印です。",
+    id: "wide", title: "640px以上の画面でカードを横に並べる",
+    why: "基本の並びを flex-col で縦にします。sm:flex-row を加えると、画面幅が 40rem（この見本では640px）以上のときだけ横並びになります。",
     example: { part: "shelf", before: "flex flex-col", after: "flex flex-col sm:flex-row", width: 680 },
     result: "広い見本の二冊は横に移ります。「狭い幅」を押すと元の縦並びを確認できます。",
-    prompt: "この棚は通常は縦一列にし、640pxに達したところから横一列に切り替えてください。",
+    prompt: "2枚のカードを、画面幅が640px未満なら縦一列、640px以上なら横一列に並べてください。",
     fields: [{ part: "shelf", solution: "flex flex-col sm:flex-row", options: ["sm:flex-col", "flex-col", "flex", "sm:flex-row", "flex-row"] }],
     checks: [
       { part: "shelf", width: 639, properties: ["display", "flexDirection"], hint: "639pxでは縦一列になるように、基本の向きを決めます。" },
       { part: "shelf", width: 640, properties: ["display", "flexDirection"], hint: "640pxになったら横一列になる条件を足します。" }
     ], widths: true,
-    quiz: ["sm:flex-row を付けた棚を幅639pxで開くと？", ["条件付きの横並びになる", "すべて消える", "sm: の指定前の向きで並ぶ", "文字が大きくなる"], 2, "sm: が効き始めるのは、この設定では640pxからです。"]
+    quiz: ["flex flex-col sm:flex-row を指定した一覧を、幅639pxで開くと？", ["条件付きの横並びになる", "すべて消える", "縦一列に並ぶ", "文字が大きくなる"], 2, "sm: が効き始めるのは、この設定では640pxからです。"]
   },
   {
-    id: "name-color", title: "文庫の色に名前を付ける",
-    why: "何枚もの紙に同じ色を使うときは、色を一か所で名付けます。@theme の中の --color-river は river という色の定義です。text-river で、その色を文字に呼び出せます。# で始まる六桁は色の番号です。",
+    id: "name-color", title: "2枚のカードの文字色を一か所で決める",
+    why: "複数のカードで同じ文字色を使うなら、一か所で色を定義して共有できます。@theme の中の --color-river は river という色の定義です。text-river で、その色を文字に指定できます。ここでは # に続く6桁で色を指定します。",
     base: { card: "text-river", other: "text-river" },
     example: { part: "theme", before: river, after: plum },
     result: "定義一か所の変更で、同じ text-river を使った二冊とも緑からすもも色に変わります。",
@@ -69,7 +69,7 @@ const shelfSteps = [
     id: "local-shelf", title: "自分の読書棚をビルドして開く",
     why: "ブラウザに渡すのは完成したCSSです。CLI はコマンドで道具を動かす方法。ここではビルド（HTMLから必要なCSSを生成）を npm run build という名前でまとめています。最後に手元の index.html を開くと、ブラウザが隣の shelf.css を読みます。",
     example: { part: "shelf", before: "flex flex-col gap-4", after: "flex flex-col gap-4 sm:flex-row", width: 680, base: { card: "text-dusk", other: "text-dusk", theme: dusk } },
-    result: "仕上がった棚が、640px以上で横に並びます。二冊の文字色は同じです。",
+    result: "画面幅が640px以上になると、2枚のカードが横一列に並びます。二冊の文字色は同じです。",
     prompt: "夕暮れ文庫の二冊を、640px未満は縦、640px以上は横にして、間を 1rem 空けます。#613e57 に名前を付けて両方の文字色に使ってください。PCでは続けてファイルを持ち帰り、手元で生成します。",
     fields: [
       { part: "shelf", solution: "flex flex-col gap-4 sm:flex-row", options: ["flex", "flex-col", "sm:flex-col", "gap-4", "sm:flex-row", "gap-2"] },

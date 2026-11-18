@@ -53,9 +53,9 @@
     </section>
     <section id="console" hidden>
       <h2>実行して確かめる</h2>
-      <label for="input">事前入力（1行に1件）</label><textarea id="input" rows="2" spellcheck="false"></textarea>
-      <p class="note" id="input-note">足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。</p>
-      <div class="actions"><button id="run" type="button">練習実行</button><button id="stop" type="button" disabled>停止</button><button id="grade" type="button">別の条件でも採点</button></div>
+      <label for="input">コードに渡す入力（1行に1件）</label><textarea id="input" rows="2" spellcheck="false"></textarea>
+      <p class="note" id="input-note">入力が足りないときは、実行が一時停止します。次の行を入力して「一行を渡す」を押してください。空欄のまま押すと空の行を渡せます。</p>
+      <div class="actions"><button id="run" type="button">コードを実行</button><button id="stop" type="button" disabled>停止</button><button id="grade" type="button">別の条件でも採点</button></div>
       <form id="waiting" hidden><label for="line">入力待ち・次の一行</label><input id="line" autocomplete="off"><button>一行を渡す</button></form>
       <p id="status" role="status"></p><h3>実際の出力</h3><pre id="output"></pre>
       <div id="checks"></div>

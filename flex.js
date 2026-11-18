@@ -13,17 +13,17 @@ const guideCss = '.guide { display: flex; gap: 12px; }\n.guide a[aria-current="l
 
 const flexLessons = [
   {
-    id: "flex-parent", title: "並べたい案内を一緒に囲む", topic: "Flexbox",
-    goal: "二枚の札の外側を選び、札の並ぶ方向を変える。",
+    id: "flex-parent", title: "二つの要素を縦に並べる", topic: "Flexbox",
+    goal: "「入口」と「展示室」を囲む要素にCSSを指定して、二つの表示を縦に並べる。",
     slides: [
       {
-        title: "横の二枚を縦に積んでみよう",
-        body: "見本の「縦に積む」を押してください。変えたのは、二枚を一緒に囲む .bar のルールです。Flexbox は箱の中身を一方向に並べる仕組み。外側に display: flex を付けると、そのすぐ内側の二枚が並べる相手になります。",
+        title: "横並びの「入口」と「展示室」を縦に並べる",
+        body: "見本の「縦に積む」を押してください。Flexboxは、親要素の中で子要素を横や縦に並べる仕組みです。この例では .bar が親で、「入口」と「展示室」の span が子です。.bar の並べる向きを変えると、二つの表示が縦に並びます。",
         html: deskRow, css: flexBar, tryCss: { label: "縦に積む", css: flexBar + "\n.bar { flex-direction: column; }" },
       },
       {
         title: "親と子で変わる場所が違う",
-        body: "親とは札を囲む箱で、子はそのすぐ中の札です。下では子の span にだけ flex を付けました。これだと、それぞれの札は自分の中の文字を並べます。二枚の札を並べるには、両方を持っている親に指定します。",
+        body: "下の例では span に display: flex を指定しています。これで変わるのは各 span の内側の配置です。二つの span の並びを変えるには、両方を囲む .bar に指定します。",
         html: deskRow, css: barFrame + "\n.bar span { display: flex; }",
       },
       {
@@ -33,35 +33,35 @@ const flexLessons = [
       },
     ],
     quiz: {
-      prompt: "二枚の札自体を縦に並べたいとき、display: flex と flex-direction: column を書く相手は？",
-      options: ["一枚目の span", "二枚を囲む .bar", "二枚目の文字だけ", "札の文字色"], correct: 1,
-      reasons: ["一枚目の中身しか並べられません。", "二枚を子に持つ箱が、子の並びを決めます。", "二枚目だけでは一枚目との並びを変えられません。", "文字の色は並びを決めません。"],
+      prompt: "二つの span を縦に並べるには、どの要素に display: flex と flex-direction: column を指定しますか？",
+      options: ["一つ目の span", "二つの span を囲む .bar", "二枚目の文字だけ", "札の文字色"], correct: 1,
+      reasons: ["一枚目の中身しか並べられません。", ".bar に指定すると、二つの span の並びが変わります。", "二枚目だけでは一枚目との並びを変えられません。", "文字の色は並びを決めません。"],
     },
     exercise: {
       field: "css", html: deskRow, css: barFrame,
-      task: "入口と展示室の札を、.bar の中で上から順に縦に積んでください。親をFlexboxにします。",
+      task: "親要素の .bar にFlexboxを指定し、「入口」の下に「展示室」を表示してください。",
       hint: ".bar に display: flex を付け、同じ場所で flex-direction を column にします。",
       answer: flexBar + "\n.bar { flex-direction: column; }",
       build: { code: barFrame + "\n① { display: flex; flex-direction: ②; }", slots: [["二枚を囲む親", ".bar", ".bar span"], ["並ぶ向き", "row", "column"]] }, review: 2,
     },
   },
   {
-    id: "along-axis", title: "余った場所を二つの札の間に配る", topic: "Flexbox",
-    goal: "主軸に沿って余りを配り、両端に札を置く。",
+    id: "along-axis", title: "二つの項目を両端に配置する", topic: "Flexbox",
+    goal: "「入口」と「展示室」を横並びの両端に置く。",
     slides: [
       {
         title: "左右の端に案内を置く",
-        body: "横並びの札を左端と右端に分けたいとき、親に justify-content: space-between を付けます。両端はそのまま、余った場所が札と札の間に入ります。",
+        body: "親要素に justify-content: space-between を指定すると、「入口」は左端、「展示室」は右端に移ります。二つの間には、横幅の余った分だけ空きができます。",
         html: deskRow, before: flexBar, css: flexBar + "\n.bar { justify-content: space-between; }",
       },
       {
-        title: "縦にするとどこの余りを配る？",
-        body: "同じ space-between でも、column では主軸は上から下です。ここでは箱の高さを100pxにして余りを作ったので、一枚目は上端、二枚目は下端に置かれます。",
+        title: "縦並びでは上端と下端に分かれる",
+        body: "同じ space-between でも、column では主軸は上から下です。ここでは親要素の高さが100pxあるので、一枚目は上端、二枚目は下端に置かれます。",
         html: deskRow, css: flexBar + "\n.bar { height: 100px; flex-direction: column; justify-content: space-between; }",
       },
     ],
     quiz: {
-      prompt: "背の高い箱で並ぶ向きが column。justify-content: space-between は二枚をどこに置きますか？",
+      prompt: "高さに余裕がある親要素に flex-direction: column を指定しました。justify-content: space-between は二枚をどこに置きますか？",
       options: ["左端と右端", "両方とも中央", "上端と下端", "同じ場所に重ねる"], correct: 2,
       reasons: ["これは横に並べた場合です。", "中央寄せは center です。", "主軸の向きが縦なので、上下へ分かれます。", "間の余白を作って離します。"],
     },
@@ -74,11 +74,11 @@ const flexLessons = [
     },
   },
   {
-    id: "across-axis", title: "横並びの札を高さの中央にそろえる", topic: "Flexbox",
-    goal: "並ぶ向きと直角の向きを見つけ、札の高さが違っても中心をそろえる。",
+    id: "across-axis", title: "高さが違う二つの要素を上下の中央にそろえる", topic: "Flexbox",
+    goal: "「入口」と「展示室」の文字の大きさが違っても、二つの枠の中心が同じ高さに来るようにする。",
     slides: [
       {
-        title: "横並びの、上下だけをそろえる",
+        title: "横並びのまま上下の中央にそろえる",
         body: "横に並べた列で上下をそろえる向きは、主軸と直角です。この向きを交差軸と呼びます。align-items: center を親に付けると、文字サイズの違う札が同じ高さの中心でそろいます。",
         html: deskRow, before: flexBar + "\n.bar { height: 80px; align-items: flex-start; }\n.bar span:first-child { font-size: 24px; }",
         css: flexBar + "\n.bar { height: 80px; align-items: center; }\n.bar span:first-child { font-size: 24px; }",
@@ -90,13 +90,13 @@ const flexLessons = [
       },
     ],
     quiz: {
-      prompt: "主軸が縦の箱で、札を左右の中央にそろえる指定は？",
+      prompt: "縦並びの親要素で、札を左右の中央にそろえる指定は？",
       options: ["align-items: center", "justify-content: space-between", "color: navy", "gap: 0"], correct: 0,
       reasons: ["縦に並べると交差軸は横です。", "この場合は上下の端へ配ります。", "色の指定です。", "間隔と、横のどこにそろえるかは別です。"],
     },
     exercise: {
       field: "css", html: deskRow, css: flexBar + "\n.bar { height: 80px; align-items: flex-start; }",
-      task: "高さ80pxの箱の中で、横に並ぶ二枚の札を上下の中央にそろえてください。札を箱いっぱいの高さに伸ばさず、上下に余りを残します。",
+      task: "高さ80pxの .bar の中で、横に並ぶ二枚の札を上下の中央にそろえてください。各項目は元の高さを保ち、上下に余りを残します。",
       hint: "align-items を親に書きます。flex-start の代わりに中央を表す値を使います。",
       answer: flexBar + "\n.bar { height: 80px; align-items: center; }",
       build: { code: flexBar + "\n.bar { height: 80px; ①: ②; }", slots: [["上下をそろえる指定", "justify-content", "align-items"], ["中央の値", "center", "flex-start"]] }, review: 0,
@@ -113,12 +113,12 @@ const flexLessons = [
       },
       {
         title: "折り返してよいと伝える",
-        body: "箱を狭くすると、すべてを一行に置くのは難しくなります。親の flex-wrap を wrap にすると、入らない作品を次の行に送れます。見本では箱を90pxに狭めています。",
+        body: "親要素の幅が狭くなると、すべての作品が一行に収まらなくなります。親の flex-wrap を wrap にすると、入らない作品を次の行に送れます。見本で指定した .row の幅は90pxです。",
         html: cardRow, css: rowFrame + "\n.row { width: 90px; gap: 8px; flex-wrap: wrap; }",
       },
       {
         title: "一枚に使いたい幅を決める",
-        body: "flex-basis は、並べるときに一枚が必要とする幅の出発点です。これは子の article に指定します。200pxの枠では、84pxの作品二枚と間8pxが収まり、三枚目は次の行になります。",
+        body: "flex-basis は、並べるときに各作品の幅を決めるときの基準です。これは子の article に指定します。200pxの枠では、84pxの作品二枚と間8pxが収まり、三枚目は次の行になります。",
         html: cardRow, css: wrappedRow,
       },
     ],
@@ -141,7 +141,7 @@ const flexLessons = [
     slides: [
       {
         title: "現在地を属性で選ぶ",
-        body: "nav は案内リンクをまとめる囲みです。今いる場所のリンクに aria-current=\"location\" と書くと、読み上げにも現在地を伝えられます。CSSの角かっこは属性で選ぶ印。下ではその値を持つリンクだけを太字にしています。",
+        body: "nav は案内リンクをまとめる囲みです。今いる場所のリンクに aria-current=\"location\" と書くと、読み上げにも現在地を伝えられます。CSSでは [属性名=値] と書くと、その属性と値を持つ要素を選べます。見本では現在地のリンクだけが太字です。",
         html: guideLinks + "\n" + guideTargets, css: guideCss,
       },
       {

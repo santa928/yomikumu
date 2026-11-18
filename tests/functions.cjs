@@ -10,7 +10,7 @@ async function verifyFunctions(browser, base) {
   const phone = await browser.newPage({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
   try {
     const cases = [
-      ["js-call", "午後のため", 'const announce = () => console.log("受付開始");\nfor(let i=0;i<2;i++) announce();', ["announce()"]],
+      ["js-call", "もう一度 announce() を呼んで", 'const announce = () => console.log("受付開始");\nfor(let i=0;i<2;i++) announce();', ["announce()"]],
       ["js-parameter", "一回目に受け取った", "function stamp(value) {console.log(2 + value);}", ["points","2"]],
       ["js-return", "return で返し", "function addBonus(value) { const result = 3 + value; return result; }", ["return","3"]],
       ["js-scope", "special は round", "function round(){const value=initialScore+4;return value}\nconst result=round();console.log(result);console.log(initialScore);", ["round()","initialScore"], 2],

@@ -21,7 +21,7 @@ function openCourse(id) {
         if (stored[key] && typeof stored[key] === "object" && !Array.isArray(stored[key])) state[key] = stored[key];
       }
     }
-  } catch { $("storage").textContent = "この環境では保存した学習を読み込めませんでした。"; }
+  } catch { $("storage").textContent = "このブラウザに保存した進捗と下書きを読み込めませんでした。"; }
 }
 function save() {
   try { localStorage.setItem(storageKey, JSON.stringify(state)); }
@@ -145,8 +145,8 @@ function renderFiles(place, files = {}, editable) {
   }
 }
 function showExercise(demo) {
-  $("task-heading").textContent = demo ? "完成例を動かす" : view === "guide" ? "見本を一か所変える" : "自分で解く";
-  $("input-note").textContent = (lesson?.engine || chapter.engine) === "cpython" ? "この章は端末内のCPythonで実行します。入力は実行前に一行ずつ用意してください。最初の実行時にこの章用の実行ファイルを読み込みます。" : "足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。";
+  $("task-heading").textContent = demo ? "完成例を動かす" : view === "guide" ? "見本のコードを直す" : "自分で解く";
+  $("input-note").textContent = (lesson?.engine || chapter.engine) === "cpython" ? "入力が必要な例では、実行前にここへ1行ずつ入力してください。初回は Python の読み込みに少し時間がかかります。" : "入力が足りないときは、実行が一時停止します。次の行を入力して「一行を渡す」を押してください。空欄のまま押すと空の行を渡せます。";
   $("input").value = draft.input ?? (demo ? task.input : task.cases[0].input) ?? "";
   $("source").labels[0].textContent = (task.targetFile || "main.py") + " のコード";
   const companion = task.targetFile ? { "main.py": task.main } : task.files;
@@ -158,7 +158,7 @@ function showExercise(demo) {
   $("driver").open = false;
   $("driver").querySelector("pre").textContent = example || "";
   $("provided").hidden = !supplied && !prefix;
-  $("provided").textContent = [supplied && "練習実行の前に用意されるコード\n" + supplied,
+  $("provided").textContent = [supplied && "実行前に用意されるコード\n" + supplied,
     prefix && task.targetFile + " の先頭に用意されるコード\n" + prefix].filter(Boolean).join("\n");
   $("source").readOnly = demo || mode === "tap";
   $("builder").hidden = demo || mode !== "tap";
@@ -172,7 +172,7 @@ function showExercise(demo) {
   if (mode === "tap") {
     const wrong = task.distractors || [lesson.code.split("\n")[0], 'print("受付")'];
     $("tap-instruction").textContent = template
-      ? (template.index === undefined ? "空欄が埋まりました。実行や採点で試しましょう。" : "空欄 " + (template.count + 1) + " / " + template.slots.length + " に入れる行を選びましょう。")
+      ? (template.index === undefined ? "空欄がすべて埋まりました。コードを実行して結果を確かめましょう。" : "空欄 " + (template.count + 1) + " / " + template.slots.length + " に入れる行を選びましょう。")
       : "行を使う順に選びます。同じ行を何度でも使えます。";
     $("undo-line").disabled = template ? template.count === 0 : !draft.tap?.length;
     $("slot-context").hidden = !template || template.index === undefined;
@@ -296,7 +296,7 @@ async function execute(grade) {
         $("checks").append(element("p", "確認した値　" + JSON.stringify(result.value) + "　期待する値　" + JSON.stringify(test.value)));
       }
       const partial = result.output && test.want.startsWith(result.output);
-      $("status").textContent = (matches || partial ? "途中までできました。 " : "もう一度試せます。 ") + (test.hint || task.hint);
+      $("status").textContent = (matches || partial ? "途中までできました。 " : "ヒントを見て直してみましょう。 ") + (test.hint || task.hint);
       break;
     }
     matches++;
@@ -307,7 +307,7 @@ async function execute(grade) {
   if (grade && matches === cases.length) {
     state.completed[route + "/" + mode] = true;
     save(); showToc();
-    $("status").textContent = "できました。すべての条件で確認できました。";
+    $("status").textContent = "すべての条件で正解です。";
   }
   $("waiting").hidden = true;
   $("stop").disabled = true; $("grade").disabled = $("run").disabled = false;

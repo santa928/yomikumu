@@ -132,7 +132,7 @@ const contactLessons = [
     slides: [
       {
         title: "見学前に使うカードを試す",
-        body: "「紙の展示室」の受付は右です。「東京国立博物館」は参考先の公式サイトを別タブで開きます。教材に戻り、「感想」を押して一言入れ、「書き直す」で消してみましょう。",
+        body: "見本の矢印は受付の方向を示しています。「東京国立博物館」を押すと公式サイトが別のタブで開きます。教材に戻ったら「感想」を押して文字を入力し、「書き直す」で消してみましょう。",
         html: '<article>\n  <h2>紙の展示室</h2>\n  ' + rightSign + '\n  <p><a href="https://www.tnm.jp/">東京国立博物館</a></p>\n  <form><label for="idea">感想</label><input id="idea">\n    <button type="reset">書き直す</button></form>\n</article>',
       },
     ],

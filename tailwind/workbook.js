@@ -217,7 +217,7 @@ function practice(unit, mode, state) {
       const missing = results.find(item => !item.ok);
       const count = results.filter(item => item.ok).length;
       if (!missing) { state[mode+"Done"] = true; save(); }
-      feedback.textContent = missing ? `${count ? count+"項目は合っています。" : ""}次の一手 · ${missing.check.hint}` :
+      feedback.textContent = missing ? `${count ? count+"項目は合っています。" : ""}${missing.check.hint}` :
         "できました。書いた指定で、読書カードが要望どおりに表示されています。";
     } catch {
       feedback.textContent = "表示を作れませんでした。見本の書き方を確認して、もう一度試してください。";

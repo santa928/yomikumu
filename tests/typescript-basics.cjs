@@ -12,7 +12,7 @@ const url = process.env.TS_URL || pathToFileURL(path.join(__dirname,"../typescri
     page.on("pageerror",e=>problems.push(e.message));
     await page.goto(url);
     assert.equal(await page.evaluate(()=>typeof window.quizCompilerGzip),"undefined");
-    await page.getByRole("button",{name:"正解3点の札を出す"}).click();
+    await page.getByRole("button",{name:"正解3点を表示"}).click();
     await page.getByText("正解 3点（string）",{exact:true}).waitFor();
     const jsx = await page.evaluate(async()=>[await transpileTSX('const el = <p>空</p>;'), await transpileTSX('const el = <p>空;')]);
     assert.match(jsx[0].code,/React\.createElement/);
@@ -61,10 +61,10 @@ const url = process.env.TS_URL || pathToFileURL(path.join(__dirname,"../typescri
     await page.goto(url+"#shape/write");
     await editor.fill(sets.shape[2][0]);
     await page.getByRole("button",{name:"実行して確かめる"}).click();
-    await page.getByText(/1項目は合っています。次の一手 · 次に「星」/).waitFor();
+    await page.getByText(/1項目は合っています。次に「星」/).waitFor();
     const phone = await browser.newPage({viewport:{width:375,height:812},isMobile:true,hasTouch:true});
     await phone.goto(url);
-    await phone.getByRole("link",{name:"得点に数の注釈を書く"}).tap();
+    await phone.getByRole("link",{name:"得点の変数に型注釈を書く"}).tap();
     await phone.getByRole("button",{name:"score に数の注釈を付ける"}).tap();
     await phone.getByRole("link",{name:"表示を予測する"}).tap();
     await phone.getByText("1",{exact:true}).tap();

@@ -30,12 +30,12 @@ async function verifyJavaScript(browser, base) {
     await sample.click();
     await pc.getByRole("button", { name: "見本を停止" }).click();
     await status.filter({ hasText: "停止しました" }).waitFor();
-    await pc.getByRole("heading", { name: "開館中" }).waitFor();
+    await pc.getByRole("heading", { name: "開館中", level: 2, exact: true }).waitFor();
     await sample.click();
-    await pc.getByRole("heading", { name: "本日は閉館" }).waitFor();
+    await pc.getByRole("heading", { name: "本日は閉館", level: 2, exact: true }).waitFor();
     const cases = [
       ["js-sign", "引用符", "showTitle('夜の展示')", ["夜の展示"]],
-      ["js-console", "人数は数", "console.log('3');\nconsole.log(1+2);\nconsole.log(!false);", ["3", "true"]],
+      ["js-console", "数として表示", "console.log('3');\nconsole.log(1+2);\nconsole.log(!false);", ["3", "true"]],
       ["js-constant", "開始点を数", "const ticket = (initialScore);\nconsole.log(ticket);\nconsole.log(ticket);", ["initialScore", "ticket"]],
       ["js-add", "数の3", "console.log(1 + initialScore + 2);", ["initialScore", "3"]],
       ["js-score", "2点増やした", "let score = initialScore;\nconsole.log(score);\nscore += 2;\nconsole.log(score);", ["initialScore", "2"]],

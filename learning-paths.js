@@ -3,7 +3,7 @@
 const pathCourses = {
   html: {
     title: "HTML / CSS", catalog: "#home", start: "#first-edit/1",
-    project: "自分の作品を二つ並べた紹介ページ。完成したらHTMLファイルとして持ち出せます。",
+    project: "作品を二つ並べた紹介ページを作ります。完成したページはHTMLファイルに保存できます。",
     first: "見出しにある「朝の港」を自分の作品名に書き換えます。",
     question: "見本に「朝の港」と表示されています。自分の作品名に変えたいのはどちら？",
     choices: ["見出しの文字", "写真の横幅"], correct: 0,
@@ -11,34 +11,34 @@ const pathCourses = {
   },
   javascript: {
     title: "JavaScript", catalog: "#javascript", start: "#js-sign/1",
-    project: "展示クイズの採点係。問題を読み、答えに合わせて点を加えます。",
-    first: "ボタンを押した後に展示の看板に出る文字を変えます。",
+    project: "クイズの答えを判定し、正解すると得点が増えるプログラムを作ります。",
+    first: "最初はボタンを押して、見出しが「開館中」から「本日は閉館」に変わる様子を見ます。",
     question: "見出しに <h2>開館中</h2> と書きました。画面で読める文字は？",
     choices: ["h2", "開館中"], correct: 1,
-    feedback: ["h2 は見出しを示す印です。二つの印の間を読んでみましょう。", "そうです。その文字をJavaScriptで切り替えます。"],
+    feedback: ["<h2> と </h2> は見出しの始まりと終わりです。その間に書かれた文字を読んでみましょう。", "そうです。その文字をJavaScriptで切り替えます。"],
     review: ["見出しを試す", "#first-edit/1"],
   },
   python: {
     title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo", start: "python/index.html#54/1/slide",
-    project: "作品展の受付係。名前と券の枚数を受け取り、券を足した結果を二行で表示します。",
-    first: "最初の一行で、看板に出る「入口」の文字を変えます。",
-    question: "受付で名前を一人ずつ受け取ります。毎回変わるのはどちら？",
-    choices: ["来た人の名前", "名前を受け取る手順"], correct: 0,
-    feedback: ["そうです。同じ手順に違う名前を渡して結果を試せます。", "手順は何度も使えます。変わるのは、そのとき来た人の名前です。"],
+    project: "入力した名前を表示したり、入力した数に1を足したりしながら、Pythonの書き方を学びます。",
+    first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
+    question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
+    choices: ["ゆき", "名前"], correct: 0,
+    feedback: ["そうです。「ゆき」と表示されます。「はる」と入力すれば、表示も「はる」に変わります。", "表示されるのは入力した文字です。今回は「ゆき」と入力しました。"],
   },
   tailwind: {
     title: "Tailwind CSS", page: "tailwind/index.html", catalog: "tailwind/index.html", start: "tailwind/index.html#padding/slide",
-    project: "余白と文字をそろえた読書カード。しおりを押せる本と貸出中の本を見分けます。",
-    first: "CSSの余白を指定した経験があれば選べます。最初は class の p-2 を変え、紙の端と文字の間を広げます。",
-    question: "カードの文字と紙の端の間を空けるCSSの指定はどちら？",
+    project: "本の紹介カードを並べ、余白や文字の大きさをそろえます。貸出中の本はボタンを押せないことが見た目でも分かるようにします。",
+    first: "CSSで余白を指定した経験があれば始められます。最初はカードの class を変え、端と文字の間を広げます。",
+    question: "カードの内側に余白をつけるCSSの指定はどちら？",
     choices: ["padding", "margin"], correct: 0,
-    feedback: ["そうです。同じ余白をTailwindで付けて、二つの結果を見比べます。", "margin は紙の外側を空けます。内側を変える例を試してみましょう。"],
+    feedback: ["そうです。同じ余白をTailwindで付けて、二つの結果を見比べます。", "margin はカードの外側の余白を指定します。文字とカードの端を離すには padding を使います。"],
     review: ["CSSの余白を試す", "#padding/1"],
   },
   typescript: {
     title: "TypeScript", page: "typescript/index.html", catalog: "typescript/index.html", start: "typescript/index.html#infer/slide",
-    project: "得点と問題の形を決めたクイズ。入力ミスを見つけた行に戻り、直してから実行します。",
-    first: "JavaScriptで数や問題を扱ったら、得点に入れた値を一か所変えてみます。",
+    project: "クイズの得点に数値を使うと決めておくと、文字を代入した行にエラーが表示されます。その行を直してから実行します。",
+    first: "JavaScriptの変数を使ったことがあれば、まず得点に代入する値を、文字列から数値に変えてみましょう。",
     question: "1点に2点を足したいとき、最初に用意する値はどちら？",
     choices: ["数の1", "文字の「1」"], correct: 0,
     feedback: ["そうです。型を決めておくと文字との取り違えを実行前に発見できます。", "文字は題名に使えます。得点は数として足します。"],
@@ -46,8 +46,8 @@ const pathCourses = {
   },
   "python-oop": {
     title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo", start: "python/index.html#63/1/slide",
-    project: "本ごとに読んだページを記録します。最後は処理に実行記録を添え、失敗した後にやり直せる仕組みを作ります。",
-    first: "一冊の本を作り、その本が覚えているページ数を表示します。",
+    project: "本ごとに読んだページ数を記録します。最後は、関数を呼ぶたびに成功か失敗かを記録する処理を作ります。",
+    first: "最初は Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
     choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
     feedback: ["そうです。一冊ごとに別の値を持たせる方法を試します。", "表示の手順は共通です。今どこまで読んだかは本ごとに違います。"],
@@ -55,8 +55,8 @@ const pathCourses = {
   },
   "python-practice": {
     title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo", start: "python/index.html#59/1/slide",
-    project: "読書記録から欲しいものを選んで集計します。順に読む処理や、読んだ後に資源を閉じる処理へ進めます。",
-    first: "基礎でリストを順に読んだら、まず読書時間を分から時間に変えます。",
+    project: "読書時間の記録を1件ずつ調べ、60分以上の分だけを合計するプログラムを作ります。",
+    first: "リストの値を順に取り出せたら、まずは30分を0.5時間に、60分を1時間に変換してみましょう。",
     question: "30分と60分をどちらも時間に変えると、記録は何件になりますか。",
     choices: ["1件", "2件"], correct: 1,
     feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。最初の練習でそれぞれを変換してみましょう。"],
@@ -64,7 +64,7 @@ const pathCourses = {
   },
   react: {
     title: "React", page: "react/index.html", catalog: "react/index.html", start: "react/index.html#components",
-    project: "同じ作品カードを二か所で使う小さな展示。作品ごとの見出しと紹介文を渡して表示します。",
+    project: "作品名と紹介文を変えるだけで、同じレイアウトのカードを何枚も表示できるようにします。",
     first: "関数を呼んで値を渡せるようになったら、最初のカードの作品名を一か所だけ変えます。",
     question: "二つの作品に同じ形のカードを使うとき、作品ごとに渡すものは？",
     choices: ["表示する作品名と紹介文", "ページの枠線を引く手順のコピー"], correct: 0,
@@ -73,16 +73,16 @@ const pathCourses = {
   },
   next: {
     title: "Next.js", page: "next/index.html", catalog: "next/index.html", start: "next/index.html#routes",
-    project: "図書室の一覧と、本ごとに住所がある詳細ページ。PCのDockerでサーバーを動かして、URLによって変わる応答を調べます。",
-    first: "Reactの部品と型を試したら、最初は一つの住所に出る見出しの文字を変えます。スマホでは見本と組み立てから始められます。",
+    project: "本の一覧から1冊を選ぶと、その本の詳細ページが開くサイトを作ります。PCではDockerでサーバーを起動して試せます。",
+    first: "Reactで画面を作ったことがあれば、まず /notice を開いたときの見出しを変えてみましょう。スマホでは見本を読んでコードを組み立てられます。",
     question: "二冊の本のうち特定の一冊を友達に案内するとき、どちらを送ると直接開ける？",
     choices: ["その本のURL", "カードの背景色"], correct: 0,
-    feedback: ["そうです。ブラウザがその住所を要求すると、本のページが届きます。", "背景色を送っても開く場所は決まりません。ページの住所を試しましょう。"],
+    feedback: ["そうです。そのURLを開くと、本の一覧を経由せずに詳細を読めます。", "背景色は見た目の指定です。本の詳細を開くには、そのページのURLを使います。"],
     review: ["Reactの作品カードを試す", "react/index.html#components"],
   },
   dom: {
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
-    project: "作品クイズに得点と再挑戦を付けます。ヒントを閉じるとキーボードで回答の続きへ戻れます。",
+    project: "クイズに回答すると得点が変わり、間違えた問題にもう一度答えられる画面を作ります。",
     first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
     question: "二つの一覧に同じ li があります。作品クイズの行だけを探すとき、先に選ぶのは？",
     choices: ["ページ全体", "作品クイズの一覧"], correct: 1,
@@ -174,18 +174,18 @@ function learningPaths(part) {
     }
     content.append(details("この先で作るもの", node("p", "JavaScriptの次はTypeScriptで問題の型を決め、Reactでクイズ画面を作り、Next.jsで複数ページのサイトにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
   } else if (python) {
-    heading("Python", "読書の記録を集計しよう", "Web制作の経験は必要ありません。最初はPythonで一行の文字を表示し、次に入力した名前で表示を変えます。");
+    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から始められます。リストや関数を使える人は「Python実践」や「Python OOP」も選べます。");
     content.append(courseEntry("python", saved.positions));
     content.append(courseEntry("python-practice", saved.positions));
     content.append(courseEntry("python-oop", saved.positions));
-    content.append(details("基礎の後に選べること", node("p", "Python実践では記録を一件ずつ加工します。Python OOPでは本ごとに別々の状態を持つ貸出の仕組みを作ります。")));
+    content.append(details("基礎の後に選べること", node("p", "読書時間の集計を練習したければ「実践」、複数の本の情報と操作をクラスにまとめたければ「OOP」へ進めます。")));
   } else {
     heading("学習パス", "作りたいものから始めよう", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");
     const href = pathHref(saved.last, saved.positions[saved.last]);
     if (href) content.append(pathLink("前回の続きへ　" + pathCourses[saved.last].title, href, "next"));
     const cards = node("div", undefined, "path-cards");
-    cards.append(pathCard("Webで作品を紹介する", "作品名を書き換えて、自分の作品展を作る。", "web", "harbor.png"),
-      pathCard("Pythonで記録を集計する", "名前と枚数を受け取る受付係から始める。", "python"));
+    cards.append(pathCard("Webで作品を紹介する", "見出しの文字を書き換えるところから、作品紹介ページを作ります。", "web", "harbor.png"),
+      pathCard("Pythonで記録を集計する", "最初の1行で文字を表示し、入力した数を使って計算します。", "python"));
     content.append(cards);
   }
   content.append(transfer());

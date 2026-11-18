@@ -36,7 +36,7 @@ function App() {
     {
       title:"同じ表示をHTMLとJSXで比べる",
       referenceHtml:'<h2>森の入口</h2>',
-      explain:"上のコードのreturnは、部品が画面に出す内容を返します。JavaScriptの中でタグの形で書ける記法がJSXです。続くHTML単独の表示とReactの表示を見比べてください。",
+      explain:"見本のコードで return が返すのは、部品が画面に表示する見出しです。JavaScriptの中でタグの形で書ける記法がJSXです。続くHTML単独の表示とReactの表示を見比べてください。",
       example:simpleApp("<h2>森の入口</h2>"),
       question:"JSXの<h2>森の入口</h2>をReactで表示した結果はどれですか。",options:["タグが文字で表示される","森の入口という見出し","何も出ない","空のボタン"],correct:1,feedback:"JSXからブラウザのh2要素が作られるので、HTMLで書いた時と同じ見出しになります。",
       task:"見本の作品名だけを書き換え、同じh2に「雨の小道」を表示します。",
@@ -57,7 +57,7 @@ function App() { return <WorkCard />; }`,
     },
     {
       title:"propsで一つの作品名を渡す",
-      explain:"propsは、使う側から部品に渡す材料です。<WorkCard title=\"月面\" />から来た文字はprops.titleで読めます。JSXの中でJavaScriptの値を表示する場所を{ }で囲みます。",
+      explain:"props は、親が部品に渡した値をまとめたものです。<WorkCard title=\"月面\" />から来た文字はprops.titleで読めます。JSXの中でJavaScriptの値を表示する場所を{ }で囲みます。",
       example:`function WorkCard(props) {
   return <h2>props.title</h2>;
 }
@@ -92,10 +92,10 @@ function App() {
       tests:[[t=>t.all("#root article h2").map(n=>n.textContent).join("/")==="朝の砂浜/坂の灯り","二枚のtitleは見出しに残します。"],[t=>t.all("#root article p").map(n=>n.textContent).join("/")==="海辺の写真/夜の版画","挟んだ内容を二枚の紹介へ表示します。"]],
     },
     {
-      title:"二つのファイルから別の作品展を作る",
+      title:"別ファイルの部品で二枚の作品カードを表示する",
       explain:"export defaultでファイルの代表部品を渡し、別ファイルのimportで受け取れます。見本はNotice.jsxの部品をApp.jsxから呼びます。実習では新しくWorkCard.jsxとApp.jsxを書きます。",
       example:joinReactFiles({"Notice.jsx":'export default function Notice({ text }) { return <p>{text}</p>; }',"App.jsx":'import Notice from "./Notice";\nfunction App() { return <Notice text="次の展示" />; }'}),
-      question:"同じカードを二組の原稿に使う時、作品名をどこに書きますか。",options:["部品内に二つ固定","親から各カードのtitleへ","ファイル名にだけ書く","カードを呼ばない"],correct:1,feedback:"親に原稿を置き、作品名をtitle、紹介をchildrenとして一枚ずつ渡します。",
+      question:"同じ部品で二枚の作品カードを表示するとき、それぞれの作品名はどこに書きますか。",options:["部品内に二つ固定","親から各カードのtitleへ","ファイル名にだけ書く","カードを呼ばない"],correct:1,feedback:"親の App から、作品名を title、紹介文を children として一枚ずつ渡します。",
       task:"WorkCard.jsxに、titleをh2、childrenをpにするarticle部品を作り、defaultで渡します。App.jsxから二枚を使い、順に「水面の月／鉛筆の習作」「冬の庭／小さな水彩」を表示してください。部品名・親の包み方は自由です。",
       files:["WorkCard.jsx","App.jsx"],starter:joinReactFiles({"WorkCard.jsx":"","App.jsx":""}),
       build:[finalPair.replace("<h2>{title}</h2><p>{children}</p>","<h2>{《1》}</h2><p>{《2》}</p>").replace('title="冬の庭"','title="《3》"'),["title","children"],["children","title"],["冬の庭","水面の月"]],
@@ -103,7 +103,7 @@ function App() {
         [t=>t.all("#root article h2").map(n=>n.textContent).join("/")==="水面の月/冬の庭","親から二つの作品名を渡し、順にカードの見出しへ表示します。"],
         [t=>t.all("#root article p").map(n=>n.textContent).join("/")==="鉛筆の習作/小さな水彩","二組の紹介をそれぞれのカードへ渡します。"],
         [()=>training.uses.WorkCard?.length>=2,"親からWorkCard.jsxの部品を二か所で使います。"],
-        [t=>{training.mount(training.read("WorkCard").default,{title:"風景",children:"別原稿"});return t.q("#root article h2")?.textContent==="風景" && t.q("#root article p")?.textContent==="別原稿";},"別の原稿を渡してもよいよう、部品はpropsから作品名と中身を受け取ります。"],
+        [t=>{training.mount(training.read("WorkCard").default,{title:"風景",children:"別原稿"});return t.q("#root article h2")?.textContent==="風景" && t.q("#root article p")?.textContent==="別原稿";},"別の作品を渡しても表示できるよう、作品名と紹介文を props から読みます。"],
       ],
     },
   ],

@@ -58,10 +58,10 @@ const checkContextRange = [t=>{
  const before=t.all("#root p")[1].textContent;
  training.mount(()=>React.createElement(provider,{value:"巡回"},React.createElement(training.app)));
  return t.all("#root p").map(n=>n.textContent).join("/")==="巡回/"+before;
-},"外側の設定を変えた時は外側の札だけが変わり、内側はそのProviderの値を読みます。"];
+},"外側の設定が変わったら、一つ目の段落に新しい値を表示します。内側の段落は、その Provider の値を表示します。"];
 const reactRoles = {
- id:"state-tools",title:"状態の更新・設定の共有・入力への復帰を選ぶ",focusTests:true,
- intro:"展示メモの追加と取消は状態の規則にまとめます。展示室の表示設定と、入力へ戻るボタンは別の小さな画面で試します。",
+ id:"state-tools",title:"メモの追加と取り消し、部品ごとの設定、入力欄のフォーカス",focusTests:true,
+ intro:"メモの追加と取り消しを reducer にまとめます。続いて、部品ごとに表示設定を変える方法と、ボタンから入力欄に戻る方法を試します。",
  demo:{code:memoApp,tip:"メモを二度追加し、取消を一度押して、どの行が残るか確かめてください。"},
  steps:[
   {
@@ -84,16 +84,16 @@ const reactRoles = {
   },
   {
    title:"contextの内側だけで表示設定を共有する",
-   explain:"離れたCaptionまで同じ設定を渡すため、createContextで受け渡し先を作ります。Providerの内側でuseContextを呼ぶと指定値、外側では初期値を読みます。途中のRoomは設定を渡し直さずに済みます。",
+   explain:"createContext で表示設定 Display を作ります。Caption が useContext(Display) を呼ぶと、いちばん近い Display.Provider の値を読めます。外側に Provider がなければ、createContext に渡した初期値を読みます。",
    example:contextApp.replace('value="拡大"','value="通常"'),
-   question:"Providerの内側だけを拡大にした時、外側の札に出るのはどれですか。",options:["拡大","空白","通常","例外"],correct:2,feedback:"外側にはそのProviderの値が届かないので、createContextの初期値を読みます。",
-   task:"内側の展示室だけを「拡大」にし、外側は「通常」のまま表示します。",
+   question:"Provider の value を「拡大」にしたとき、その外側の段落に表示されるのはどれですか。",options:["拡大","空白","通常","例外"],correct:2,feedback:"外側にはそのProviderの値が届かないので、createContextの初期値を読みます。",
+   task:"Provider の value を変えて、一つ目の段落に「通常」、二つ目の段落に「拡大」と表示してください。",
    build:reactBuild(contextApp,['value="拡大"','value="通常"'],["useContext(Display)",'"拡大"']),
    tests:[[t=>t.q("#root p")?.textContent==="通常","Providerの外側では初期値の通常を表示します。"],[t=>t.all("#root p").map(n=>n.textContent).join("/")==="通常/拡大","内側にある同じ部品には拡大設定を届けます。"], checkContextRange],
   },
   {
    title:"refで実際の入力欄に戻る",
-   explain:"useRefで要素を指す入れ物を作り、inputのrefに渡します。描画後はcurrentに実際の欄が入るため、focus()を呼べます。フォーカスを移すだけなら表示用のstateを増やさずに済みます。",
+   explain:"useRef(null) で作った entry を input の ref に指定すると、表示後は entry.current でその入力欄を参照できます。entry.current.focus() を呼ぶと、その欄で文字を入力できる状態に戻ります。",
    example:focusApp.replace("entry.current.focus();","entry.current.select(); entry.current.blur();"),
    question:"ボタンから入力欄へカーソルを戻すために使うのはどれですか。",options:["配列のlength","新しいメモの文字","reducerに入力欄を保存","ref.current.focus()"],correct:3,feedback:"refから実際の欄を読み、そこへフォーカスを動かします。",
    task:"resumeの中で入力欄へフォーカスを移し、入力中の文字を保ってください。",
@@ -101,13 +101,13 @@ const reactRoles = {
    tests:[[t=>{training.input("input","続き");training.click("button");return document.activeElement===t.q("input");},"ボタンを押したらrefが指す入力欄へフォーカスします。"],[t=>t.q("input").value==="続き","直前の入力をそのまま残します。"]],
   },
   {
-   title:"見学室の表示とメモへの復帰を作る",
-   explain:"見学者へ見せる設定はcontextで共有し、入力の場所へ戻る操作はrefで行います。見本は一つの札へ通常の表示設定を渡す小例です。",
+   title:"二つの設定を表示し、ボタンでメモの入力に戻る",
+   explain:"見本では、同じ Caption が Provider の外では「通常」、内側では「拡大」と表示します。練習ではこの仕組みで二つの設定を表示し、ref を使ってメモの入力欄に戻ります。",
    example:contextApp,
-   question:"二つの札で共有する設定と、一度だけ実行する操作の組み合わせはどれですか。",options:["設定はcontext、入力先はref","設定も入力先も配列に保存","両方を毎回初期化","設定はfocus、入力先は作品数"],correct:0,feedback:"部品に届く設定と、実際の入力欄に対する命令を分けます。",
-   task:"同じ札の部品を二か所に使い、外側のpには「一般」、Providerの内側は「静音」を表示します。見学メモ用の入力欄と「メモへ戻る」ボタンを作り、押すと書きかけの欄へフォーカスを戻してください。",
+   question:"表示設定の読み取りと、ボタンで入力欄に戻る操作に、それぞれ何を使いますか。",options:["設定はcontext、入力先はref","設定も入力先も配列に保存","両方を毎回初期化","設定はfocus、入力先は作品数"],correct:0,feedback:"部品に届く設定と、実際の入力欄に対する命令を分けます。",
+   task:"同じ部品を二か所に置き、Provider の外側の p に「一般」、内側の p に「静音」と表示してください。見学メモ用の入力欄と「メモへ戻る」ボタンを作り、押すと書きかけの欄へフォーカスを戻してください。",
    starter:"",build:reactBuild(roleFinal,['value="静音"','value="一般"'],["input.current.focus()","input.current.blur()"]),
-   tests:[[t=>t.all("#root p").map(n=>n.textContent).join("/")==="一般/静音","同じ札を二か所で使い、外側と内側の設定を表示します。"],[t=>{training.input("input","書きかけ");training.click("button");return t.q("button").textContent==="メモへ戻る" && document.activeElement===t.q("input") && t.q("input").value==="書きかけ";},"ボタンから入力欄に実際に戻し、文字を保ちます。"], checkContextRange],
+   tests:[[t=>t.all("#root p").map(n=>n.textContent).join("/")==="一般/静音","同じ部品を二か所で使い、各段落にその場所の設定を表示します。"],[t=>{training.input("input","書きかけ");training.click("button");return t.q("button").textContent==="メモへ戻る" && document.activeElement===t.q("input") && t.q("input").value==="書きかけ";},"ボタンから入力欄に実際に戻し、文字を保ちます。"], checkContextRange],
   },
  ],
 };

@@ -81,7 +81,7 @@ async function prepareModuleFiles(files) {
   const visiting = new Set();
   function visit(name) {
     if (visited.has(name)) return;
-    if (visiting.has(name)) throw Error(name + " が読み込み元に戻ります。この練習では問題集から採点、最後に表示の順で読み込みます。");
+    if (visiting.has(name)) throw Error(name + " が読み込み元に戻ります。import の読み込み先を確認し、同じファイルに戻る指定を直してください。");
     visiting.add(name);
     const source = files[name];
     let imports;

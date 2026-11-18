@@ -11,25 +11,25 @@ async function verifyCounters(browser, base) {
   try {
     const counter = "const makeCounter = (value, amount) => () => { value += amount; return value; };";
     await checkJsLessons(pc, phone, base, [
-      ["js-return-action", "後で呼べる desk", 'function desk() { return "受付中"; } function prepare(){return () => desk();}', ["desk"]],
+      ["js-return-action", "prepare が関数 desk を返す", 'function desk() { return "受付中"; } function prepare(){return () => desk();}', ["desk"]],
       ["js-kept-name", "固定の文字", "const makeDesk = name => () => name;", ["name"]],
       ["js-counter", "初回は開始点", counter, ["score","step"]],
       ["js-reset-counter", "二回目が同じ点", counter, ["let score = start;","score += step;"]],
-      ["js-two-counters", "青は独立", counter + "\nconst red=makeCounter(initialScore,2);\nconst blue=makeCounter(0,3);", ["0","3"]],
+      ["js-two-counters", "最初の blue() が3を返す", counter + "\nconst red=makeCounter(initialScore,2);\nconst blue=makeCounter(0,3);", ["0","3"]],
     ]);
     await phone.goto(base + "#js-counter/1");
     await phone.getByRole("link", { name: "初期化を直す練習" }).tap();
-    for (let i=0; i<2; i++) await phone.getByRole("button", { name: "受付で1点加える" }).tap();
+    for (let i=0; i<2; i++) await phone.getByRole("button", { name: "visit() を呼ぶ" }).tap();
     await phone.getByText("2回の呼び出しを実行しました。", { exact: true }).waitFor();
     assert.equal(await phone.locator(".code-result pre").textContent(), "1（数）\n1（数）");
     await phone.getByRole("link", { name: "次のスライドへ →" }).tap();
-    for (let i=0; i<2; i++) await phone.getByRole("button", { name: "受付で1点加える" }).tap();
+    for (let i=0; i<2; i++) await phone.getByRole("button", { name: "visit() を呼ぶ" }).tap();
     await phone.getByText("2回の呼び出しを実行しました。", { exact: true }).waitFor();
     assert.equal(await phone.locator(".code-result pre").textContent(), "1（数）\n2（数）");
     await phone.goto(base + "#js-counter/1");
-    await phone.getByRole("link", { name: "二つの受付に挑戦" }).tap();
-    const red = phone.getByRole("button", { name: "赤い受付で2点加える" });
-    const blue = phone.getByRole("button", { name: "青い受付で3点加える" });
+    await phone.getByRole("link", { name: "二つのカウンターを使う" }).tap();
+    const red = phone.getByRole("button", { name: "red() を呼ぶ" });
+    const blue = phone.getByRole("button", { name: "blue() を呼ぶ" });
     await red.tap(); await blue.tap(); await red.tap();
     await phone.getByText("3回の呼び出しを実行しました。", { exact: true }).waitFor();
     assert.equal(await phone.locator(".code-result pre").textContent(), "4（数）\n3（数）\n6（数）");

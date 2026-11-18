@@ -150,14 +150,14 @@ function gridMatches(grid, columns) {
 
 function autoGridProblem(docs) {
   if (!gridMatches(docs[0].querySelector(".gallery"), 2))
-    return "狭い棚で、間を8pxずつ空け、等幅の作品二枚が一行に入るようにしましょう。";
+    return "狭い幅で、間を8pxずつ空け、等幅の作品二枚が一行に入るようにしましょう。";
   if (!gridMatches(docs[1].querySelector(".gallery"), 3))
-    return "狭い棚はできました。広い棚に三枚入るよう、列数を入る本数に合わせましょう。";
+    return "狭い幅での配置は合っています。広い幅では三枚並ぶように、幅に応じて列数を変えましょう。";
   const grid = docs[0].querySelector(".gallery");
   const previous = grid.style.cssText;
   try {
     grid.style.setProperty("width", "207px", "important");
-    if (!gridMatches(grid, 1)) return "二つの画面幅はできました。100pxの二列と間8pxが入らない棚では一列にしましょう。";
+    if (!gridMatches(grid, 1)) return "二つの画面幅はできました。100pxの二列と間8pxが入らない幅では一列にしましょう。";
     grid.style.setProperty("width", "208px", "important");
     if (!gridMatches(grid, 2)) return "一列の最小幅を100pxにし、幅208pxで二列に戻るようにしましょう。";
   } finally {
@@ -247,7 +247,7 @@ function quietCueProblem(doc) {
 function profileEntryProblem(doc) {
   const header = doc.querySelector("header");
   if (!namedElement(header, "h1", "栞を刷る小野") || !namedElement(header, "p", "古い紙に版画を刷っています。"))
-    return "入口の header に、原稿の作者名を h1 で、一行紹介を p で置きましょう。";
+    return "ページ先頭の header に、原稿の作者名を h1 で、一行紹介を p で置きましょう。";
   const link = namedElement(header, "a", "作品を見る");
   const target = link?.hash && doc.getElementById(link.hash.slice(1));
   if (!target || target.localName !== "h2" || target.textContent.trim() !== "作品")
@@ -348,11 +348,11 @@ function exerciseResult(id, docs) {
     }
     case "page-regions": {
       const head = namedElement(doc, "header h1", "窓辺の作品展")?.closest("header");
-      if (!head) return "まず展示名を h1 にして、ページの入口となる header で囲みましょう。";
+      if (!head) return "まず展示名を h1 にして、ページの先頭に置く header で囲みましょう。";
       const heading = namedElement(doc, "main h2", "展示内容");
       const main = heading?.closest("main");
       if (!comesAfter(main, head) || doc.querySelectorAll("main").length !== 1)
-        return "入口はできました。header を閉じ、その後に一つの main を置き、「展示内容」の小見出しを入れましょう。";
+        return "展示名と header はできました。header を閉じ、その後に一つの main を置き、「展示内容」の小見出しを入れましょう。";
       if (!comesAfter(namedElement(main, "p", "木版画を二枚展示します。"), heading))
         return "本文の見出しはできました。同じ main の中で、見出しの下に説明の段落を置きましょう。";
       const foot = namedElement(doc, "footer p", "問い合わせは図書室へ。")?.closest("footer");
@@ -591,7 +591,7 @@ function exerciseResult(id, docs) {
         return "高さ80pxの親をFlexboxにし、二枚を横に並べましょう。";
       if (items.some(item => item.height >= bar.clientHeight ||
           Math.abs(item.top + item.height / 2 - bounds.top - bounds.height / 2) > 1))
-        return "横並びはできました。親の交差軸で二枚の中心を箱の高さの中央にそろえましょう。";
+        return "横並びはできました。親に align-items を指定して、二枚の中心を上下の中央にそろえましょう。";
       break;
     }
     case "wrap-works":
@@ -615,14 +615,14 @@ function exerciseResult(id, docs) {
     }
     case "layout": {
       const cards = rowsOfCards(doc);
-      if (!horizontal(cards)) return "まず、2枚が同じ行に並ぶように棚の配置を直しましょう。";
+      if (!horizontal(cards)) return "まず、2枚が同じ行に並ぶようにカードを囲む親要素の配置を直しましょう。";
       const gap = Math.max(cards[1].left - cards[0].right, cards[0].left - cards[1].right);
       if (Math.abs(gap - 12) > 1) return "横並びはできました。カード同士の間を12px空けましょう。";
       break;
     }
     case "equal-tracks":
       if (!gridMatches(doc.querySelector(".gallery"), 3))
-        return "棚に等幅の三列と間8pxを指定し、四枚目を二行目の先頭に置きましょう。";
+        return "親要素 .gallery に等幅の三列と間8pxを指定し、四枚目を二行目の先頭に置きましょう。";
       break;
     case "fitting-tracks":
       return autoGridProblem(docs);
@@ -630,7 +630,7 @@ function exerciseResult(id, docs) {
       const grid = doc.querySelector(".gallery");
       const [wide, left, right] = [...grid.children].map(card => card.getBoundingClientRect());
       if (style(grid).display !== "grid" || Math.abs(wide.width - grid.clientWidth) > 1)
-        return "おすすめの一枚目に、棚の左端の線から右端の線までを使わせましょう。";
+        return "おすすめの一枚目に、一覧の左端の線から右端の線までを指定しましょう。";
       if (!horizontal([left, right]) || !vertical([wide, left]) || Math.abs(left.width - right.width) > 1)
         return "一枚目は広がりました。次の二枚はその下で同じ幅に並べましょう。";
       break;
@@ -638,20 +638,20 @@ function exerciseResult(id, docs) {
     case "grid-catalog": {
       const cards = [...doc.querySelectorAll(".gallery > article")];
       if (!["雨の栞", "青い本", "丸い窓", "星の紙"].every(name => cards.some(card => namedElement(card, "h3", name))))
-        return "棚の中に四枚の article を置き、四枚目の見出しを「星の紙」にしましょう。";
+        return ".gallery の中に四枚の article を置き、四枚目の見出しを「星の紙」にしましょう。";
       const layout = autoGridProblem(docs);
       if (layout) return layout;
       if (!doc.getElementById("notes") || !doc.getElementById("desk"))
-        return "棚はできました。リンク先の作品メモと受付の見出しを残しましょう。";
+        return "作品の配置は合っています。リンク先の作品メモと受付の見出しを残しましょう。";
       for (const card of cards) {
         const actions = card.querySelector(".actions");
         const note = namedElement(actions, "a", "メモ");
         const desk = namedElement(actions, "a", "受付");
         if (!note || !desk || note.hash !== "#notes" || desk.hash !== "#desk")
-          return "棚の列はできました。各作品の中に、メモと受付への二つのリンクをまとめましょう。";
+          return "一覧の列数は合っています。各作品の中に、メモと受付への二つのリンクをまとめましょう。";
         const links = [note, desk].map(a => a.getBoundingClientRect());
         if (!["flex", "inline-flex"].includes(style(actions).display) || !horizontal(links) || Math.abs(links[1].left - links[0].right - 6) > 1)
-          return "外側の棚はできました。内側の .actions にFlexboxを使い、二つのリンクを横に6px離しましょう。";
+          return "作品の配置は合っています。内側の .actions にFlexboxを使い、二つのリンクを横に6px離しましょう。";
       }
       break;
     }

@@ -100,7 +100,7 @@ function renderDom() {
   model.append(sample);
   if (id === "elements" && index > 0) {
     const css = node("details");
-    css.append(node("summary", "見本で使う目印のCSS"), node("pre", chosenStyle));
+    css.append(node("summary", "行を強調する chosen クラスのCSS"), node("pre", chosenStyle));
     model.append(css);
   }
   if (step.compare) {

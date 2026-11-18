@@ -2,8 +2,8 @@
 
 nextChapters.push({
   "id": "client",
-  "title": "整理室から届いた本に、ブラウザで栞をはさむ",
-  "goal": "PCの完成例 /client-lab で本を選び、お気に入りを入れて外します。原稿を読んだサーバーと、その後の操作を受けるブラウザの仕事を確かめます。",
+  "title": "サーバーで本を読み、ブラウザでお気に入りを切り替える",
+  "goal": "/client-lab で本を選び、お気に入りに追加してから外してみましょう。本のデータを読む処理はサーバーで、ボタンの操作に応じて表示を変える処理はブラウザで実行します。",
   "examples": [
     [
       "/client-lab?book=bridge",
@@ -22,31 +22,31 @@ nextChapters.push({
 
 nextLessons.push({
   "id": "server-book",
-  "title": "整理室の原稿をサーバーで読む",
+  "title": "本の JSON ファイルをサーバーで読む",
   "slides": [
     [
-      "原稿がある場所で読んでから返す",
-      "ブラウザには整理室のファイルがありません。サーバー側のページは教材の readBook に本の番号を渡し、ファイルにある一冊を読みます。await は、その読み取りが終わるのを待つ印です。",
+      "inventory.json から一冊を読み込む",
+      "サーバー側のページから readBook に本の id を渡します。readBook は inventory.json を開いてその本のデータを返します。await で読み込みを待ってから title を使います。",
       "const selected = await readBook(\"bridge\");\nreturn <h1>{selected.title}</h1>;",
       "/client-lab/read には「石橋のスケッチ」が届きます。"
     ],
     [
-      "URLから受け取った番号で一冊を選ぶ",
-      "同じページで本を選びたいときは、住所の ?book= に続く番号を使います。値がないときは || で最初の本を選びます。",
+      "URL の book で一冊を選ぶ",
+      "URL の ?book= に続く値が本の id です。book の指定がなければ、|| の右側に書いた bridge を使います。",
       "const { book } = await searchParams;\nconst selected = await readBook(book || \"bridge\");",
-      "?book=fern を開くと整理室で二冊目が選ばれ、「羊歯の標本帳」という見出しを受け取ります。"
+      "?book=fern を付けて開くと、id が fern の本を読み込み、見出しが「羊歯の標本帳」に変わります。"
     ]
   ],
   "quiz": [
-    "ローカルの整理室ファイルを直接読めるのは？",
+    "この例で inventory.json を直接読むのは？",
     [
-      "訪問者のボタン",
+      "ブラウザのボタン",
       "サーバーの readBook",
       "画面の CSS",
       "URL の文字だけ"
     ],
     1,
-    "原稿はサーバーのファイルです。読む役をサーバー側に置きます。"
+    "readBook はサーバー上で inventory.json を開きます。"
   ],
   "build": [
     "const selected = ① readBook(②);",
@@ -57,7 +57,7 @@ nextLessons.push({
         "return"
       ],
       [
-        "URLにある番号を使う",
+        "URL にある本の id",
         "book || \"bridge\"",
         "\"bridge\""
       ]
@@ -67,35 +67,35 @@ nextLessons.push({
     "await",
     "book || \"bridge\""
   ],
-  "task": "/client-lab/read で、番号のない住所は「石橋のスケッチ」、?book=fern は「羊歯の標本帳」をサーバーで読んで見出しとして返してください。",
-  "hint": "最初の一冊が出たら、readBook に固定の番号を渡していないかを見直します。",
+  "task": "/client-lab/read で、book を指定しないときは「石橋のスケッチ」、?book=fern は「羊歯の標本帳」をサーバーで読んで見出しとして返してください。",
+  "hint": "最初の一冊が出たら、readBook に固定の idを渡していないかを見直します。",
   "chapter": "client",
   "file": "app/client-lab/read/page.jsx",
   "source": "import { readBook } from \"../book-store\";\n\nexport default async function Reading({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(\"bridge\");\n  return <h1>{selected.title}</h1>;\n}",
   "answer": "import { readBook } from \"../book-store\";\n\nexport default async function Reading({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(book || \"bridge\");\n  return <h1>{selected.title}</h1>;\n}"
 }, {
   "id": "book-props",
-  "title": "本の題名と冊数だけを子に渡す",
+  "title": "本の題名と冊数を子コンポーネントに渡す",
   "slides": [
     [
       "ブラウザが使う値に絞る",
-      "整理用メモを含む一冊から、公開の札に必要な題名と冊数だけを選びます。親から名前付きで子に渡す値を props と呼びます。",
+      "selected は選んだ本のデータです。親コンポーネントから BookLabel に、表示に使う title と copies を渡します。このように名前を付けて渡す値を props と呼びます。",
       "<BookLabel title={selected.title} copies={selected.copies} />",
-      "題名の文字と冊数の数値が届きます。整理記号は利用者の札に渡りません。"
+      "BookLabel が受け取るのは題名と冊数の二つです。整理用の filing はサーバー側に残ります。"
     ],
     [
       "子では受け取った数をそのまま表示する",
-      "BookLabel は表示に必要な二項目で働きます。受け取る側でファイルを開く手順はありません。",
+      "BookLabel は受け取った title と copies を本文に表示します。",
       "function BookLabel({ title, copies }) {\n  return <p>{title} · 所蔵 {copies} 冊</p>;\n}",
-      "羊歯の標本帳に切り替えれば、同じ札でも所蔵 5 冊になります。"
+      "羊歯の標本帳に切り替えれば、同じ BookLabel に「所蔵 5 冊」と表示されます。"
     ]
   ],
   "quiz": [
-    "サーバーの一冊から、この札に渡すのは？",
+    "この例で親が BookLabel に渡す値は？",
     [
       "ファイルを読む関数",
       "内部整理記号も含む全件",
-      "整理室の場所",
+      "JSON ファイルのパス",
       "題名と冊数"
     ],
     3,
@@ -105,12 +105,12 @@ nextLessons.push({
     "<BookLabel title={①} copies={②} />",
     [
       [
-        "札に出す題名",
+        "表示する題名",
         "selected.title",
         "selected.filing"
       ],
       [
-        "札に出す数",
+        "表示する冊数",
         "selected.copies",
         "0"
       ]
@@ -120,19 +120,19 @@ nextLessons.push({
     "selected.title",
     "selected.copies"
   ],
-  "task": "/client-lab/props で選んだ本の題名と所蔵冊数を子に渡します。bridge は3冊、fern は5冊です。公開札に整理用の filing を含めないようにします。",
-  "hint": "題名が合ったら、親が子に渡す copies の値を原稿と対応させます。",
+  "task": "/client-lab/props で選んだ本の題名と所蔵冊数を子に渡します。bridge は3冊、fern は5冊です。BookLabel の props には整理用の filing を含めません。",
+  "hint": "題名が合ったら、親が子に渡す copies の値をselected.copies と比べましょう。",
   "chapter": "client",
   "file": "app/client-lab/props/page.jsx",
   "source": "import { readBook } from \"../book-store\";\nimport BookLabel from \"./BookLabel\";\n\nexport default async function Shelf({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(book || \"bridge\");\n  return <BookLabel title={selected.title} copies={0} />;\n}",
   "answer": "import { readBook } from \"../book-store\";\nimport BookLabel from \"./BookLabel\";\n\nexport default async function Shelf({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(book || \"bridge\");\n  return <BookLabel title={selected.title} copies={selected.copies} />;\n}"
 }, {
   "id": "client-switch",
-  "title": "クリックを待つボタンをブラウザに置く",
+  "title": "クリックでボタンの状態を切り替える",
   "slides": [
     [
-      "押せる部品の入口を示す",
-      "人が押すまで待つ栞には最初の行に \"use client\" と書きます。部品の初期表示が届き、ブラウザに操作がつながると onClick の関数が働きます。",
+      "クリックに反応する部品を作る",
+      "ボタンの状態を変えるコンポーネントのファイルの先頭に \"use client\" と書きます。ブラウザでボタンをクリックすると、onClick に指定した関数が実行されます。",
       "\"use client\";\nconst [saved, setSaved] = useState(false);",
       "最初は栞なし。saved に true が入ると栞ありに変わります。"
     ],
@@ -147,12 +147,12 @@ nextLessons.push({
     "訪問者が押すのを待つ処理の場所は？",
     [
       "ブラウザで動くClient Component",
-      "整理室のJSON",
+      "本の JSON ファイル",
       "CSSファイル",
       "サーバーのファイル読込"
     ],
     0,
-    "クリックに反応する部品は use client の入口より内側に置きます。"
+    "このボタンは Client Component で、ブラウザがクリックを受け取って saved を更新します。"
   ],
   "build": [
     "①;\nonClick={() => setSaved(value => ②)}",

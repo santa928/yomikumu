@@ -26,7 +26,7 @@ async function verifyPaths(browser, base) {
     await pc.getByRole("link", { name: /Pythonで記録を集計する/ }).click();
     const py = pc.locator(".path-course").first();
     await py.getByText("始める前に一問試す").click();
-    await py.getByRole("radio", { name: "来た人の名前" }).check();
+    await py.getByRole("radio", { name: "ゆき" }).check();
     await py.getByRole("button", { name: "答えを確かめる" }).click();
     await py.getByRole("status").filter({ hasText: "そうです" }).waitFor();
     await py.getByRole("link", { name: "最初の一課題を開く" }).click();

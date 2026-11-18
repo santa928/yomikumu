@@ -37,7 +37,7 @@ async function verifyTapExercises(phone, entry) {
   assert.ok((await phone.locator("#source").inputValue()).includes("# 空欄 1"));
   for (const name of ["@classmethod", "def from_text(cls, text):", "return cls(int(text))"]) await choose(name);
   await phone.locator("#grade").tap();
-  await phone.locator("#status").getByText(/できました。すべて/).waitFor();
+  await phone.locator("#status").getByText("すべての条件で正解です。").waitFor();
   await phone.goto(entry + "#67/5/write");
   assert.match(await phone.locator("#tap-instruction").textContent(), /空欄 1 \/ 3/);
   if (process.env.SCREENSHOT_DIR) {

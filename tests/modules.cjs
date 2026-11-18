@@ -22,8 +22,8 @@ async function verifyModules(browser, base) {
     const status = pc.locator("main [role=status]");
     const run = pc.getByRole("button", { name: "コードを実行して確かめる" });
     for (const [id, fixed, hint] of [
-      ["js-file-value", 'console.log("星のしおり");', "別の原稿"],
-      ["js-catch", 'console.log(3); console.log("配点は0以上です"); console.log(0);', "採点係の理由が変わった"],
+      ["js-file-value", 'console.log("星のしおり");', "questions.js の題名が変わっても"],
+      ["js-catch", 'console.log(3); console.log("配点は0以上です"); console.log(0);', "エラーメッセージが変わっても"],
     ]) {
       await pc.goto(base + "#" + id + "/write");
       await pc.getByRole("textbox", { name: "main.js", exact: true }).fill(fixed);

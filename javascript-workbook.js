@@ -39,7 +39,7 @@ function showCodeOutput(host, result, sign) {
     const title = node("h2", result.title || "開館中");
     title.style.color = "navy";
     const example = node("figure", undefined, "code-result");
-    example.append(node("figcaption", "展示の看板"), title);
+    example.append(node("figcaption", "見出しの表示"), title);
     host.append(example);
   }
   if (result.output.length || !sign) {
@@ -135,7 +135,7 @@ function scoreSlide(slide) {
     if (slide.pauseExample) {
       showCodeOutput(output, { title: "開館中", output: [] }, true);
       stop.disabled = false;
-      feedback.textContent = "看板が変わるのを待っています。ここで停止も試せます。";
+      feedback.textContent = "まもなく見出しが変わります。「見本を停止」で途中で止められます。";
     }
     displayedCode.textContent = variant
       ? "const " + slide.variant.name + " = " + JSON.stringify(variant.value) + ";\n" + slide.code
@@ -154,7 +154,7 @@ function scoreSlide(slide) {
     revision++;
     stopCodeRun();
     stop.disabled = true;
-    feedback.textContent = "看板を変える前に停止しました。もう一度実行できます。";
+    feedback.textContent = "見出しを書き換える前に停止しました。もう一度実行できます。";
     run.focus();
   });
   stop.disabled = true;
@@ -185,7 +185,7 @@ function counterSlide(slide) {
       return;
     }
     showCodeOutput(output, result, false);
-    feedback.textContent = history.length ? history.length + "回の呼び出しを実行しました。" : "受付を用意するコードを実行しました。";
+    feedback.textContent = history.length ? history.length + "回の呼び出しを実行しました。" : "最初のコードを実行しました。ボタンを押すと関数を呼び出せます。";
   }
   if (slide.variableStart) {
     controls.append(label);
@@ -205,7 +205,7 @@ function counterSlide(slide) {
     history.length = 0;
     show();
   }));
-  content.append(details("受付を用意するJavaScript", node("pre", slide.code)), controls,
+  content.append(details("最初に実行するJavaScript", node("pre", slide.code)), controls,
     node("strong", "追加した呼び出し"), calls, output, feedback);
   show();
 }

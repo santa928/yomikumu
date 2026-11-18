@@ -54,7 +54,7 @@ const url = process.env.TAILWIND_URL || pathToFileURL(path.resolve(__dirname, ".
     const editor = page.getByRole("textbox");
     await editor.fill("w-48 p-2");
     await page.getByRole("button", {name:"表示と答えを確かめる"}).click();
-    await page.getByText("2項目は合っています。次の一手 · 書名と本文の文字を 1.125rem にします。").waitFor();
+    await page.getByText("2項目は合っています。書名と本文の文字を 1.125rem にします。").waitFor();
     await page.getByRole("link", {name:"この課題の見本を読み返す"}).click();
     await page.getByRole("button", {name:"見本を一か所変える"}).click();
     await page.getByRole("link", {name:"自分で書く"}).click();

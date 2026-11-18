@@ -21,7 +21,7 @@ form.addEventListener("submit", event => {
 });`;
 const eventsUnit = {
   id: "events", title: "クリックと入力から回答を登録する",
-  intro: "送信ボタンを押す方法と、回答欄でEnterを押す方法を、一つの受付で扱います。",
+  intro: "作品名を入力し、送信ボタンか Enter キーで回答一覧に追加します。どちらの操作もフォームの submit イベントで処理できます。",
   demo: { html: answerForm, code: registerAnswer, tip: "空白のまま送った後に名前を書き直し、Enterで登録してください。続けて別の作品もボタンから登録できます。" },
   steps: [
     {
@@ -125,7 +125,7 @@ form.onsubmit = event => {
         [t => { t.type("#answer","　 "); t.click("form button"); return !t.q("#answers li") && /入力.{0,8}ください/.test(t.q("#notice").textContent); }, "空白だけのときは追加せず、入力してくださいと案内します。"],
         [t => { t.type("#answer"," 灯台 "); const e = new Event("submit",{bubbles:true,cancelable:true}); t.q("form").dispatchEvent(e); return e.defaultPrevented && t.all("#answers li").length === 1 && t.q("#answers li").textContent === "灯台"; }, "直して送信すると、移動を抑え、作品名だけを一行登録します。"],
         [t => t.q("#answer").value === "", "登録したら欄を空にし、次の作品を書けるようにします。"],
-        [t => { t.type("#answer","森"); t.click("form button"); return t.all("#answers li").map(n=>n.textContent).join("/") === "灯台/森"; }, "ボタンからも同じ受付を通し、一行だけ追加します。"],
+        [t => { t.type("#answer","森"); t.click("form button"); return t.all("#answers li").map(n=>n.textContent).join("/") === "灯台/森"; }, "送信ボタンを押したときも、入力した作品名を一行だけ追加します。"],
       ],
     },
   ],

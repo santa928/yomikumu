@@ -49,7 +49,7 @@ const custom = { shelf: "gap-[1rem] flex-col min-[640px]:flex-row flex", theme: 
     const boxes = page.getByRole("textbox");
     await boxes.first().fill("text-dusk");
     await page.getByRole("button", {name:"表示と答えを確かめる"}).click();
-    await page.getByText(/^1項目は合っています。次の一手 · 二冊目/).waitFor();
+    await page.getByText(/^1項目は合っています。二冊目/).waitFor();
     await page.getByRole("link", {name:"この課題の見本を読み返す"}).click();
     await page.getByRole("link", {name:"自分で書く"}).click();
     assert.equal(await boxes.first().inputValue(), "text-dusk");
@@ -61,7 +61,7 @@ const custom = { shelf: "gap-[1rem] flex-col min-[640px]:flex-row flex", theme: 
     await page.locator("#built-css").setInputFiles(path.join(folder,"shelf/input.css"));
     await page.getByText(/^生成後の shelf.css を選んでください/).waitFor();
     await page.locator("#built-css").setInputFiles(path.join(folder,"shelf/shelf.css"));
-    await page.getByText(/^手元のCSSで、狭い棚/).waitFor();
+    await page.getByText(/^読み込んだCSSで、幅639pxでは縦/).waitFor();
     await fill(custom);
     const pending = page.waitForEvent("download");
     await page.getByRole("button", {name:"今の読書棚をZIPで保存"}).click();
@@ -71,11 +71,11 @@ const custom = { shelf: "gap-[1rem] flex-col min-[640px]:flex-row flex", theme: 
 
     const phone = await browser.newPage({ viewport:{width:375,height:812}, isMobile:true, hasTouch:true });
     await phone.goto(url);
-    await phone.getByRole("link", {name:"広いときだけ棚を横並びにする"}).tap();
+    await phone.getByRole("link", {name:"640px以上の画面でカードを横に並べる"}).tap();
     await phone.getByRole("button", {name:"見本を一か所変える"}).tap();
     await phone.getByRole("button", {name:"狭い幅（300px）"}).tap();
     await phone.getByRole("link", {name:"表示を予測する"}).tap();
-    await phone.getByText("sm: の指定前の向きで並ぶ", {exact:true}).tap();
+    await phone.getByText("縦一列に並ぶ", {exact:true}).tap();
     await phone.getByRole("button", {name:"予測を確かめる"}).tap();
     await phone.getByText(/^正解です。/).waitFor();
     await phone.getByRole("link", {name:"コードの練習へ"}).tap();
@@ -87,7 +87,7 @@ const custom = { shelf: "gap-[1rem] flex-col min-[640px]:flex-row flex", theme: 
     if (process.env.SHELF_BUILT) {
       const kit = process.env.SHELF_BUILT;
       await page.locator("#built-css").setInputFiles(path.join(kit,"shelf.css"));
-      await page.getByText(/^手元のCSSで、狭い棚/).waitFor();
+      await page.getByText(/^読み込んだCSSで、幅639pxでは縦/).waitFor();
       await page.goto(pathToFileURL(path.join(kit,"index.html")).href);
       assert.match(fs.readFileSync(path.join(kit,"input.css"),"utf8"), /--color-night/);
       for (const [width, direction] of [[639,"column"],[640,"row"]]) {

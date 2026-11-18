@@ -142,7 +142,7 @@ const responsiveLessons = [
     slides: [
       {
         title: "同じ展示を四つの幅で見る",
-        body: "縦長の月と横長の港を、一点ずつ説明します。320pxでは縦並び。479pxから480pxにかけて二列に切り替わり、720pxでは棚の幅が560pxで止まります。どの絵も四辺が見え、文章を右に追いかけずに最後まで読めます。",
+        body: "縦長の月と横長の港を、一点ずつ説明します。320pxでは縦並び。479pxから480pxにかけて二列に切り替わり、720pxでは作品一覧の幅が560pxになります。どの絵も四辺が見え、横にスクロールせずに説明文を最後まで読めます。",
         html: illustratedShelf, css: exhibitLayout, widths: fourWidths,
       },
     ],

@@ -32,12 +32,12 @@ const testsForSearch = [
   [t => { t.click("#clear"); return t.q("#filter").value === "" && t.all("#rows li").map(n=>n.textContent).join("/") === "雨音/月影/雨雲" && t.q("#count").textContent === "3件"; }, "検索語を空にし、保存した元の3件から描き直します。"],
 ];
 const stateUnit = {
-  id:"state", title:"回答を覚えて、一覧を描き直す",
-  intro:"一度表示した後もデータを覚えておくと、次のクリックや検索に使えます。回答を絞り込み、元の一覧へ戻してみましょう。",
+  id:"state", title:"回答を保存し、検索結果と件数を表示する",
+  intro:"回答を配列に保存し、入力した文字を含む回答だけを一覧に表示します。検索欄を空にすると、元の回答がすべて表示されます。",
   demo:{html:filterHtml,code:searchCode,tip:"「雨」と入力して2件、続いて「石」で0件にします。「絞り込みを解除」で全3件に戻ることを確認してください。"},
   steps:[
     {
-      title:"二回のクリックの間で値を覚える", html:tallyHtml,
+      title:"前回の件数に1を足す", html:tallyHtml,
       explain:"クリックの中で毎回let total = 0を実行すると、一回前の値が消えます。ボタンを二度押して表示を見てください。外側で一度だけ用意した変数なら、次の操作でも値を使えます。",
       example:`document.querySelector("#plus").onclick = () => {
   let total = 0;
@@ -54,7 +54,7 @@ const stateUnit = {
     },
     {
       title:"初期状態を最初に表示する",html:tallyHtml,
-      explain:"画面の材料にする値を状態と呼びます。関数renderに表示を書くと、最初も操作後も同じ方法で描けます。見本は最初に3件を表示します。",
+      explain:"この画面では表示に使う件数を変数 total に保存します。このように、操作の間も保持する値を「状態」と呼びます。関数 render を呼ぶと、その時点の件数を表示できます。見本は最初に3件を表示します。",
       example:`let total = 3;
 function render() {
   document.querySelector("#count").textContent = total + "件";

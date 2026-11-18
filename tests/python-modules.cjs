@@ -7,7 +7,7 @@ async function verifyModules(page, entry) {
   const helper = page.getByLabel("counts.py のコード");
   await helper.fill("def as_count(text):\n    return int(text)");
   await page.getByRole("button", { name: "別の条件でも採点" }).click();
-  await page.locator("#status").getByText(/できました。すべて/).waitFor();
+  await page.locator("#status").getByText("すべての条件で正解です。").waitFor();
   await page.goto(entry + "#58/5/write");
   const source = page.getByLabel("main.py のコード");
   await source.fill("from counts import as_count\na = as_count(input())\nprint(a)\nprint(a)");
