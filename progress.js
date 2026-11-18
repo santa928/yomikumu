@@ -1,7 +1,8 @@
 "use strict";
 
 const progressKey = "yomikumu/course/v1";
-const knownIds = new Set([...lessons.map((lesson) => lesson.id), "studio"]);
+const allLessons = [...lessons, ...javascriptLessons];
+const knownIds = new Set([...allLessons.map((lesson) => lesson.id), "studio"]);
 let memoryProgress = { version: 1, units: {}, last: "" };
 let storageProblem = false;
 
@@ -16,11 +17,11 @@ function validatedProgress(value) {
     if (!knownIds.has(id) || !isObject(item)) throw Error("単元");
     const clean = {};
     for (const [key, field] of Object.entries(item)) {
-      if (["html", "css", "note"].includes(key) && typeof field === "string") clean[key] = field;
+      if (["html", "css", "js", "note"].includes(key) && typeof field === "string") clean[key] = field;
       else if (["quizDone", "writeDone", "quizChecked", "buildDone", "buildChecked"].includes(key) && typeof field === "boolean")
         clean[key] = field;
       else if (key === "pieces" && Array.isArray(field)) {
-        const slots = lessons.find((lesson) => lesson.id === id)?.exercise.build.slots;
+        const slots = allLessons.find((lesson) => lesson.id === id)?.exercise.build.slots;
         if (!slots || field.length !== slots.length || !field.every((piece, i) =>
           piece === "" || slots[i].slice(1).includes(piece))) throw Error("組み立て");
         clean.pieces = field;

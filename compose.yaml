@@ -24,6 +24,9 @@ services:
       - ./keyboard.js:/usr/share/nginx/html/keyboard.js:ro
       - ./profile-project.js:/usr/share/nginx/html/profile-project.js:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
+      - ./javascript-lessons.js:/usr/share/nginx/html/javascript-lessons.js:ro
+      - ./javascript-runner.js:/usr/share/nginx/html/javascript-runner.js:ro
+      - ./javascript-workbook.js:/usr/share/nginx/html/javascript-workbook.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro
       - ./grading.js:/usr/share/nginx/html/grading.js:ro
