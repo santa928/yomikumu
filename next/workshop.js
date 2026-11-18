@@ -83,7 +83,7 @@ function pcSetup(step, message) {
   const steps = [
     ["ZIPをPCに保存して展開します。compose.yaml と同じ場所でターミナルを開きます。"],
     ["Dockerが起動しているPCで次を実行します。初回は依存の取得に通信を使います。", "docker compose up --build -d web"],
-    ["ブラウザで http://localhost:3090 を開き、図書室の一覧から二冊の詳細を試します。ソースの変更は自動で反映されます。"],
+    ["ブラウザで http://localhost:3090 を開き、図書室の一覧か「実習の入口」から、この章の見本を開きます。ソースの変更は自動で反映されます。"],
     ["手元のサーバーの実際の応答を採点するには次を実行します。", "docker compose run --build --rm check " + step],
     ["終えたらサーバーを停止します。", "docker compose stop web"],
   ];
@@ -112,14 +112,18 @@ function catalog() {
 function chapterPage(chapter) {
   title("Next.js", chapter.title, chapter.goal);
   const sample = el("div", undefined, "code-result");
-  const address = el("p");
   const output = el("pre");
+  output.setAttribute("aria-live", "polite");
   const actions = el("div", undefined, "parts");
-  for (const [url, value] of chapter.examples) {
-    actions.append(command(url, () => { address.textContent = "住所　" + url; output.textContent = value; }));
+  for (const [label, value] of chapter.examples) {
+    const option = command(label, () => {
+      for (const item of actions.children) item.setAttribute("aria-pressed", String(item === option));
+      output.textContent = value;
+    });
+    actions.append(option);
   }
   actions.firstElementChild.click();
-  sample.append(el("h2", "住所を選んで完成例を読む"), el("p", "ここでは完成例にある住所と結果を見比べます。PCでは手元のサーバーへ要求を送れます。"), actions, address, output);
+  sample.append(el("h2", "完成例を見比べる"), el("p", "住所や操作を選ぶと、そのときの結果を読めます。PCでは手元のサーバーで同じ操作を試せます。"), actions, output);
   const list = el("ol");
   for (const item of nextLessons.filter(lesson => lesson.chapter === chapter.id)) {
     const row = el("li");
@@ -135,6 +139,7 @@ function slide(lesson, index, from) {
   const [heading, body, source, result] = lesson.slides[index];
   title(lesson.title + "　" + (index + 1) + " / " + lesson.slides.length, heading, body);
   screen.append(el("pre", source), el("p", result));
+  if (index > 0) screen.append(jump("前のスライドへ", lesson.id + "/slide/" + index + (from ? "/" + from : ""), "review"));
   if (from === "write" || from === "tap") screen.append(jump("解きかけの課題へ戻る", lesson.id + "/" + from, "return"));
   screen.append(index + 1 < lesson.slides.length
     ? jump("次のスライドへ", lesson.id + "/slide/" + (index + 2) + (from ? "/" + from : ""), "next")
@@ -201,8 +206,16 @@ function write(lesson, rec) {
       const report = JSON.parse(await selected.text());
       if (report.version !== 1 || report.course !== "yomikumu-next" || report.step !== lesson.id ||
           !Array.isArray(report.results) || !report.results.length || !report.results.every(row => typeof row.label === "string" && typeof row.passed === "boolean")) throw Error();
-      const normal = source => source.trim().replace(/\r\n/g, "\n").replace(/\n\s*\n/g, "\n");
+      const normal = source => source.replace(/\r\n/g, "\n").replace(/\n$/, "");
       if (normal(report.source) !== normal(area.value)) { result.textContent = "手元で採点したコードと記述欄が違います。採点したファイルの内容を記述欄に貼り、もう一度この結果を選んでください。"; return; }
+      for (const id of lesson.companionIds || []) {
+        const other = nextLessons.find(item => item.id === id);
+        const saved = report.companionSources?.[other.file];
+        if (typeof saved !== "string" || normal(saved) !== normal(state.units[id]?.code ?? other.source)) {
+          result.textContent = other.file + " の下書きも採点した内容とそろえ、同じZIPで再採点してください。";
+          return;
+        }
+      }
       const issue = report.results.find(row => !row.passed);
       if (!issue && report.passed === true) { rec.writeDone = true; save(); result.textContent = "できました。手元のサーバーで動作を確認しました。"; }
       else result.textContent = (report.results[0].passed ? "途中までできました。 " : "") + "次に確かめること　" + (issue?.label || lesson.hint);
