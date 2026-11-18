@@ -1,5 +1,5 @@
 "use strict";
-const domUnits = [elementsUnit, eventsUnit];
+const domUnits = [elementsUnit, eventsUnit, stateUnit];
 const domMain = document.querySelector("main");
 const domStateKey = "yomikumu/dom/v1";
 let domState = { last: "", tasks: {} };
@@ -136,7 +136,7 @@ function renderDom() {
   const builtStatus = node("p", state.built ? "前回の組み立てで達成しました。" : "");
   builtStatus.setAttribute("role", "status");
   const builtPreview = node("div");
-  const [template, ...slots] = domBuilders[id][index];
+  const [template, ...slots] = step.build || domBuilders[id][index];
   const assembled = node("pre");
   const pieces = Array.isArray(state.pieces) ? state.pieces : [];
   const assemble = () => template.replace(/《(\d+)》/g, (mark, n) => pieces[n - 1] || mark);

@@ -22,7 +22,12 @@ async function verifyDom(id, answers, demo) {
       if (typical !== undefined) await editor.fill(typical);
       await run.click();
       await feedback.filter({ hasText: /項目を確認|実行で止まりました/ }).waitFor();
-      for (const answer of [primary, alternative]) {
+      const model = await pc.evaluate(([id, index]) => {
+        const step = domUnits.find(u=>u.id===id).steps[index];
+        const [template, ...slots] = step.build || domBuilders[id][index];
+        return template.replace(/《(\d+)》/g, (_, n) => slots[n-1][0]);
+      }, [id, i]);
+      for (const answer of [primary ?? model, alternative]) {
         await editor.fill(answer);
         await run.click();
         await feedback.filter({ hasText: "できました" }).waitFor();
@@ -44,7 +49,7 @@ async function verifyDom(id, answers, demo) {
       assert.equal(await phone.getByRole("combobox").inputValue(), "build");
       assert.equal(await phone.getByRole("textbox", { name: "JavaScript" }).count(), 0);
       const fields = phone.getByRole("group").filter({ has: phone.locator('input[name^="piece-"]') });
-      const slots = await phone.evaluate(([id, i]) => domBuilders[id][i].slice(1), [id, i]);
+      const slots = await phone.evaluate(([id, i]) => (domUnits.find(u=>u.id===id).steps[i].build || domBuilders[id][i]).slice(1), [id, i]);
       const buildResult = phone.locator("section").last().getByRole("status").filter({visible:true});
       for (const wrong of [true, false]) {
         for (const [j, choices] of slots.entries())
