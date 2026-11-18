@@ -1,0 +1,6 @@
+{
+  "name": "yomikumu-quiz-types",
+  "private": true,
+  "scripts": { "build": "node build.cjs" },
+  "devDependencies": { "typescript": "6.0.3" }
+}
