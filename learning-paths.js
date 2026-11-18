@@ -71,6 +71,15 @@ const pathCourses = {
     feedback: ["そうです。一つの部品に違う原稿を渡して確かめましょう。", "同じ構造は部品にまとめられます。それぞれの原稿を分けて渡しましょう。"],
     review: ["関数に値を渡す練習", "#javascript"],
   },
+  next: {
+    title: "Next.js", page: "next/index.html", catalog: "next/index.html", start: "next/index.html#routes",
+    project: "図書室の一覧と、本ごとに住所がある詳細ページ。PCのDockerでサーバーを動かして、URLによって変わる応答を調べます。",
+    first: "Reactの部品と型を試したら、最初は一つの住所に出る見出しの文字を変えます。スマホでは見本と組み立てから始められます。",
+    question: "二冊の本のうち特定の一冊を友達に案内するとき、どちらを送ると直接開ける？",
+    choices: ["その本のURL", "カードの背景色"], correct: 0,
+    feedback: ["そうです。ブラウザがその住所を要求すると、本のページが届きます。", "背景色を送っても開く場所は決まりません。ページの住所を試しましょう。"],
+    review: ["Reactの作品カードを試す", "react/index.html#components"],
+  },
   dom: {
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
     project: "作品クイズに得点と再挑戦を付けます。ヒントを閉じるとキーボードで回答の続きへ戻れます。",
@@ -160,7 +169,7 @@ function learningPaths(part) {
   nav.children[web ? 1 : python ? 2 : 0].setAttribute("aria-current", "page");
   if (web) {
     heading("Web制作", "自分の作品をページにしよう", "最初はHTMLで作品名を書きます。スマホではスライドを読んでタップで組み、PCではコードを書いて結果を見られます。");
-    for (const course of ["html", "javascript", "dom", "typescript", "react", "tailwind"]) {
+    for (const course of ["html", "javascript", "dom", "typescript", "react", "next", "tailwind"]) {
       if (pathCourses[course]) content.append(courseEntry(course, saved.positions));
     }
     content.append(details("この先で作るもの", node("p", "JavaScriptの次はTypeScriptで問題の型を決め、Reactでクイズ画面を作り、Next.jsで複数ページのサイトにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));

@@ -47,6 +47,7 @@ services:
       - ./tailwind:/usr/share/nginx/html/tailwind:ro
       - ./typescript:/usr/share/nginx/html/typescript:ro
       - ./react:/usr/share/nginx/html/react:ro
+      - ./next:/usr/share/nginx/html/next:ro
   test:
     profiles: ["test"]
     build: ./tests

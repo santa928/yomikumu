@@ -2,7 +2,7 @@
 
 window.YomikumuPaths = (() => {
   const key = "yomikumu/paths/v1";
-  const courses = new Set(["html", "javascript", "tailwind", "dom", "typescript", "react", "python", "python-practice", "python-oop"]);
+  const courses = new Set(["html", "javascript", "tailwind", "dom", "typescript", "react", "next", "python", "python-practice", "python-oop"]);
   let fallback = { last: "", positions: {} };
 
   function validRoute(route) {
