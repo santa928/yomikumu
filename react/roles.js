@@ -52,6 +52,13 @@ function App() {
     <button onClick={() => input.current.focus()}>メモへ戻る</button>
   </section>;
 }`;
+const checkContextRange = [t=>{
+ const provider=training.providers[0];
+ if (!provider) return false;
+ const before=t.all("#root p")[1].textContent;
+ training.mount(()=>React.createElement(provider,{value:"巡回"},React.createElement(training.app)));
+ return t.all("#root p").map(n=>n.textContent).join("/")==="巡回/"+before;
+},"外側の設定を変えた時は外側の札だけが変わり、内側はそのProviderの値を読みます。"];
 const reactRoles = {
  id:"state-tools",title:"状態の更新・設定の共有・入力への復帰を選ぶ",focusTests:true,
  intro:"展示メモの追加と取消は状態の規則にまとめます。展示室の表示設定と、入力へ戻るボタンは別の小さな画面で試します。",
@@ -82,7 +89,7 @@ const reactRoles = {
    question:"Providerの内側だけを拡大にした時、外側の札に出るのはどれですか。",options:["拡大","空白","通常","例外"],correct:2,feedback:"外側にはそのProviderの値が届かないので、createContextの初期値を読みます。",
    task:"内側の展示室だけを「拡大」にし、外側は「通常」のまま表示します。",
    build:reactBuild(contextApp,['value="拡大"','value="通常"'],["useContext(Display)",'"拡大"']),
-   tests:[[t=>t.q("#root p")?.textContent==="通常","Providerの外側では初期値の通常を表示します。"],[t=>t.all("#root p").map(n=>n.textContent).join("/")==="通常/拡大","内側にある同じ部品には拡大設定を届けます。"]],
+   tests:[[t=>t.q("#root p")?.textContent==="通常","Providerの外側では初期値の通常を表示します。"],[t=>t.all("#root p").map(n=>n.textContent).join("/")==="通常/拡大","内側にある同じ部品には拡大設定を届けます。"], checkContextRange],
   },
   {
    title:"refで実際の入力欄に戻る",
@@ -100,7 +107,7 @@ const reactRoles = {
    question:"二つの札で共有する設定と、一度だけ実行する操作の組み合わせはどれですか。",options:["設定はcontext、入力先はref","設定も入力先も配列に保存","両方を毎回初期化","設定はfocus、入力先は作品数"],correct:0,feedback:"部品に届く設定と、実際の入力欄に対する命令を分けます。",
    task:"同じ札の部品を二か所に使い、外側のpには「一般」、Providerの内側は「静音」を表示します。見学メモ用の入力欄と「メモへ戻る」ボタンを作り、押すと書きかけの欄へフォーカスを戻してください。",
    starter:"",build:reactBuild(roleFinal,['value="静音"','value="一般"'],["input.current.focus()","input.current.blur()"]),
-   tests:[[t=>t.all("#root p").map(n=>n.textContent).join("/")==="一般/静音","同じ札を二か所で使い、外側と内側の設定を表示します。"],[t=>{training.input("input","書きかけ");training.click("button");return t.q("button").textContent==="メモへ戻る" && document.activeElement===t.q("input") && t.q("input").value==="書きかけ";},"ボタンから入力欄に実際に戻し、文字を保ちます。"]],
+   tests:[[t=>t.all("#root p").map(n=>n.textContent).join("/")==="一般/静音","同じ札を二か所で使い、外側と内側の設定を表示します。"],[t=>{training.input("input","書きかけ");training.click("button");return t.q("button").textContent==="メモへ戻る" && document.activeElement===t.q("input") && t.q("input").value==="書きかけ";},"ボタンから入力欄に実際に戻し、文字を保ちます。"], checkContextRange],
   },
  ],
 };
