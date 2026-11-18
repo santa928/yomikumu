@@ -47,9 +47,10 @@ async function verifyChapter(chapter, alternatives, failures, retryId) {
     await phone.getByRole("button",{name:"予測を確認"}).tap();
     await phone.getByText(/^正解です。/).waitFor();
     await phone.getByRole("link",{name:"コードの練習へ"}).tap();
-    for (const group of await phone.locator("fieldset").all()) await group.getByRole("radio").first().tap();
+    for (let i = 0; i < current.slots.length; i++) await phone.locator('[data-slot="'+i+'"]').first().tap();
     await phone.getByRole("button",{name:"実行して確かめる"}).tap();
-    await phone.getByText(/^できました。/).waitFor();
+    await phone.waitForFunction(()=>document.getElementById("halt-type").disabled);
+    assert.match(await phone.locator(".ts-result").innerText(), /できました。/);
     assert.ok(await phone.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     console.log("TypeScript "+lessons.length+"課題の正答・別解・誤答、下書き再開と375pxの四択・組立を確認");
   } finally { await browser.close(); }
