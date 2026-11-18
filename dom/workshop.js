@@ -1,5 +1,5 @@
 "use strict";
-const domUnits = [elementsUnit, eventsUnit, stateUnit, loadingUnit];
+const domUnits = [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit];
 const domMain = document.querySelector("main");
 const domStateKey = "yomikumu/dom/v1";
 let domState = { last: "", tasks: {} };
@@ -202,7 +202,12 @@ function renderDom() {
     result.textContent = "実行しています。";
     const frame = domFrame("自分の実行結果", step.html, code, [], unit.setup);
     const test = domFrame("操作の確認", step.html, code, step.tests, unit.setup);
-    test.hidden = true;
+    const beforeTest = document.activeElement;
+    if (unit.focusTests) {
+      test.className = "dom-focus-check";
+      test.tabIndex = -1;
+      test.setAttribute("aria-hidden", "true");
+    } else test.hidden = true;
     function receive(event) {
       if (event.source !== test.contentWindow || !event.data?.domWorkshop) return;
       const { error, done, hint } = event.data;
@@ -217,7 +222,7 @@ function renderDom() {
       result.textContent = "確認が時間内に終わりませんでした。繰り返しや待ち時間を見直してください。";
       stopRun();
     }, 6000);
-    stopRun = () => { removeEventListener("message", receive); clearTimeout(timer); test.remove(); stopRun = () => {}; };
+    stopRun = () => { removeEventListener("message", receive); clearTimeout(timer); if (document.activeElement === test) beforeTest?.focus({preventScroll:true}); test.remove(); stopRun = () => {}; };
     output.append(frame, test);
   }
   build.append(button("組んだコードを確かめる", () => {
