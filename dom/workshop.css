@@ -1,0 +1,8 @@
+main section { margin: 1.8rem 0; }
+main h2 { font-size: 1.2rem; }
+main iframe { width: 100%; min-height: 11rem; display: block; margin-top: 0.7rem; border: 1px solid #9cae9c; border-radius: 6px; background: white; }
+main .catalog { margin-top: 0.5rem; }
+main button { margin-top: 0.5rem; }
+main pre { max-height: 24rem; overflow: auto; }
+main textarea { min-height: 12rem; }
+#storage-note { padding-inline: 1rem; }
