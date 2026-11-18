@@ -39,7 +39,7 @@ async function run() {
       "heading-levels", "material-list", "making-steps", "page-regions", "work-section", "word-emphasis",
       "museum-link", "sign-image", "field-name", "clear-form", "contact-card",
       "class", "linked-css", "rule-order", "specific-rule", "inherited-size", "root-size",
-      "card", "padding", "layout", "responsive",
+      "card", "padding", "outer-space", "border-width", "link-area", "narrow-card", "layout", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -166,6 +166,31 @@ async function run() {
       await confirm.click();
       await says("できました。条件を満たしています");
     }
+    const boxCases = [
+      ["outer-space", ".tags{display:flex}.tag{border:2px solid;padding:6px}", "札の内側はできました", ".tags{display:flex;column-gap:12px}.tag{border:2px solid;padding:6px}"],
+      ["border-width", ".ticket{box-sizing:border-box;width:100px;padding:2px;border:2px solid}", "幅はできました", ".ticket{box-sizing:border-box;inline-size:100px;padding-inline:8px;border:2px solid}"],
+      ["link-area", ".desk{width:160px;border:1px solid}.desk a{display:block}", "横の押せる範囲", ".desk{width:160px;border:1px solid}.desk a{display:flex;padding-block:6px}"],
+      ["narrow-card", ".piece{box-sizing:border-box;width:100%;padding:8px;border:1px solid;overflow:hidden}.piece a{display:block}", "長い作品名を途中で", ".piece{padding:8px;border:1px solid}.piece h2{word-break:break-all}.piece a{display:flex}"],
+    ];
+    for (const [id, wrong, message, alternate] of boxCases) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
+    await open("link-area/1");
+    const linkFrame = page.frameLocator("main iframe").first();
+    await linkFrame.locator(".desk").click({ position: { x: 155, y: 10 } });
+    assert.equal(await linkFrame.locator("h2:target").count(), 0);
+    await open("link-area/2");
+    await linkFrame.locator(".desk").click({ position: { x: 155, y: 10 } });
+    await linkFrame.locator("h2:target").waitFor();
+    await open("border-width/2");
+    await page.getByText("札の外幅　140px", { exact: true }).waitFor();
+    await page.getByText("札の外幅　120px", { exact: true }).waitFor();
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -326,6 +351,8 @@ async function run() {
       "field-name": ["for", "note"], "clear-form": ["reset"], "contact-card": ["受付は右です", "memo"],
       "linked-css": ["stylesheet", "ink.css"], "rule-order": ["navy", "green"],
       "specific-rule": [".author", "navy"], "inherited-size": [".wall", "22px"], "root-size": ["1.5rem"],
+      "outer-space": ["padding", "margin-right"], "border-width": ["100px", "border-box"],
+      "link-area": ["block", "padding"], "narrow-card": ["border-box", "anywhere"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],

@@ -13,6 +13,7 @@ services:
       - ./arrow.png:/usr/share/nginx/html/arrow.png:ro
       - ./typography.js:/usr/share/nginx/html/typography.js:ro
       - ./ink.css:/usr/share/nginx/html/ink.css:ro
+      - ./boxes.js:/usr/share/nginx/html/boxes.js:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro
