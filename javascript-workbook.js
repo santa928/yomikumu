@@ -100,9 +100,19 @@ function scoreSlide(slide) {
   const actions = node("div", undefined, "code-actions");
   const { label, select } = startSelector(slide);
   let revision = 0;
+  let variant;
+  if (slide.variant) {
+    const selector = node("label", slide.variant.label + " ");
+    variant = node("select");
+    for (const value of slide.variant.options) variant.append(node("option", value));
+    selector.append(variant);
+    actions.append(selector);
+  }
+  if (slide.setup) content.append(details("用意した問題集と関数", node("pre", slide.setup)));
   if (slide.markup) content.append(fields("<h2>開館中</h2>", "h2 { color: navy; }"));
   const source = node("div", undefined, "sources");
-  source.append(node("strong", "JavaScript"), node("pre", slide.code));
+  const displayedCode = node("pre", slide.code);
+  source.append(node("strong", "JavaScript"), displayedCode);
   const run = button("見本を実行", async () => {
     const at = ++revision;
     if (slide.pauseExample) {
@@ -110,7 +120,11 @@ function scoreSlide(slide) {
       stop.disabled = false;
       feedback.textContent = "看板が変わるのを待っています。ここで停止も試せます。";
     }
-    const result = await executeCode(slide.code, Number(select.value), undefined, slide.pauseExample);
+    displayedCode.textContent = variant
+      ? "const " + slide.variant.name + " = " + JSON.stringify(variant.value) + ";\n" + slide.code
+      : slide.code;
+    const program = slide.setup ? slide.setup + "\n" + displayedCode.textContent : displayedCode.textContent;
+    const result = await executeCode(program, Number(select.value), undefined, slide.pauseExample);
     if (revision !== at || !output.isConnected) return;
     stop.disabled = true;
     if (result.ok) {
@@ -128,6 +142,7 @@ function scoreSlide(slide) {
   stop.disabled = true;
   if (slide.variableStart) actions.append(label);
   actions.append(run);
+  variant?.addEventListener("change", () => run.click());
   if (slide.pauseExample) actions.append(stop);
   if (slide.sign) showCodeOutput(output, { title: "開館中", output: [] }, true);
   content.append(source, actions, output, feedback);
