@@ -1,0 +1,7 @@
+main section { margin: 1.4rem 0; }
+main .code-result { margin-top: 1rem; }
+main textarea { min-height: 12rem; }
+main li { margin: .55rem 0; }
+main li pre { margin-top: .4rem; }
+main .parts a { min-height: 44px; }
+.result-list { padding-inline-start: 1.25rem; }

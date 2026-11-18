@@ -4,10 +4,21 @@ const courseStores = {
   python: { key: "yomikumu-python-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
   "python-practice": { key: "yomikumu-python-practice-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
   typescript: { key: "yomikumu/typescript/v1", position: "last", groups: ["units"], version: 1, validate: validateTypeRecord },
+  next: { key: "yomikumu/next/v1", position: "last", groups: ["units"], version: 1, validate: validateNextRecord },
   dom: { key: "yomikumu/dom/v1", position: "last", groups: ["tasks"], validate: validateDomRecord },
   react: { key: "yomikumu/react/v1", position: "last", groups: ["tasks"], validate: validateDomRecord },
   tailwind: { key: "yomikumu/tailwind/v1", position: "last", groups: ["units"], version: 1, validate: validateReadingRecord },
 };
+
+function validateNextRecord(group, id, item) {
+  if (!/^[a-z][a-z0-9-]*$/.test(id) || !validMap(item)) return false;
+  return Object.entries(item).every(([key, value]) => {
+    if (key === "choice") return Number.isInteger(value) && value >= 0 && value < 4;
+    if (key === "pieces") return Array.isArray(value) && value.every(piece => piece === null || typeof piece === "string");
+    if (key === "code") return typeof value === "string";
+    return ["quizDone", "tapDone", "writeDone"].includes(key) && typeof value === "boolean";
+  });
+}
 
 function validateTypeRecord(group, id, item) {
   if (!/^[a-z][a-z0-9-]*$/.test(id) || !validMap(item)) return false;
