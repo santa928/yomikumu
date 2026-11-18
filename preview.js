@@ -109,8 +109,9 @@ function makePreview(host, html, css, label, width, maxHeight = 310, showTitle =
         if (showTitle) caption.textContent = "タブのタイトル　" + (doc.title || "（未入力）");
         const measured = measure && doc.querySelector(measure.selector);
         if (measured) {
-          const size = doc.defaultView.getComputedStyle(measured).fontSize;
-          figure.append(node("small", measure.label + "の実測値　" + size));
+          const size = measure.width ? Math.round(measured.getBoundingClientRect().width) + "px" :
+            doc.defaultView.getComputedStyle(measured).fontSize;
+          figure.append(node("small", measure.label + (measure.width ? "の外幅　" : "の実測値　") + size));
         }
         // srcdoc の相対URLは親ページを基準にする。作品内のリンクを同じ見本の文書に向ける。
         for (const anchor of doc.querySelectorAll('a[href^="#"]')) {

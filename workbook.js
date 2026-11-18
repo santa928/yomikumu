@@ -334,7 +334,7 @@ function practicePreview(host, id, exercise, html, css) {
   const cssText = exercise.field === "declaration"
     ? ".label { display:inline-block; border:1px solid; " + css + " }"
     : css;
-  const widths = id === "studio" || id === "responsive" ? [360, 720] : [undefined];
+  const widths = exercise.widths || (id === "studio" || id === "responsive" ? [360, 720] : [undefined]);
   return Promise.all(widths.map((width) =>
     makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle, exercise.measure),
   ));

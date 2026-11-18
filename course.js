@@ -413,6 +413,7 @@ const lessons = [
       review: 1,
     },
   },
+  ...boxLessons,
   {
     id: "layout",
     title: "二つの作品を並べる",
