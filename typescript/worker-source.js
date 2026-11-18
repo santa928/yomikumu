@@ -52,9 +52,42 @@ function inspectProgram({ source, contract = "", rules = [] }) {
   if (!errors.length) program.emit(answer);
   return { errors, bindings, missing, contractOk: contractErrors.length === 0, js: emitted };
 }
+function inspectProject(files, declarations) {
+  const normalize = name => ts.normalizePath(name).replace(/^\/?/, "/");
+  const sources = new Map();
+  for (const [name, source] of Object.entries({...libraries,...declarations,...files})) sources.set(normalize(name), source);
+  const names = Array.from(sources.keys());
+  const read = name => sources.get(normalize(name));
+  const config = { ...opts, jsx:ts.JsxEmit.React, esModuleInterop:true };
+  const host = {
+    getSourceFile(name) {
+      const text = read(name);
+      if (text !== undefined) return ts.createSourceFile(normalize(name),text,config.target,true);
+    },
+    getDefaultLibFileName:()=>"/lib.es2022.full.d.ts", writeFile(){},
+    getCurrentDirectory:()=>"/", getDirectories:()=>[],
+    directoryExists:name=>normalize(name)==="/" || names.some(path=>path.startsWith(normalize(name).replace(/\/$/,"")+"/")),
+    fileExists:name=>sources.has(normalize(name)), readFile:read,
+    getCanonicalFileName:normalize, useCaseSensitiveFileNames:()=>true, getNewLine:()=>"\n"
+  };
+  const program = ts.createProgram(names.filter(name=>/\.[cm]?[tj]sx?$/.test(name)),config,host);
+  const diagnostics = [];
+  for (const name of Object.keys(files)) {
+    const file = program.getSourceFile(normalize(name));
+    if (!file) continue;
+    for (const d of [...program.getSyntacticDiagnostics(file),...program.getSemanticDiagnostics(file)]) {
+      const pos = file.getLineAndCharacterOfPosition(d.start ?? 0);
+      diagnostics.push({file:name,line:pos.line+1,col:pos.character+1,code:d.code,text:ts.flattenDiagnosticMessageText(d.messageText,"\n")});
+      if(diagnostics.length===16) return {diagnostics};
+    }
+  }
+  return {diagnostics};
+}
 self.onmessage = event => {
   try {
-    if (event.data.mode === "tsx") {
+    if (event.data.mode === "tsx-files") {
+      self.postMessage({id:event.data.id,result:inspectProject(event.data.files,event.data.declarations)});
+    } else if (event.data.mode === "tsx") {
       const compiled = ts.transpileModule(event.data.source, {
         fileName: "answer.tsx", reportDiagnostics: true,
         compilerOptions: { target: ts.ScriptTarget.ES2022,

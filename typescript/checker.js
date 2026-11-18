@@ -56,3 +56,6 @@ function inspectTS(source, contract, rules) {
 function transpileTSX(source, commonJS = false) {
   return askTypeWorker({ source, mode: "tsx", commonJS });
 }
+function inspectTSXFiles(files, declarations = {}) {
+  return askTypeWorker({ mode: "tsx-files", files, declarations });
+}
