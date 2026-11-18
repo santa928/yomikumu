@@ -9,6 +9,8 @@ services:
       - ./padding.html:/usr/share/nginx/html/padding.html:ro
       - ./lesson.css:/usr/share/nginx/html/lesson.css:ro
       - ./exhibition.js:/usr/share/nginx/html/exhibition.js:ro
+      - ./contact.js:/usr/share/nginx/html/contact.js:ro
+      - ./arrow.png:/usr/share/nginx/html/arrow.png:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro

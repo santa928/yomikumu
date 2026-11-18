@@ -37,6 +37,7 @@ async function run() {
     const expectedIds = [
       "first-edit", "structure", "link", "word-language", "page-names",
       "heading-levels", "material-list", "making-steps", "page-regions", "work-section", "word-emphasis",
+      "museum-link", "sign-image", "field-name", "clear-form", "contact-card",
       "class", "card", "padding", "layout", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
@@ -78,6 +79,58 @@ async function run() {
           .waitFor({ timeout: 3000 });
       }
     }
+    await open("museum-link/1");
+    const destinations = page.frameLocator("main iframe").first();
+    await destinations.getByRole("link", { name: "受付へ" }).click();
+    await destinations.locator("h2:target").waitFor();
+    await page.context().route("https://www.tnm.jp/", (route) =>
+      route.fulfill({ contentType: "text/html", body: "<title>テスト用の行き先</title>" }));
+    const opened = page.waitForEvent("popup");
+    await destinations.getByRole("link", { name: "東京国立博物館" }).click();
+    const museum = await opened;
+    await museum.waitForURL("https://www.tnm.jp/");
+    assert.equal(await museum.evaluate(() => window.opener === null), true);
+    await museum.close();
+    await open("sign-image/1");
+    const image = page.frameLocator("main iframe").getByRole("img", { name: "受付は右です" });
+    assert.equal(await image.evaluate((img) => img.complete && img.naturalWidth > 0), true);
+    await open("sign-image/2");
+    assert.equal(await image.evaluate((img) => img.naturalWidth), 0);
+    await open("field-name/write");
+    await page.getByRole("textbox").fill('<label>見学メモ<input type="text"></label>');
+    await confirm.click();
+    await says("できました。条件を満たしています");
+    const preview = page.frameLocator("main iframe").first();
+    await preview.locator("label").click();
+    assert.ok(await preview.getByRole("textbox").evaluate((el) => el === el.ownerDocument.activeElement));
+    await open("clear-form/2");
+    const field = preview.getByRole("textbox");
+    await field.fill("赤い紙を見たい");
+    await preview.getByRole("button", { name: "書き直す" }).click();
+    assert.equal(await field.inputValue(), "");
+    await open("contact-card/write");
+    const answer = units.find((unit) => unit.id === "contact-card").answer;
+    const incomplete = answer.replace('type="reset"', 'type="button"');
+    await page.getByRole("textbox").fill(incomplete);
+    await confirm.click();
+    await says("入力欄はできました");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.equal(await page.getByRole("textbox").inputValue(), incomplete);
+    await page.getByRole("textbox").fill(answer.replaceAll("note", "private-memo")
+      .replace('src="arrow.png"', 'src="./arrow.png"').replace("kahaku.go.jp/", "kahaku.go.jp"));
+    await confirm.click();
+    await says("できました。条件を満たしています");
+    const requests = [];
+    const rememberRequest = (request) => requests.push(request.url());
+    page.on("request", rememberRequest);
+    await preview.locator("label").click();
+    await preview.getByRole("textbox").fill("これは練習メモ");
+    await preview.getByRole("textbox").press("Enter");
+    await preview.getByRole("button", { name: "メモを消す" }).click();
+    assert.equal(await preview.getByRole("textbox").inputValue(), "");
+    page.off("request", rememberRequest);
+    assert.deepEqual(requests, []);
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -234,6 +287,8 @@ async function run() {
     await touch.getByRole("status").filter({ hasText: "行き先の id" }).waitFor();
     const buildSolutions = {
       "first-edit": ["雨の港"], "word-language": ["lang", "en"], "page-names": ["夜の作品集", "星の切符"],
+      "museum-link": ["href", "https://www.kahaku.go.jp/"], "sign-image": ["arrow.png", "受付は右です"],
+      "field-name": ["for", "note"], "clear-form": ["reset"], "contact-card": ["受付は右です", "memo"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
