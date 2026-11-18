@@ -49,3 +49,11 @@ module.exports[59] = [
   ["x = []\nfor m in minutes:\n    if m >= 30:\n        x.append(m)\nprint(x)", "print([m for m in minutes if m <= 30])", "print(list(filter(lambda t: t < 30, minutes)))"],
   ["print([x / 60 for x in minutes if x > 59])", "print([m + 10 for m in minutes if m >= 30])", "x = []\nfor m in minutes:\n    if m > 30:\n        x.append(10 + m)\nprint(x)"],
 ];
+
+module.exports[60] = [
+  ["r = iter(rows)\nprint(list(r))", "reader = rows", "reader = (item for item in rows)"],
+  ["reader = iter([2, 5])\nfor num in reader:\n    print(num)", "print(next(iter(rows)))", "reader = iter(rows)\nfirst = next(reader)\nsecond = next(reader)\nprint(second)"],
+  ['r = iter([5])\nprint(next(r))\nprint(next(r, "終"))', "r = iter(rows)\nlist(r)\nprint(next(r, 0))\nprint(next(r, 0))", "r = iter(rows)\nfor n in r:\n    pass\nprint(next(r, 0))\nfresh = iter(rows)\nprint(next(fresh, 0))"],
+  ["def supply():\n    for n in [2, 7]:\n        yield n", "def supply(rows):\n    return rows", "def supply(rows):\n    return (n for n in rows)"],
+  ["a, b = supply(), supply()\nprint(next(a))\nprint(next(b))", "def supply(rows):\n    return iter(rows)\na = supply(rows)\nb = a\nprint(next(a, 0))\nprint(next(a, 0))\nprint(next(b, 0))", "def supply(rows):\n    return iter(rows)\na, b = supply(rows), supply(rows)\nfor reader in [a, a, b]:\n    print(next(reader, 0))"],
+];
