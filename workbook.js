@@ -40,11 +40,11 @@ function details(label, child) {
   return el;
 }
 
-function fields(html, css) {
+function fields(html, css, cssLabel = "CSS") {
   const box = node("div", undefined, "sources");
   for (const [label, code] of [
     ["HTML", html],
-    ["CSS", css],
+    [cssLabel, css],
   ]) {
     if (code) box.append(node("strong", label), node("pre", code));
   }
@@ -193,7 +193,7 @@ function slidePage(lesson, position) {
   );
   const examples = node("div", undefined, "slide-examples");
   content.append(examples);
-  if (slide.before) makePreview(examples, slide.html, slide.before, "変更前");
+  if (slide.before) makePreview(examples, slide.html, slide.before, "変更前", undefined, undefined, false, slide.measure);
   for (const width of slide.widths || [undefined]) {
     const ready = makePreview(
       examples,
@@ -203,6 +203,7 @@ function slidePage(lesson, position) {
       width,
       slide.previewHeight,
       slide.showTitle,
+      slide.measure,
     );
     if (slide.nextWork) {
       ready.then((doc) => {
@@ -219,7 +220,21 @@ function slidePage(lesson, position) {
     }
   }
   if (slide.before) content.append(details("変更前のコード", fields(slide.html, slide.before)));
-  const source = fields(slide.html, slide.css);
+  let source = slide.sheetCode ? fields(slide.html, inkCss, "ink.css") : fields(slide.html, slide.css);
+  if (slide.tryCss) {
+    let changed = false;
+    const toggle = button(slide.tryCss.label, () => {
+      changed = !changed;
+      const css = changed ? slide.tryCss.css : slide.css;
+      const nextSource = fields(slide.html, css);
+      source.replaceWith(nextSource);
+      source = nextSource;
+      examples.replaceChildren();
+      makePreview(examples, slide.html, css, "ブラウザでの表示");
+      toggle.textContent = changed ? "元の指定に戻す" : slide.tryCss.label;
+    });
+    content.append(toggle);
+  }
   content.append(slide.previewHeight ? details("見本のHTMLを読む", source) : source);
   if (revisit && revisit.lesson === lesson.id)
     content.append(link("解きかけの問題へ戻る →", revisit.route, "return"));
@@ -321,7 +336,7 @@ function practicePreview(host, id, exercise, html, css) {
     : css;
   const widths = id === "studio" || id === "responsive" ? [360, 720] : [undefined];
   return Promise.all(widths.map((width) =>
-    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle),
+    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle, exercise.measure),
   ));
 }
 

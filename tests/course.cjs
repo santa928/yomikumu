@@ -38,7 +38,8 @@ async function run() {
       "first-edit", "structure", "link", "word-language", "page-names",
       "heading-levels", "material-list", "making-steps", "page-regions", "work-section", "word-emphasis",
       "museum-link", "sign-image", "field-name", "clear-form", "contact-card",
-      "class", "card", "padding", "layout", "responsive",
+      "class", "linked-css", "rule-order", "specific-rule", "inherited-size", "root-size",
+      "card", "padding", "layout", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -131,6 +132,40 @@ async function run() {
     assert.equal(await preview.getByRole("textbox").inputValue(), "");
     page.off("request", rememberRequest);
     assert.deepEqual(requests, []);
+    await open("class/1");
+    await page.getByRole("button", { name: "緑の指定を試す" }).click();
+    await page.locator("pre").filter({ hasText: "color: green;" }).waitFor();
+    assert.equal(await page.frameLocator("main iframe").locator("p").evaluate((el) => getComputedStyle(el).color), "rgb(0, 128, 0)");
+    await open("linked-css/1");
+    const sample = page.frameLocator("main iframe").first();
+    const authorColor = () => sample.locator(".author").evaluate((el) => getComputedStyle(el).color);
+    assert.equal(await authorColor(), "rgb(0, 0, 0)");
+    await open("linked-css/2");
+    assert.equal(await authorColor(), "rgb(0, 0, 128)");
+    await open("inherited-size/1");
+    await page.getByText("撮影者の文字の実測値　16px", { exact: true }).waitFor();
+    await page.getByText("撮影者の文字の実測値　20px", { exact: true }).waitFor();
+    const typeCases = [
+      ["linked-css", '<link rel="stylesheet" href="paper.css"><p class="author">青木ミナ</p>', "href に ink.css", '<link href="./ink.css" rel="stylesheet"><main><p class="author">青木ミナ</p><p>紙の小さな展示です。</p></main>'],
+      ["rule-order", ".author{color:green}", "二行を残し", ".author{color:#000080} .author{color:#008000}"],
+      ["specific-rule", "p{color:navy}", "紹介文には", "p{color:green} p.author{color:#000080}"],
+      ["inherited-size", ".wall{font-size:22px} .credit{font-size:22px}", "引き継ぐ", ".wall{font-size:22px} .credit{font-size:inherit}"],
+      ["root-size", "html{font-size:20px} .credit{font-size:30px}", "今の表示は30px", "html{font-size:20px} .credit{font-size:calc(1rem + .5rem)}"],
+    ];
+    for (const [id, wrong, message, alternate] of typeCases) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      if (id === "root-size") {
+        await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+        await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+        assert.equal(await page.getByRole("textbox").inputValue(), wrong);
+      }
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -289,6 +324,8 @@ async function run() {
       "first-edit": ["雨の港"], "word-language": ["lang", "en"], "page-names": ["夜の作品集", "星の切符"],
       "museum-link": ["href", "https://www.kahaku.go.jp/"], "sign-image": ["arrow.png", "受付は右です"],
       "field-name": ["for", "note"], "clear-form": ["reset"], "contact-card": ["受付は右です", "memo"],
+      "linked-css": ["stylesheet", "ink.css"], "rule-order": ["navy", "green"],
+      "specific-rule": [".author", "navy"], "inherited-size": [".wall", "22px"], "root-size": ["1.5rem"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
