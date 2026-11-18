@@ -11,3 +11,10 @@ module.exports = {
     [["Book.multiply(4, 2)", "Book.multiply(4, Book.rate)"], ["Book.multiply(n, 5)", "Book.multiply(n, Book.rate)"], ["Book.multiply(n, 5)", "b.multiply(n, 5)"]],
   ],
 };
+
+module.exports[64] = [
+  [["p = Fare(5)", "p = Fare(rate=5)"], ["self.rate * days", "self.rate + days"], ["self.rate * days", "days * self.rate"]],
+  [["super().price(days) - 2", "Fare.price(self, days) - 2"], ["super().price(days) + 3", "self.rate + 3"], ["super().price(days) + 3", "3 + Fare.price(self, days)"]],
+  [["Fare(5)", "Fare(rate=5)"], ["return self.policy.price(days)", "return 4 * days"], ["return self.policy.price(days)", "charge = self.policy.price\n        return charge(days)"]],
+  [["t.policy = Flat()", "replacement = Flat()\nt.policy = replacement"], ["self.dest.append(value)", "self.dest = [value]"], ["self.dest.append(value)", "self.dest.extend([value])"]],
+];
