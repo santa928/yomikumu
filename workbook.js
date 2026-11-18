@@ -184,6 +184,61 @@ function sectionTabs(lesson, part) {
   content.append(links);
 }
 
+// 見本だけで二つの設定を比較する。端末の設定は変更しない。
+function previewMotionSetting(doc, reduce) {
+  const changes = [];
+  function visit(rules) {
+    for (const rule of rules) {
+      if (rule.type === CSSRule.MEDIA_RULE) {
+        const original = rule.media.mediaText;
+        const simulated = original.replace(/\(\s*prefers-reduced-motion\s*:\s*(reduce|no-preference)\s*\)/gi,
+          (_, value) => (value.toLowerCase() === "reduce") === reduce ? "(min-width: 0px)" : "(max-width: 0px)");
+        if (simulated !== original) {
+          changes.push([rule, original]);
+          rule.media.mediaText = simulated;
+        }
+      }
+      if (rule.cssRules) visit(rule.cssRules);
+    }
+  }
+  for (const sheet of doc.querySelectorAll("style")) visit(sheet.sheet.cssRules);
+  return () => {
+    for (const [rule, original] of changes) rule.media.mediaText = original;
+  };
+}
+
+function keyboardExample(host, doc, motion) {
+  const controls = [...doc.querySelectorAll("a[href], input, button")];
+  const report = statusMessage();
+  let last = -1;
+  const showFocus = (control) => {
+    control.scrollIntoView({ block: "nearest", inline: "nearest" });
+    control.focus({ preventScroll: true });
+    report.textContent = "現在の操作先　" + (control.labels?.[0]?.textContent || control.textContent).trim();
+  };
+  doc.addEventListener("focusin", (event) => {
+    last = controls.indexOf(event.target);
+    if (last >= 0) report.textContent = "現在の操作先　" + (event.target.labels?.[0]?.textContent || event.target.textContent).trim();
+  });
+  const next = button(motion ? "操作先を試す" : "次の操作先を試す", () => {
+    showFocus(controls[(last + 1) % controls.length]);
+  });
+  host.append(next, report);
+  if (motion) {
+    const actual = doc.defaultView.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    host.append(node("p", "端末の現在の設定　" + (actual ? "動きを減らす" : "通常")));
+    let restore;
+    for (const [setting, label] of [[true, "動きを減らした見本を試す"], [false, "通常の見本を試す"]]) {
+      host.append(button(label, () => {
+        if (restore) restore();
+        restore = previewMotionSetting(doc, setting);
+        showFocus(controls[0]);
+        report.textContent += setting ? "（減らす設定の見本）" : "（通常設定の見本）";
+      }));
+    }
+  }
+}
+
 function slidePage(lesson, position) {
   const slide = lesson.slides[position];
   heading(
@@ -216,6 +271,11 @@ function slidePage(lesson, position) {
       slide.showTitle,
       slide.measure,
     );
+    if (slide.focusWalk || slide.motionDemo) {
+      ready.then((doc) => {
+        if (examples.isConnected) keyboardExample(examples, doc, slide.motionDemo);
+      });
+    }
     if (slide.nextWork) {
       ready.then((doc) => {
         if (!examples.isConnected) return;

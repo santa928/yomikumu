@@ -21,6 +21,7 @@ services:
       - ./viewport-sample.html:/usr/share/nginx/html/viewport-sample.html:ro
       - ./harbor.png:/usr/share/nginx/html/harbor.png:ro
       - ./moon.png:/usr/share/nginx/html/moon.png:ro
+      - ./keyboard.js:/usr/share/nginx/html/keyboard.js:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro
