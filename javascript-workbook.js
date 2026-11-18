@@ -96,6 +96,12 @@ async function checkScoreCode(ex, code, start, host, current) {
     if (index === 0) showCodeOutput(host, result, ex.sign);
     const problem = scoreProblem(ex, result, input);
     if (problem) return (index ? (ex.inputLabel || "開始点") + "を" + input + "に変えた場合も確かめましょう。 " : "") + problem;
+    if (ex.moduleTrial) {
+      const trial = await executeCode(program, input, undefined, false, { ...files, ...ex.moduleTrial.files });
+      if (!current()) return "";
+      if (!trial.ok) return executionMessage(trial);
+      if (scoreProblem({ ...ex, expected: () => ex.moduleTrial.values }, trial, input)) return ex.moduleTrial.hint;
+    }
   }
   return "";
 }
@@ -252,11 +258,13 @@ function scoreWorkshop(lesson) {
     updateUnit(id, { note: "" });
   });
   if (ex.files) content.append(moduleSources(ex.files, ex.filename));
-  content.append(editor(ex.filename || "JavaScript", code, value => {
+  const codeEditor = editor(ex.filename || "JavaScript", code, value => {
     code = value;
     resetResult();
     updateUnit(id, { js: code, note: "" });
-  }));
+  });
+  if (ex.importFile) content.append(localModuleFile(ex, codeEditor.querySelector("textarea"), message));
+  content.append(codeEditor);
   if (ex.calls) content.append(details("続けて実行する確認用コード", node("pre", ex.calls)));
   if (ex.variableStart) actions.append(label);
   actions.append(run, stop);

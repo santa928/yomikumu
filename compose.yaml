@@ -30,6 +30,7 @@ services:
       - ./javascript-counters.js:/usr/share/nginx/html/javascript-counters.js:ro
       - ./javascript-cards.js:/usr/share/nginx/html/javascript-cards.js:ro
       - ./javascript-transforms.js:/usr/share/nginx/html/javascript-transforms.js:ro
+      - ./javascript-module-lessons.js:/usr/share/nginx/html/javascript-module-lessons.js:ro
       - ./javascript-runner.js:/usr/share/nginx/html/javascript-runner.js:ro
       - ./module-files.js:/usr/share/nginx/html/module-files.js:ro
       - ./vendor:/usr/share/nginx/html/vendor:ro

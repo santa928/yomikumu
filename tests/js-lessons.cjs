@@ -3,13 +3,12 @@ const assert = require("node:assert/strict");
 
 async function checkJsLessons(pc, phone, base, cases) {
   const run = pc.getByRole("button", { name: "コードを実行して確かめる" });
-  const editor = pc.getByRole("textbox", { name: "JavaScript" });
   const feedback = pc.locator("main [role=status]");
   for (const [id, typical, alternate, pieces, failingSlide] of cases) {
     await pc.goto(base + "#" + id + "/1");
     const lesson = await pc.evaluate(id => {
       const l = javascriptLessons.find(l => l.id === id);
-      return { slides: l.slides.map(s => ({ sign: s.sign })), answer: l.exercise.answer, correct: l.quiz.correct };
+      return { slides: l.slides.map(s => ({ sign: s.sign })), answer: l.exercise.answer, correct: l.quiz.correct, filename: l.exercise.filename };
     }, id);
     for (const [i, slide] of lesson.slides.entries()) {
       await pc.goto(base + "#" + id + "/" + (i + 1));
@@ -24,6 +23,7 @@ async function checkJsLessons(pc, phone, base, cases) {
       assert.equal((await feedback.textContent()).startsWith("正解"), index === lesson.correct);
     }
     await pc.goto(base + "#" + id + "/write");
+    const editor = pc.getByRole("textbox", { name: lesson.filename || "JavaScript", exact: true });
     await run.click();
     await feedback.filter({ hasText: typical }).waitFor();
     for (const code of [lesson.answer, alternate]) {

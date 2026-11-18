@@ -10,6 +10,52 @@ function moduleSources(files, editing) {
   return section;
 }
 
+function localModuleFile(ex, area, message) {
+  const group = node("div");
+  const input = node("input");
+  input.type = "file";
+  input.accept = ".js,.mjs,text/javascript";
+  const label = node("label", "手元の問題集をコード欄に取り込む ");
+  label.append(input);
+  let previous;
+  let revision = 0;
+  function replace(value) {
+    area.value = value;
+    area.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  const undo = button("取り込み前の下書きに戻す", () => {
+    replace(previous);
+    undo.hidden = true;
+    message.textContent = "取り込み前のコードに戻しました。";
+    area.focus();
+  });
+  undo.hidden = true;
+  area.addEventListener("input", () => { revision++; undo.hidden = true; });
+  input.addEventListener("change", async () => {
+    const file = input.files[0];
+    const at = ++revision;
+    input.value = "";
+    if (!file) return;
+    if (file.size > 65536) {
+      message.textContent = "この練習では64 KiBまでの問題集を選んでください。";
+      return;
+    }
+    try {
+      const source = await file.text();
+      if (at !== revision || !area.isConnected) return;
+      previous = area.value;
+      replace(source);
+      undo.hidden = false;
+      message.textContent = "問題集を取り込みました。内容を確かめてから実行できます。";
+      area.focus();
+    } catch {
+      if (at === revision) message.textContent = "ファイルを読めませんでした。もう一度選んでください。";
+    }
+  });
+  group.append(button("問題集の見本を保存", () => downloadFile(ex.filename, ex.code, "text/javascript")), label, undo);
+  return group;
+}
+
 // ファイルを開く形式でも利用できるよう、教材に同梱した実装を必要な章でだけ読む。
 function loadModuleLexer() {
   if (!moduleLexerReady) {
