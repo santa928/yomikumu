@@ -244,6 +244,32 @@ function quietCueProblem(doc) {
   });
 }
 
+function profileEntryProblem(doc) {
+  const header = doc.querySelector("header");
+  if (!namedElement(header, "h1", "栞を刷る小野") || !namedElement(header, "p", "古い紙に版画を刷っています。"))
+    return "入口の header に、原稿の作者名を h1 で、一行紹介を p で置きましょう。";
+  const link = namedElement(header, "a", "作品を見る");
+  const target = link?.hash && doc.getElementById(link.hash.slice(1));
+  if (!target || target.localName !== "h2" || target.textContent.trim() !== "作品")
+    return "作者は分かりました。「作品を見る」から、作品の見出しへ進めるようにしましょう。";
+  return "";
+}
+
+function profileBodyProblem(doc) {
+  const sectionFor = label => namedElement(doc, "section h2", label)?.closest("section");
+  if (!namedElement(sectionFor("自己紹介"), "p", "図書室で冊子を作っています。"))
+    return "自己紹介の章に、図書室で冊子を作っていることを書きましょう。";
+  const skills = sectionFor("得意なこと")?.querySelector("ul");
+  if (!skills || !["二色刷り", "手製本"].every(skill => listItems(skills).includes(skill)))
+    return "得意なことの一覧に、二色刷りと手製本を一項目ずつ入れましょう。";
+  const works = sectionFor("作品");
+  for (const [title, caption] of [["窓の栞", "朝の光を青で刷りました。"], ["水辺の本", "池の形を一冊に綴じました。"]]) {
+    const card = namedElement(works, "article h3", title)?.closest("article");
+    if (!namedElement(card, "p", caption)) return title + "の作品名と原稿の説明を、同じ article に入れましょう。";
+  }
+  return "";
+}
+
 function exerciseResult(id, docs) {
   const doc = docs[0];
   const style = (node) => doc.defaultView.getComputedStyle(node);
@@ -735,6 +761,29 @@ function exerciseResult(id, docs) {
       if (!horizontal(rowsOfCards(docs[1])))
         return "狭い画面はできました。広い画面で2列になるところを確かめましょう。";
       break;
+    case "reader-outline": {
+      const headings = [...doc.querySelectorAll("h2")].map(el => el.textContent.trim());
+      const sequence = ["自己紹介", "得意なこと", "作品", "連絡先"];
+      const missing = sequence.findIndex((heading, i) => headings[i] !== heading);
+      if (missing >= 0) return (missing + 1) + "番目に「" + sequence[missing] + "」の見出しを置きましょう。";
+      break;
+    }
+    case "profile-entry":
+      return profileEntryProblem(doc);
+    case "profile-stories":
+      return profileBodyProblem(doc);
+    case "profile-visit": {
+      const previous = profileEntryProblem(doc) || profileBodyProblem(doc);
+      if (previous) return previous;
+      const contact = namedElement(doc, "footer h2", "連絡先")?.closest("footer");
+      if (!namedElement(contact, "p", "土曜の午後、図書室の受付で声をかけてください。"))
+        return "連絡先に、いつ、どこを訪ねるかが分かる原稿の一文を入れましょう。";
+      if (!vertical(rowsOfCards(doc, "section article"))) return "連絡先はできました。狭い幅では二つの作品を縦に並べましょう。";
+      if (!horizontal(rowsOfCards(docs[1], "section article"))) return "スマホ幅はできました。720pxの見本では二作品を横に並べましょう。";
+      if (docs.some(d => d.documentElement.scrollWidth > d.documentElement.clientWidth + 1))
+        return "作品は並びました。横にずらさずに本文まで読める幅にしましょう。";
+      break;
+    }
   }
   return "";
 }
@@ -754,15 +803,16 @@ function checkProject(docs) {
   }
   if (cards.length === 1)
     return "1作品目の紹介ができました。次は2作品目を加え、両方の作品から制作メモへ案内しましょう。";
+  let sharedNotes;
   for (const [i, card] of cards.entries()) {
-    const link = [...card.querySelectorAll("a[href]")].some((a) => {
-      const target = doc.getElementById(a.hash.slice(1));
-      return (
-        a.textContent.trim() && target && !target.closest("article") && target.textContent.trim()
-      );
-    });
-    if (!link)
+    const targets = new Set([...card.querySelectorAll("a[href]")]
+      .filter(a => a.textContent.trim() && a.hash)
+      .map(a => doc.getElementById(a.hash.slice(1)))
+      .filter(target => target && !target.closest("article") && target.textContent.trim()));
+    if (!targets.size)
       return i + 1 + "件目の作品から、このページの作者メモへ移動できるリンクを付けましょう。";
+    sharedNotes = sharedNotes ? new Set([...sharedNotes].filter(target => targets.has(target))) : targets;
+    if (!sharedNotes.size) return (i + 1) + "件目からも、一つ目の作品と同じ制作メモへ進めるようにしましょう。";
   }
   if (!vertical(rowsOfCards(doc, "article")))
     return "内容はそろいました。幅360pxで最初の2作品を縦に並べましょう。";

@@ -422,14 +422,17 @@ function buildPage(lesson) {
   const feedback = statusMessage();
   const preview = node("div", undefined, "slide-examples");
   const form = node("form", undefined, "build-form");
+  const exportButton = ex.exportProfile && button("プロフィールをHTMLで書き出す", () =>
+    downloadProfile(assembled(), ex.answerCss));
+  if (exportButton) exportButton.hidden = true;
   let revision = 0;
-  function assembled() {
-    return code.replace(/[①②]/g, (mark) => pieces[marks.indexOf(mark)] || mark);
+  function assembled(template = code) {
+    return template.replace(/[①②]/g, (mark) => pieces[marks.indexOf(mark)] || mark);
   }
   heading(lesson.title, "タップでコードを組む", ex.build.task || ex.task);
   const blanks = marks.slice(0, slots.length).join("と");
   content.append(node("p", blanks + "に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
-  snippet.textContent = assembled();
+  snippet.textContent = assembled(ex.build.excerpt);
   slots.forEach(([label, ...options], i) => {
     const group = node("fieldset");
     group.append(node("legend", marks[i] + " " + label));
@@ -442,10 +445,11 @@ function buildPage(lesson) {
       input.checked = pieces[i] === option;
       input.addEventListener("change", () => {
         pieces[i] = option;
-        snippet.textContent = assembled();
+        snippet.textContent = assembled(ex.build.excerpt);
         updateUnit(id, { pieces: [...pieces], buildChecked: false });
         revision++;
         feedback.textContent = "";
+        if (exportButton) exportButton.hidden = true;
         preview.replaceChildren();
       });
       wrapper.append(input, node("code", option));
@@ -463,15 +467,22 @@ function buildPage(lesson) {
     if (at !== revision || !preview.isConnected) return;
     const problem = exerciseResult(id, docs);
     feedback.textContent = problem || "できました。組んだコードの表示を見てみましょう。";
+    if (exportButton) exportButton.hidden = Boolean(problem);
     updateUnit(id, { buildChecked: true, ...(!problem ? { buildDone: true } : {}) });
   }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     check();
   });
-  content.append(form, feedback, preview, reviewLink(lesson), nextLessonLink(id),
+  content.append(form, feedback, preview);
+  if (exportButton) content.append(exportButton);
+  content.append(reviewLink(lesson), nextLessonLink(id),
     link("キーボードで書く", unitRoute(id, "type"), "review"));
   if (record.buildChecked && pieces.every(Boolean)) check();
+}
+
+function downloadProfile(html, css) {
+  downloadFile("ono-profile.html", pageSource(html, css, "栞を刷る小野"), "text/html");
 }
 
 function workshop(lesson) {
@@ -507,6 +518,8 @@ function workshop(lesson) {
       : ex.task,
   );
   if (project) {
+    content.append(link("案内付きでプロフィールを作る（全4工程）", "reader-outline/1", "review"),
+      node("h2", "別の原稿で作品展を作る"));
     const manuscript = details("原稿を読む「夜の机の小さな作品展」", node("pre", studioManuscript));
     const steps = node("ol", undefined, "studio-steps");
     for (const step of studioSteps) {
@@ -575,6 +588,7 @@ function workshop(lesson) {
       link("コース目次へ", "home", "review"),
     );
   } else {
+    if (ex.exportProfile) content.append(button("プロフィールをHTMLで書き出す", () => downloadProfile(html, css)));
     content.append(
       details("ヒント", node("p", ex.hint)),
       details("書き方の一例", ex.field === "both" ? fields(ex.answer, ex.answerCss) : node("pre", ex.answer)),

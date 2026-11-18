@@ -46,6 +46,7 @@ async function run() {
       "equal-tracks", "fitting-tracks", "grid-lines", "grid-catalog",
       "device-width", "responsive", "content-break", "reading-width", "photo-fit", "four-widths",
       "tab-route", "visible-focus", "control-names", "ticket-state", "quiet-cue", "keyboard-exhibit",
+      "reader-outline", "profile-entry", "profile-stories", "profile-visit",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -465,6 +466,55 @@ async function run() {
     await says("できました");
 
     await open("studio");
+    await page.getByRole("link", { name: /案内付きでプロフィールを作る/ }).click();
+    const sampleProfile = page.frameLocator("main iframe").first();
+    await sampleProfile.getByRole("link", { name: "作品を見る" }).click();
+    await sampleProfile.locator("h2:target").filter({ hasText: "作品" }).waitFor();
+    const guidedCases = [
+      ["reader-outline", answer => answer.replace("<h2>作品</h2>", "<p>作品</p>"), "3番目", answer => "<main>" + answer + "</main>"],
+      ["profile-entry", answer => answer.replace("#prints", "#wrong"), "作品の見出しへ", answer => answer.replaceAll("prints", "portfolio")],
+      ["profile-stories", answer => answer.replace("池の形を一冊に綴じました。", "朝の光を青で刷りました。"), "水辺の本の作品名", answer => answer.replace("<li>手製本</li>", "<li><strong>手製本</strong></li>")],
+    ];
+    for (const [id, wrong, reply, alternate] of guidedCases) {
+      const unit = units.find(unit => unit.id === id);
+      await open(id + "/write");
+      const entry = page.getByRole("textbox");
+      await entry.fill(wrong(unit.answer));
+      await confirm.click();
+      await says(reply);
+      await entry.fill(alternate(unit.answer));
+      await confirm.click();
+      await says("できました");
+    }
+    await open("profile-visit/write");
+    const profile = units.find(unit => unit.id === "profile-visit");
+    const profileHtml = page.getByRole("textbox", { name: "HTML", exact: true });
+    const profileCss = page.getByRole("textbox", { name: "CSS", exact: true });
+    const twoRows = profile.answerCss.replace("1fr 1fr", "1fr");
+    await profileHtml.fill(profile.answer);
+    await profileCss.fill(twoRows);
+    await confirm.click();
+    await says("720px");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.equal(await profileCss.inputValue(), twoRows);
+    await profileCss.fill(profile.answerCss.replace("1fr 1fr", "repeat(2,1fr)"));
+    await confirm.click();
+    await says("できました");
+    const profileFile = page.waitForEvent("download");
+    await page.getByRole("button", { name: "プロフィールをHTMLで書き出す" }).click();
+    const savedProfile = await profileFile;
+    const profilePath = path.join(os.tmpdir(), savedProfile.suggestedFilename());
+    await savedProfile.saveAs(profilePath);
+    const reader = await browser.newPage({ viewport: { width: 360, height: 800 } });
+    await reader.goto(pathToFileURL(profilePath).href);
+    await reader.getByRole("link", { name: "作品を見る" }).click();
+    await reader.locator("h2:target").filter({ hasText: "作品" }).waitFor();
+    assert.equal(await reader.locator(".prints").evaluate(el => getComputedStyle(el).gridTemplateColumns.split(" ").length), 1);
+    await reader.setViewportSize({ width: 720, height: 800 });
+    assert.equal(await reader.locator(".prints").evaluate(el => getComputedStyle(el).gridTemplateColumns.split(" ").length), 2);
+    await reader.close();
+    await open("studio");
     const htmlEditor = page.getByLabel("HTML", { exact: true });
     const mark = page.getByRole("button", { name: "作品を確認する" });
     const useManuscript = page.getByRole("button", { name: "この原稿をHTML欄に入れる" });
@@ -498,6 +548,10 @@ async function run() {
     await mark.click();
     await says("スマホ幅はできました");
     await page.getByLabel("CSS", { exact: true }).fill(styles);
+    await htmlEditor.fill(artwork.replace('夏</h2><p>白い器。</p><a href="#memo"', '夏</h2><p>白い器。</p><a href="#other"') + '<p id="other">別の案内</p>');
+    await mark.click();
+    await says("同じ制作メモ");
+    await htmlEditor.fill(artwork);
     await mark.click();
     await says("完成です");
     if (process.env.SCREENSHOT_DIR)
@@ -583,6 +637,8 @@ async function run() {
       "tab-route": ["#artist", "#works"], "visible-focus": [":focus", "outline-offset"],
       "control-names": ["受付時間を読む", "受付は右です"], "ticket-state": ["受付中", "受付終了"],
       "quiet-cue": ["reduce", "none"], "keyboard-exhibit": ["受付時間を読む", "受付中"],
+      "reader-outline": ["自己紹介", "連絡先"], "profile-entry": ["栞を刷る小野", "#prints"],
+      "profile-stories": ["手製本", "池の形を一冊に綴じました。"], "profile-visit": ["土曜の午後", "図書室の受付"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
