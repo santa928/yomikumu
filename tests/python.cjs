@@ -70,13 +70,16 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
       assert.equal(await pc.locator("#source").inputValue(), "読書の下書き");
       assert.equal(await pc.evaluate(() => JSON.parse(localStorage.getItem("yomikumu-python-practice-v1")).route), "59/1/guide");
     }
+    if (!only || only === "62") await require("./python-cpython.cjs").verifyCPython(pc, entry);
     const report = await pc.evaluate(async ({ requested, fixtures }) => {
       const errors = [];
       let count = 0;
+      let engine;
       async function run(source, test, files) {
-        return runPython({ source, before: test.before, lines: splitInput(test.input || ""), files, observe: test.observe, afterError: test.afterError, interactive: false }).result;
+        return runPython({ engine, source, before: test.before, lines: splitInput(test.input || ""), files, observe: test.observe, afterError: test.afterError, interactive: false }).result;
       }
       for (const ch of pythonChapters.filter(ch => !requested || ch.id === requested)) {
+        engine = ch.engine;
         for (const [i, lesson] of ch.lessons.entries()) {
           const id = ch.id + "/" + (i + 1);
           const ex = await run(lesson.code, lesson, lesson.files);

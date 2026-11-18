@@ -68,6 +68,7 @@ function pythonFrame() {
 }
 
 function runPython(options, onWait = () => {}) {
+  const advanced = options.engine === "cpython";
   const frame = document.createElement("iframe");
   frame.hidden = true;
   frame.title = "Python実行用";
@@ -87,7 +88,7 @@ function runPython(options, onWait = () => {}) {
     resolve(value);
   }
   function watch() {
-    timer = setTimeout(() => finish({ output: "", error: "実行時間が長いため停止しました。繰り返しを確認しましょう。" }), 5000);
+    timer = setTimeout(() => finish({ output: "", error: "実行時間が長いため停止しました。繰り返しを確認しましょう。" }), advanced ? 30000 : 5000);
   }
   channel.port1.onmessage = ({ data }) => {
     if (!data || typeof data.output !== "string" || data.output.length > 13000) return;
@@ -96,10 +97,16 @@ function runPython(options, onWait = () => {}) {
       onWait(data.output);
     } else if (data.kind === "end") finish(data);
   };
-  frame.addEventListener("load", () => {
+  frame.addEventListener("load", async () => {
     if (finished) return;
-    const workerSource = pythonRuntimeSource + "\n(" + pythonWorker.toString() + ")();";
-    frame.contentWindow.postMessage({ workerSource, options }, "*", [channel.port2]);
+    try {
+      const assets = advanced ? await cpythonAssets() : null;
+      if (finished) return;
+      const workerSource = advanced ? "(" + cpythonWorker.toString() + ")();" : pythonRuntimeSource + "\n(" + pythonWorker.toString() + ")();";
+      frame.contentWindow.postMessage({ workerSource, options: advanced ? { ...options, assets } : options }, "*", [channel.port2]);
+    } catch (error) {
+      finish({ output: "", error: String(error) });
+    }
   }, { once: true });
   frame.srcdoc = '<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;unsafe-inline&apos; &apos;unsafe-eval&apos;; worker-src blob:; connect-src &apos;none&apos;">' +
     "<script>(" + pythonFrame.toString() + ")()<" + "/script>";
