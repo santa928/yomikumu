@@ -56,11 +56,15 @@ function unitRoute(id, part = 1) {
 }
 
 function navFor(active) {
+  const isJs = active === "javascript" || javascriptLessons.some(l => l.id === active);
+  document.querySelector(".mast span").textContent = isJs ? "JavaScript 入門" : "HTML / CSS 入門";
   const group = node("details", undefined, "chapter-menu");
   group.open = window.matchMedia("(min-width: 721px)").matches;
   group.append(node("summary", "すべての単元"));
-  nav.replaceChildren(link("コース目次", "home", "nav-home"), group);
-  for (const [id, title] of [...lessons.map((l) => [l.id, l.title]), ["studio", "卒業制作"]]) {
+  nav.replaceChildren(link("コース目次", isJs ? "javascript" : "home", "nav-home"), group);
+  const entries = isJs ? javascriptLessons.map(l => [l.id, l.title]) :
+    [...lessons.map(l => [l.id, l.title]), ["studio", "卒業制作"]];
+  for (const [id, title] of entries) {
     const a = link(title, id === "studio" ? id : unitRoute(id));
     if (id === active) a.setAttribute("aria-current", "page");
     group.append(a);
@@ -127,23 +131,27 @@ function transfer() {
   return details("進捗と下書きの引き継ぎ", controls);
 }
 
-function home() {
+function home(isJs = false) {
+  const units = isJs ? javascriptLessons : lessons;
   heading(
-    "HTML / CSS 入門",
-    "好きな作品を紹介するページを作ろう",
-    "作品名をひとつ書くところから始めます。最後は自分の作品を並べ、完成したページを持ち出せます。",
+    isJs ? "JavaScript 入門" : "HTML / CSS 入門",
+    isJs ? "展示クイズの得点を記録しよう" : "好きな作品を紹介するページを作ろう",
+    isJs ? "看板の文字を一か所変えるところから始めます。数と文字を読み分け、正解の前と後の得点を表示しましょう。" :
+      "作品名をひとつ書くところから始めます。最後は自分の作品を並べ、完成したページを持ち出せます。",
   );
   const state = readProgress();
-  const resume = state.last && state.last !== "home";
+  const resume = state.last && (!isJs || units.some(l => l.id === state.last.split("/")[0]));
   content.append(
     link(
       resume ? "前回の続きへ →" : "最初のスライドへ →",
-      resume ? state.last : unitRoute(lessons[0].id),
+      resume ? state.last : unitRoute(units[0].id),
       "next",
     ),
   );
+  content.append(link(isJs ? "HTML / CSS の作品紹介コースへ" : "JavaScript の得点クイズへ",
+    isJs ? "home" : "javascript", "review"));
   const list = node("ol", undefined, "catalog");
-  for (const lesson of lessons) {
+  for (const lesson of units) {
     const item = node("li");
     const record = state.units[lesson.id] || {};
     item.append(link(lesson.title, unitRoute(lesson.id)), node("p", lesson.goal));
@@ -158,6 +166,10 @@ function home() {
       );
     }
     list.append(item);
+  }
+  if (isJs) {
+    content.append(list, transfer());
+    return;
   }
   const last = node("li");
   last.append(
@@ -246,6 +258,11 @@ function slidePage(lesson, position) {
     slide.title,
     slide.body,
   );
+  if (slide.code !== undefined) {
+    scoreSlide(slide);
+    slideLinks(lesson, position);
+    return;
+  }
   const examples = node("div", undefined, "slide-examples");
   if (slide.viewportSamples) {
     for (const [suffix, label] of [["", "幅の指定なし"], ["?device", "端末の幅を指定"]]) {
@@ -308,6 +325,10 @@ function slidePage(lesson, position) {
   }
   const sourceLabel = slide.css ? "見本のHTMLとCSSを読む" : "見本のHTMLを読む";
   content.append(slide.previewHeight ? details(sourceLabel, source) : source);
+  slideLinks(lesson, position);
+}
+
+function slideLinks(lesson, position) {
   if (revisit && revisit.lesson === lesson.id)
     content.append(link("解きかけの問題へ戻る →", revisit.route, "return"));
   if (revisit?.lesson === "studio") content.append(link("卒業制作に戻る →", revisit.route, "return"));
@@ -390,10 +411,12 @@ function editor(label, value, onInput) {
 }
 
 function nextLessonLink(id) {
-  const next = lessons[lessons.findIndex((l) => l.id === id) + 1];
+  const isJs = javascriptLessons.some(l => l.id === id);
+  const units = isJs ? javascriptLessons : lessons;
+  const next = units[units.findIndex((l) => l.id === id) + 1];
   return next
     ? link("次へ　" + next.title + " →", unitRoute(next.id), "next")
-    : link("卒業制作へ →", "studio", "next");
+    : isJs ? link("JavaScriptの目次へ →", "javascript", "next") : link("卒業制作へ →", "studio", "next");
 }
 
 const projectExample = {
@@ -461,11 +484,16 @@ function buildPage(lesson) {
   async function check() {
     const at = ++revision;
     const result = assembled();
-    const buildsHtml = ex.field === "html" || ex.field === "both";
-    const docs = await practicePreview(preview, id, ex,
-      buildsHtml ? result : ex.html, buildsHtml ? (ex.answerCss ?? ex.css) : result);
+    let problem;
+    if (ex.field === "javascript") {
+      problem = await checkScoreCode(ex, result, 2, preview, () => at === revision && preview.isConnected);
+    } else {
+      const buildsHtml = ex.field === "html" || ex.field === "both";
+      const docs = await practicePreview(preview, id, ex,
+        buildsHtml ? result : ex.html, buildsHtml ? (ex.answerCss ?? ex.css) : result);
+      problem = at === revision && preview.isConnected ? exerciseResult(id, docs) : "";
+    }
     if (at !== revision || !preview.isConnected) return;
-    const problem = exerciseResult(id, docs);
     feedback.textContent = problem || "できました。組んだコードの表示を見てみましょう。";
     if (exportButton) exportButton.hidden = Boolean(problem);
     updateUnit(id, { buildChecked: true, ...(!problem ? { buildDone: true } : {}) });
@@ -601,13 +629,14 @@ function workshop(lesson) {
 
 function render() {
   clearTimeout(pendingPreview);
+  stopCodeRun();
   content.replaceChildren();
   const [id, raw = "1", origin] = location.hash.slice(1).split("/");
   revisit = null;
   if (origin === "studio") revisit = { lesson: "studio", route: "studio/edit" };
   else if (["quiz", "write", "type", "build"].includes(origin))
     revisit = { lesson: id, route: unitRoute(id, origin) };
-  const lesson = lessons.find((item) => item.id === id);
+  const lesson = allLessons.find((item) => item.id === id);
   navFor(id);
   if (lesson) {
     const valid =
@@ -617,7 +646,10 @@ function render() {
     const part = valid ? raw : "1";
     currentRoute = unitRoute(id, part);
     if (part === "build" || (part === "write" && narrowScreen.matches)) buildPage(lesson);
-    else if (part === "type" || part === "write") workshop(lesson);
+    else if (part === "type" || part === "write") {
+      if (lesson.exercise.field === "javascript") scoreWorkshop(lesson);
+      else workshop(lesson);
+    }
     else if (part === "quiz") quizPage(lesson);
     else slidePage(lesson, Number(part) - 1);
     sectionTabs(lesson, ["type", "build"].includes(part) ? "write" : part);
@@ -625,10 +657,10 @@ function render() {
     currentRoute = raw === "edit" ? "studio/edit" : "studio";
     workshop(null);
   } else {
-    currentRoute = "home";
-    home();
+    currentRoute = id === "javascript" ? "javascript" : "home";
+    home(currentRoute === "javascript");
   }
-  if (currentRoute !== "home") {
+  if (currentRoute !== "home" && currentRoute !== "javascript") {
     const state = readProgress();
     state.last = revisit ? currentRoute + "/" + origin : currentRoute;
     writeProgress(state);

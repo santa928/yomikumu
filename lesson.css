@@ -115,6 +115,29 @@ a {
   font-size: 0.85rem;
   margin: 10px 0 3px;
 }
+.code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+}
+.code-actions select {
+  font: inherit;
+  padding: 4px 8px;
+}
+.code-actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.code-result {
+  padding: 12px 16px;
+  border: 1px solid #c6cebf;
+  background: white;
+}
+.code-result pre {
+  margin-bottom: 0;
+}
 .slide-examples {
   display: grid;
   gap: 12px;
