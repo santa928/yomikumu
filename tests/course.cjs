@@ -45,6 +45,7 @@ async function run() {
       "flex-parent", "along-axis", "across-axis", "wrap-works", "flex-guide", "layout",
       "equal-tracks", "fitting-tracks", "grid-lines", "grid-catalog",
       "device-width", "responsive", "content-break", "reading-width", "photo-fit", "four-widths",
+      "tab-route", "visible-focus", "control-names", "ticket-state", "quiet-cue", "keyboard-exhibit",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -348,6 +349,65 @@ async function run() {
     const ratios = await narrowPrints.locator("img").evaluateAll(images => images.map(img => img.naturalWidth / img.naturalHeight));
     assert.ok(ratios[0] > 1 && ratios[1] < 1);
     assert.equal(await page.locator("main iframe").count(), 4);
+    await open("keyboard-exhibit/1");
+    const keyboardFrame = page.frameLocator("main iframe");
+    await page.getByRole("button", { name: "次の操作先を試す" }).click();
+    await keyboardFrame.locator('a[href$="#works"]:focus').waitFor();
+    await page.keyboard.press("Tab");
+    await keyboardFrame.locator('a[href$="#hours"]:focus').waitFor();
+    await page.keyboard.press("Tab");
+    await keyboardFrame.locator("input:focus").waitFor();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Enter");
+    await keyboardFrame.locator("#hours:target").waitFor();
+    for (const reduce of [true, false]) {
+      await page.emulateMedia({ reducedMotion: reduce ? "reduce" : "no-preference" });
+      await open("quiet-cue/" + (reduce ? "1" : "2"));
+      await page.getByRole("button", { name: "操作先を試す", exact: true }).click();
+      const focused = keyboardFrame.locator("a:focus");
+      const shift = () => focused.evaluate(a => {
+        const style = getComputedStyle(a);
+        return [new DOMMatrixReadOnly(style.transform === "none" ? undefined : style.transform).m41, style.outlineColor];
+      });
+      assert.deepEqual(await shift(), [reduce ? 0 : 8, "rgb(0, 0, 128)"]);
+      await page.getByRole("button", { name: reduce ? "通常の見本を試す" : "動きを減らした見本を試す" }).click();
+      assert.deepEqual(await shift(), [reduce ? 8 : 0, "rgb(0, 0, 128)"]);
+    }
+    const keyboardCases = [
+      ["tab-route", answer => answer.replace('href="#works"', 'tabindex="1" href="#works"'), "Tabで最初", answer => answer.replace("作者へ</a>", "<span>作者へ</span></a>")],
+      ["visible-focus", answer => answer.replace("a:focus", "a"), "フォーカスのない", answer => answer.replace("3px solid navy", "solid #000080 3px")],
+      ["control-names", answer => answer.replace('for="note"', 'for="wrong"'), "ラベルを押す", answer => answer.replace('<label for="note">訪問メモ</label><input id="note">', '<label>訪問メモ<input></label>')],
+      ["quiet-cue", answer => answer.replace("transform: none", "transform: translateX(8px)"), "動きを減らす設定", answer => answer.replace("translateX(8px)", "translate(8px,0)")],
+    ];
+    for (const [id, wrong, message, alternate] of keyboardCases) {
+      const { answer } = units.find(unit => unit.id === id);
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong(answer));
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(alternate(answer));
+      await confirm.click();
+      await says("できました");
+    }
+    for (const id of ["ticket-state", "keyboard-exhibit"]) {
+      const unit = units.find(unit => unit.id === id);
+      await open(id + "/write");
+      const html = page.getByRole("textbox", { name: "HTML", exact: true });
+      const css = page.getByRole("textbox", { name: "CSS", exact: true });
+      const wrong = id === "ticket-state" ? unit.answerCss.replace("white", "navy") : unit.answerCss.replace("transform: none", "transform: translateX(8px)");
+      await html.fill(unit.answer);
+      await css.fill(wrong);
+      await confirm.click();
+      await says(id === "ticket-state" ? "文字を白" : "動きを減らす設定");
+      await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+      await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+      assert.equal(await html.inputValue(), unit.answer);
+      assert.equal(await css.inputValue(), wrong);
+      await css.fill(unit.answerCss.replaceAll("navy", "#000080"));
+      await confirm.click();
+      await says("できました");
+      assert.equal(await confirm.evaluate(el => el === document.activeElement), true);
+    }
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -520,6 +580,9 @@ async function run() {
       "grid-lines": [".pick", "3"], "grid-catalog": ["gallery", "星の紙"],
       "device-width": ["device-width", "1"], "content-break": ["min-width", "1fr 1fr"],
       "reading-width": ["max-width", "auto"], "photo-fit": ["contain", "cover"], "four-widths": ["480px", "contain"],
+      "tab-route": ["#artist", "#works"], "visible-focus": [":focus", "outline-offset"],
+      "control-names": ["受付時間を読む", "受付は右です"], "ticket-state": ["受付中", "受付終了"],
+      "quiet-cue": ["reduce", "none"], "keyboard-exhibit": ["受付時間を読む", "受付中"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],

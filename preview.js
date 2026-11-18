@@ -16,7 +16,7 @@ function safeMarkup(source) {
     }
     if (node.nodeType !== Node.ELEMENT_NODE || !permittedTags.has(node.localName)) return;
     const element = document.createElement(node.localName);
-    for (const attribute of ["class", "id", "style", "lang", "aria-label", "aria-current"]) {
+    for (const attribute of ["class", "id", "style", "lang", "aria-label", "aria-current", "tabindex"]) {
       if (node.hasAttribute(attribute))
         element.setAttribute(attribute, node.getAttribute(attribute));
     }
@@ -39,10 +39,13 @@ function safeMarkup(source) {
     if (node.localName === "input") {
       if (!["text", "search", "email", "number", "checkbox"].includes(node.type)) return;
       element.type = node.type;
+      element.disabled = node.disabled;
+      element.readOnly = node.readOnly;
       if (node.hasAttribute("value")) element.defaultValue = node.defaultValue;
     }
     if (node.localName === "button") {
       element.type = node.type;
+      element.disabled = node.disabled;
     }
     for (const child of node.childNodes) copy(child, element);
     parent.append(element);

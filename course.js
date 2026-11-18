@@ -512,4 +512,5 @@ const lessons = [
     },
   },
   ...responsiveLessons,
+  ...keyboardLessons,
 ];
