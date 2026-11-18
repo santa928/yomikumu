@@ -44,6 +44,15 @@ const pathCourses = {
     feedback: ["そうです。型を決めておくと文字との取り違えを実行前に発見できます。", "文字は題名に使えます。得点は数として足します。"],
     review: ["JavaScriptで数と文字を比べる", "#js-console/1"],
   },
+  "python-oop": {
+    title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo", start: "python/index.html#63/1/slide",
+    project: "本ごとに読んだページを記録します。最後は処理に実行記録を添え、失敗した後にやり直せる仕組みを作ります。",
+    first: "一冊の本を作り、その本が覚えているページ数を表示します。",
+    question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
+    choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
+    feedback: ["そうです。一冊ごとに別の値を持たせる方法を試します。", "表示の手順は共通です。今どこまで読んだかは本ごとに違います。"],
+    review: ["Pythonで関数を作る", "python/index.html#57/1/slide"],
+  },
   "python-practice": {
     title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo", start: "python/index.html#59/1/slide",
     project: "読書記録から欲しいものを選んで集計します。順に読む処理や、読んだ後に資源を閉じる処理へ進めます。",
@@ -168,6 +177,7 @@ function learningPaths(part) {
     heading("Python", "読書の記録を集計しよう", "Web制作の経験は必要ありません。最初はPythonで一行の文字を表示し、次に入力した名前で表示を変えます。");
     content.append(courseEntry("python", saved.positions));
     content.append(courseEntry("python-practice", saved.positions));
+    content.append(courseEntry("python-oop", saved.positions));
     content.append(details("基礎の後に選べること", node("p", "Python実践では記録を一件ずつ加工します。Python OOPでは本ごとに別々の状態を持つ貸出の仕組みを作ります。")));
   } else {
     heading("学習パス", "作りたいものから始めよう", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");

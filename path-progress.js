@@ -2,6 +2,7 @@
 
 const courseStores = {
   python: { key: "yomikumu-python-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
+  "python-oop": { key: "yomikumu-python-oop-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
   "python-practice": { key: "yomikumu-python-practice-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
   typescript: { key: "yomikumu/typescript/v1", position: "last", groups: ["units"], version: 1, validate: validateTypeRecord },
   next: { key: "yomikumu/next/v1", position: "last", groups: ["units"], version: 1, validate: validateNextRecord },
@@ -36,7 +37,7 @@ function validateDomRecord(group, route, item) {
     if (key === "choice") return Number.isInteger(value) && value >= 0 && value < 4;
     if (key === "pieces") return Array.isArray(value) && value.every(piece => piece === null || typeof piece === "string");
     if (key === "mode") return value === "build" || value === "write";
-    if (key === "code" || key === "file") return typeof value === "string";
+    if (["code", "file", "note"].includes(key)) return typeof value === "string";
     return ["tap", "built", "passed"].includes(key) && typeof value === "boolean";
   });
 }

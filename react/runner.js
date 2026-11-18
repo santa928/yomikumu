@@ -46,10 +46,24 @@ React.createElement = (type, props, ...children) => {
   return originalCreateElement(type, props, ...children);
 };`;
 
-function compiledReact(source) {
-  if (reactCompileCache.has(source)) return reactCompileCache.get(source);
+function compiledReact(source, typed) {
+  const key = (typed ? "tsx:" : "jsx:") + source;
+  if (reactCompileCache.has(key)) return reactCompileCache.get(key);
   const compiling = (async () => {
-    const entries = await Promise.all(Object.entries(splitReactFiles(source)).map(async ([name, text]) => {
+    if (source.length > 64000) throw Error("入力は64000文字までです。");
+    const files = splitReactFiles(source);
+    if (typed) {
+      if (Object.hasOwn(files, "App.jsx")) {
+        files["App.tsx"] = files["App.jsx"];
+        delete files["App.jsx"];
+      }
+      const { diagnostics } = await inspectTSXFiles(files, await loadReactDeclarations());
+      if (diagnostics.length) {
+        const d = diagnostics[0];
+        throw Error(d.file + " " + d.line + "行目 TS" + d.code + " " + d.text);
+      }
+    }
+    const entries = await Promise.all(Object.entries(files).map(async ([name, text]) => {
       const {code, diagnostics} = await window.transpileTSX(text, true);
       if (diagnostics.length) {
         const first = diagnostics[0];
@@ -86,8 +100,8 @@ if (!training.app) throw Error("App部品を用意してください。");
 training.mount(training.app);`;
   })();
   if (reactCompileCache.size > 24) reactCompileCache.delete(reactCompileCache.keys().next().value);
-  reactCompileCache.set(source, compiling);
-  compiling.catch(() => reactCompileCache.delete(source));
+  reactCompileCache.set(key, compiling);
+  compiling.catch(() => reactCompileCache.delete(key));
   return compiling;
 }
 
@@ -96,9 +110,10 @@ function reactFrame(title, html, source, tests = [], setup = "") {
   frame.title = title;
   frame.setAttribute("sandbox", "allow-scripts allow-forms");
   frame.referrerPolicy = "no-referrer";
-  compiledReact(source).then(compiled => {
+  const typed = setup?.typed === true;
+  compiledReact(source, typed).then(compiled => {
     frame.srcdoc = domFrame(title, html || reactPage, compiled, tests,
-      reactRuntimeSource + "\n" + reactHarness + "\n" + setup).srcdoc;
+      reactRuntimeSource + "\n" + reactHarness + "\n" + (typed ? "" : setup)).srcdoc;
   }).catch(error => {
     frame.srcdoc = domFrame(title, reactPage, "throw Error(" + JSON.stringify(error.message) + ");", tests).srcdoc;
   });

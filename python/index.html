@@ -20,6 +20,12 @@
   <script defer src="practice-iterators.js"></script>
   <script defer src="practice-resources.js"></script>
   <script defer src="practice-records.js"></script>
+  <script defer src="oop-books.js"></script>
+  <script defer src="oop-design.js"></script>
+  <script defer src="oop-notebook.js"></script>
+  <script defer src="oop-decorators.js"></script>
+  <script defer src="oop-studio.js"></script>
+  <script defer src="tap.js"></script>
   <script defer src="workbook.js"></script>
 </head>
 <body>
@@ -40,8 +46,9 @@
       <h2 id="task-heading">練習</h2><div id="method"><button id="keyboard" type="button">キーボードで書く</button><button id="tap" type="button">タップで組む</button></div>
       <div id="task-files"></div>
       <p id="provided" hidden></p>
+      <div id="builder" hidden><p id="tap-instruction">行を使う順に選びます。同じ行を何度でも使えます。</p><pre id="slot-context" hidden></pre><div id="pieces"></div><button id="undo-line" type="button">最後の一行を戻す</button></div>
       <label for="source">main.py のコード</label><textarea id="source" rows="6" spellcheck="false" autocapitalize="off"></textarea>
-      <div id="builder" hidden><p>行を使う順に選びます。同じ行を何度でも使えます。</p><div id="pieces"></div><button id="undo-line" type="button">最後の一行を戻す</button></div>
+      <details id="driver" hidden><summary>採点で試す呼び出し例</summary><pre></pre></details>
       <details id="hint"><summary>ヒントを見る</summary><p></p></details>
     </section>
     <section id="console" hidden>
@@ -54,6 +61,6 @@
       <div id="checks"></div>
     </section>
     <nav id="steps" aria-label="この単元の移動"></nav>
-    <details class="environment"><summary>ブラウザとPCでの実行方法</summary><p>この画面は端末内で Python 3 のコードを実行します。基礎や反復の練習には Skulpt、標準ライブラリが必要な章には CPython を使います。名前・コードは端末内に保存します。回線やアカウントは不要です。追加パッケージの導入やPC上のファイルの操作は、PCに用意した CPython で試せます。</p><p>PCではコードを main.py に保存し、同じフォルダーをターミナルで開いて python3 main.py（Windowsでは py main.py）を実行します。入力は一行ずつ Enter で渡し、停止は Ctrl+C です。別ファイルがある例は同じフォルダーに保存します。</p></details>
+    <details class="environment"><summary>ブラウザとPCでの実行方法</summary><p>この画面は端末内で Python 3 のコードを実行します。基礎や反復の練習には Skulpt、標準ライブラリが必要な章には CPython を使います。名前・コードは端末内に保存します。教材のファイル一式を保存して開くとオフラインでも動きます。追加パッケージの導入やPC上のファイルの操作は、PCに用意した CPython で試せます。</p><p>PCではコードを main.py に保存し、同じフォルダーをターミナルで開いて python3 main.py（Windowsでは py main.py）を実行します。入力は一行ずつ Enter で渡し、停止は Ctrl+C です。別ファイルがある例は同じフォルダーに保存します。</p></details>
   </main>
 </body></html>

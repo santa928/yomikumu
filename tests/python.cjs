@@ -5,6 +5,7 @@ const { pathToFileURL } = require("node:url");
 const path = require("node:path");
 const { chromium } = require("playwright");
 const fixtures = require("./python-answers.cjs");
+const replacements = require("./python-oop-answers.cjs");
 
 async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/index.html")).href, only) {
   const pc = await browser.newPage();
@@ -71,7 +72,9 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
       assert.equal(await pc.evaluate(() => JSON.parse(localStorage.getItem("yomikumu-python-practice-v1")).route), "59/1/guide");
     }
     if (!only || only === "62") await require("./python-cpython.cjs").verifyCPython(pc, entry);
-    const report = await pc.evaluate(async ({ requested, fixtures }) => {
+    await require("./python-demos.cjs").verifyDemos(pc, entry, only);
+    if (!only || only === "67") await require("./python-tap.cjs").verifyTapExercises(phone, entry);
+    const report = await pc.evaluate(async ({ requested, fixtures, replacements }) => {
       const errors = [];
       let count = 0;
       let engine;
@@ -79,34 +82,41 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
         return runPython({ engine, source, before: test.before, lines: splitInput(test.input || ""), files, observe: test.observe, afterError: test.afterError, interactive: false }).result;
       }
       for (const ch of pythonChapters.filter(ch => !requested || ch.id === requested)) {
-        engine = ch.engine;
         for (const [i, lesson] of ch.lessons.entries()) {
+          engine = lesson.engine || ch.engine;
           const id = ch.id + "/" + (i + 1);
           const ex = await run(lesson.code, lesson, lesson.files);
           const expected = lesson.output ? lesson.output + "\n" : "";
           if (ex.output !== expected || (lesson.error ? !ex.error?.startsWith(lesson.error) : ex.error)) errors.push([id, "slide", ex]);
           for (const step of ["guide", "write"]) {
             const assignment = lesson[step];
-            const fixture = fixtures[ch.id]?.[i];
+            let fixture = fixtures[ch.id]?.[i];
+            if (replacements[ch.id]) {
+              fixture = replacements[ch.id][i].map(([original, change], index) => {
+                const base = lesson[index === 0 ? "guide" : "write"].solution;
+                if (!base.includes(original)) throw new Error("検証例の置換元が見つかりません " + id + " " + original);
+                return base.replace(original, change);
+              });
+            }
             for (const test of assignment.cases) {
               const files = { ...assignment.files, ...assignment.tapFiles };
               for (const source of [assignment.solution, fixture?.[step === "guide" ? 0 : 2] || assignment.solution]) {
                 const result = assignment.targetFile
                   ? await run(assignment.main, test, { ...files, [assignment.targetFile]: (assignment.filePrefix || "") + source })
-                  : await run(source, test, files);
+                  : await run(source + (assignment.after ? "\n" + assignment.after : ""), test, files);
                 if (!passed(result, test)) errors.push([id, step, test.label, result]);
               }
             }
             const incorrect = (step === "write" && fixture ? fixture[1] : assignment.starter);
             const wrong = [];
-            for (const test of assignment.cases) wrong.push(passed(assignment.targetFile ? await run(assignment.main, test, { [assignment.targetFile]: (assignment.filePrefix || "") + incorrect }) : await run(incorrect, test, assignment.files), test));
+            for (const test of assignment.cases) wrong.push(passed(assignment.targetFile ? await run(assignment.main, test, { [assignment.targetFile]: (assignment.filePrefix || "") + incorrect }) : await run(incorrect + (assignment.after ? "\n" + assignment.after : ""), test, assignment.files), test));
             if (wrong.every(Boolean)) errors.push([id, step, "典型誤答が通過"]);
             count++;
           }
         }
       }
       return { errors, count };
-    }, { requested: only || "", fixtures });
+    }, { requested: only || "", fixtures, replacements });
     assert.deepEqual(report.errors, []);
     console.log("Python " + report.count + "課題の実行・正誤採点・別解、スマホ組立、入力待ち・停止・保存復帰を確認");
   } finally { await pc.close(); await phone.close(); }

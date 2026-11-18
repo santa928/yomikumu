@@ -140,35 +140,55 @@ function renderFiles(place, files = {}, editable) {
     area.spellcheck = false;
     area.value = draft.files?.[name] ?? content;
     label.append(area);
-    area.addEventListener("input", () => { (draft.files ||= {})[name] = area.value; save(); });
+    area.addEventListener("input", () => { stopForEdit(); (draft.files ||= {})[name] = area.value; save(); });
     place.append(label);
   }
 }
 function showExercise(demo) {
   $("task-heading").textContent = demo ? "完成例を動かす" : view === "guide" ? "見本を一か所変える" : "自分で解く";
-  $("input-note").textContent = chapter.engine === "cpython" ? "この章は端末内のCPythonで実行します。入力は実行前に一行ずつ用意してください。最初の実行時にこの章用の実行ファイルを読み込みます。" : "足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。";
+  $("input-note").textContent = (lesson?.engine || chapter.engine) === "cpython" ? "この章は端末内のCPythonで実行します。入力は実行前に一行ずつ用意してください。最初の実行時にこの章用の実行ファイルを読み込みます。" : "足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。";
   $("input").value = draft.input ?? (demo ? task.input : task.cases[0].input) ?? "";
   $("source").labels[0].textContent = (task.targetFile || "main.py") + " のコード";
   const companion = task.targetFile ? { "main.py": task.main } : task.files;
   renderFiles($("task-files"), companion, !demo && mode === "code" && task.editFiles);
   const supplied = !demo && task.cases[0].before;
-  $("provided").hidden = !supplied;
-  $("provided").textContent = supplied ? "練習実行の前に用意されるコード\n" + supplied : "";
+  const prefix = !demo && task.filePrefix;
+  const example = !demo && [task.after, task.cases[0].observe].filter(Boolean).join("\n");
+  $("driver").hidden = !example;
+  $("driver").open = false;
+  $("driver").querySelector("pre").textContent = example || "";
+  $("provided").hidden = !supplied && !prefix;
+  $("provided").textContent = [supplied && "練習実行の前に用意されるコード\n" + supplied,
+    prefix && task.targetFile + " の先頭に用意されるコード\n" + prefix].filter(Boolean).join("\n");
   $("source").readOnly = demo || mode === "tap";
   $("builder").hidden = demo || mode !== "tap";
   $("keyboard").setAttribute("aria-pressed", String(mode === "code"));
   $("tap").setAttribute("aria-pressed", String(mode === "tap"));
   if (demo) { $("source").value = task.code; return; }
   $("hint").querySelector("p").textContent = task.hint;
-  $("source").value = mode === "code" ? draft.code ?? task.starter : (draft.tap || []).join("\n");
+  const template = mode === "tap" ? tapTemplate(task, view, chapter.id + "/" + number, draft.tap) : null;
+  $("source").value = mode === "code" ? draft.code ?? task.starter : (template?.program || draft.tap || []).join("\n");
   $("undo-line").disabled = !draft.tap?.length;
   if (mode === "tap") {
     const wrong = task.distractors || [lesson.code.split("\n")[0], 'print("受付")'];
-    const lines = [...new Set([...task.solution.split("\n"), ...wrong].filter(Boolean))].sort();
+    $("tap-instruction").textContent = template
+      ? (template.index === undefined ? "空欄が埋まりました。実行や採点で試しましょう。" : "空欄 " + (template.count + 1) + " / " + template.slots.length + " に入れる行を選びましょう。")
+      : "行を使う順に選びます。同じ行を何度でも使えます。";
+    $("undo-line").disabled = template ? template.count === 0 : !draft.tap?.length;
+    $("slot-context").hidden = !template || template.index === undefined;
+    if (template && template.index !== undefined) {
+      $("slot-context").textContent = template.program.slice(Math.max(0, template.index - 1), template.index + 2).join("\n");
+    }
+    const lines = template ? template.candidates : [...new Set([...task.solution.split("\n"), ...wrong].filter(Boolean))].sort();
     $("pieces").replaceChildren(...lines.map(line => button(line, () => {
-      (draft.tap ||= []).push(line);
+      stopForEdit();
+      if (template) {
+        draft.tap = template.program;
+        draft.tap[template.index] = line;
+      } else (draft.tap ||= []).push(line);
       save(); showExercise(false);
-      [...$("pieces").children].find(node => node.textContent === line)?.focus();
+      const next = [...$("pieces").children].find(node => node.textContent === line) || $("pieces").firstElementChild || $("run");
+      next.focus();
     })));
   }
 }
@@ -203,6 +223,12 @@ function showSteps() {
   nav.append(next);
   if (view !== "demo") nav.append(link("完成例を試す", chapter.id + "/demo"));
 }
+function stopForEdit() {
+  if (!execution) return;
+  stop();
+  $("checks").replaceChildren();
+  $("status").textContent = "下書きが変わったため停止しました。編集した内容で実行できます。";
+}
 function switchMode(next) {
   stop(); mode = draft.mode = next;
   $("status").textContent = ""; $("checks").replaceChildren(); $("output").textContent = "";
@@ -210,9 +236,17 @@ function switchMode(next) {
 }
 $("keyboard").onclick = () => switchMode("code");
 $("tap").onclick = () => switchMode("tap");
-$("undo-line").onclick = () => { draft.tap.pop(); save(); showExercise(false); };
-$("source").oninput = () => { draft.code = $("source").value; save(); };
-$("input").oninput = () => { draft.input = $("input").value; save(); };
+$("undo-line").onclick = () => {
+  stopForEdit();
+  const template = tapTemplate(task, view, chapter.id + "/" + number, draft.tap);
+  if (template) {
+    const last = template.count - 1;
+    draft.tap[template.slots[last]] = template.placeholders[last];
+  } else draft.tap.pop();
+  save(); showExercise(false);
+};
+$("source").oninput = () => { stopForEdit(); draft.code = $("source").value; save(); };
+$("input").oninput = () => { stopForEdit(); draft.input = $("input").value; save(); };
 $("skip").onclick = event => { event.preventDefault(); $("content").focus(); };
 $("stop").onclick = () => { stop(); $("status").textContent = "停止しました。書いたコードから再実行できます。"; $("run").focus(); };
 $("waiting").onsubmit = event => {
@@ -223,8 +257,16 @@ $("waiting").onsubmit = event => {
 async function execute(grade) {
   stop();
   const token = generation;
+  if (grade && mode === "tap") {
+    const template = tapTemplate(task, view, chapter.id + "/" + number, draft.tap);
+    if (template && template.index !== undefined) {
+      $("status").textContent = "次は空欄 " + (template.count + 1) + " に入れる行を選びましょう。";
+      return;
+    }
+  }
   const edit = $("source").value;
-  const source = task.targetFile ? task.main : edit;
+  let source = task.targetFile ? task.main : edit;
+  if (grade && task.after) source += "\n" + task.after;
   const demo = view === "demo";
   const files = { ...task.files, ...(!demo && mode === "code" ? draft.files : {}), ...(!demo && mode === "tap" ? task.tapFiles : {}) };
   if (task.targetFile) files[task.targetFile] = (task.filePrefix || "") + edit;
@@ -236,7 +278,7 @@ async function execute(grade) {
   let matches = 0;
   for (const test of cases) {
     $("status").textContent = grade ? "採点中　" + test.label : "実行中…";
-    execution = runPython({ engine: chapter.engine, source, files, before: test.before || "", observe: test.observe, afterError: test.afterError, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
+    execution = runPython({ engine: lesson?.engine || chapter.engine, source, files, before: test.before || "", observe: test.observe, afterError: test.afterError, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
       $("output").textContent = output;
       $("status").textContent = "入力を待っています。";
       $("waiting").hidden = false; $("line").value = ""; $("line").focus();
@@ -258,7 +300,9 @@ async function execute(grade) {
       break;
     }
     matches++;
-    $("checks").append(element("p", "✓ " + test.label + (test.observe ? "　確認した値 " + JSON.stringify(result.value) : "")));
+    const observed = test.error ? "　" + test.error : "";
+    const value = (test.observe || test.afterError) && result.value !== undefined ? "　確認した値 " + JSON.stringify(result.value) : "";
+    $("checks").append(element("p", "✓ " + test.label + observed + value));
   }
   if (grade && matches === cases.length) {
     state.completed[route + "/" + mode] = true;

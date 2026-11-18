@@ -188,6 +188,7 @@ function renderDom() {
     const input = node("textarea");
     input.value = files[name] ?? "";
     input.spellcheck = false;
+    input.dataset.sourceEditor = "";
     input.oninput = () => {
       stopRun();
       state.code = readEditors();
@@ -269,6 +270,15 @@ function renderDom() {
   else {
     const following = domUnits[domUnits.indexOf(unit) + 1];
     if (following) links.append(route("次の単元へ　" + following.title, following.id));
+  }
+  if (step.reflection) {
+    const noteLabel = node("label", step.reflection);
+    noteLabel.className = "code-field";
+    const note = node("textarea");
+    note.value = typeof state.note === "string" ? state.note : "";
+    note.oninput = () => { state.note = note.value; saveDom(); };
+    noteLabel.append(note);
+    exercise.append(noteLabel);
   }
   domMain.append(model, phone, exercise, links);
   if (position === "read") model.focus();
