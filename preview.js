@@ -51,17 +51,32 @@ function safeMarkup(source) {
   return {
     body: container.innerHTML,
     title: template.content.querySelector("title")?.textContent.trim(),
+    usesInk: [...template.content.querySelectorAll("link")].some((link) =>
+      link.relList.contains("stylesheet") && ["ink.css", "./ink.css"].includes(link.getAttribute("href")?.trim())),
   };
 }
 
-function pageSource(html, css, fallbackTitle = "作品紹介") {
+function pageSource(html, css, fallbackTitle = "作品紹介", preview = false) {
   const page = safeMarkup(html);
+  // 配信中は本物の別ファイルを読み、持ち出した作品では同じCSSを同梱する。
+  let linkedSheet = "";
+  let styleSource = "";
+  if (page.usesInk) {
+    const url = new URL("ink.css", document.baseURI);
+    const hosted = preview && ["https:", "http:"].includes(url.protocol);
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = hosted ? url.href : "data:text/css;charset=utf-8," + encodeURIComponent(inkCss);
+    linkedSheet = stylesheet.outerHTML;
+    styleSource = hosted ? " " + url.href : " data:";
+  }
   const safeTitle = document.createElement("span");
   safeTitle.textContent = page.title || fallbackTitle;
   return (
     '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
-    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\">\n" +
+    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'" + styleSource + "; base-uri 'none'; form-action 'none'\">\n" +
+    linkedSheet +
     "<title>" +
     safeTitle.innerHTML +
     "</title>\n<style>\n" +
@@ -72,7 +87,7 @@ function pageSource(html, css, fallbackTitle = "作品紹介") {
   );
 }
 
-function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false) {
+function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false, measure) {
   const frame = document.createElement("iframe");
   frame.title = label;
   frame.setAttribute("sandbox", "allow-same-origin allow-popups allow-popups-to-escape-sandbox");
@@ -92,6 +107,11 @@ function makePreview(host, html, css, label, width, maxHeight = 310, showTitle =
       () => {
         const doc = frame.contentDocument;
         if (showTitle) caption.textContent = "タブのタイトル　" + (doc.title || "（未入力）");
+        const measured = measure && doc.querySelector(measure.selector);
+        if (measured) {
+          const size = doc.defaultView.getComputedStyle(measured).fontSize;
+          figure.append(node("small", measure.label + "の実測値　" + size));
+        }
         // srcdoc の相対URLは親ページを基準にする。作品内のリンクを同じ見本の文書に向ける。
         for (const anchor of doc.querySelectorAll('a[href^="#"]')) {
           anchor.href = "about:srcdoc" + anchor.getAttribute("href");
@@ -113,7 +133,7 @@ function makePreview(host, html, css, label, width, maxHeight = 310, showTitle =
       { once: true },
     ),
   );
-  frame.srcdoc = pageSource(html, css, showTitle ? "" : "作品紹介");
+  frame.srcdoc = pageSource(html, css, showTitle ? "" : "作品紹介", true);
   view.append(frame);
   return ready;
 }

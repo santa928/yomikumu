@@ -280,9 +280,10 @@ const lessons = [
     slides: [
       {
         title: "色を指定する",
-        body: "CSSは見た目を指定する言葉です。波かっこの前に対象、中に変えるものと値を書きます。ここでは p の文字を紺色にします。",
+        body: "CSSは見た目を指定する言葉です。波かっこの前の p が対象、color が変えるもの、navy がその値です。「緑の指定を試す」を押すと、色の値と実際の文字が一緒に変わります。",
         html: "<p>雨の日の栞</p>",
         css: "p { color: navy; }",
+        tryCss: { label: "緑の指定を試す", css: "p { color: green; }" },
       },
       {
         title: "変えたい箇所に名前を付ける",
@@ -322,6 +323,7 @@ const lessons = [
       review: 2,
     },
   },
+  ...typeLessons,
   {
     id: "card",
     title: "一つの作品をカードにまとめる",
