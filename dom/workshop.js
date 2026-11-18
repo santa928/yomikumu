@@ -1,7 +1,12 @@
 "use strict";
-const domUnits = [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit];
+const workshop = window.courseWorkshop || {
+  id: "dom", heading: "ブラウザで動かすJavaScript", language: "JavaScript",
+  units: [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit],
+  frame: domFrame, prepare: limitDomLoops,
+};
+const domUnits = workshop.units;
 const domMain = document.querySelector("main");
-const domStateKey = "yomikumu/dom/v1";
+const domStateKey = "yomikumu/" + workshop.id + "/v1";
 let domState = { last: "", tasks: {} };
 try {
   const parsed = JSON.parse(localStorage.getItem(domStateKey));
@@ -46,7 +51,7 @@ function renderDom() {
     else a.removeAttribute("aria-current");
   }
   if (!unit) {
-    domMain.append(node("h1", "ブラウザで動かすJavaScript"));
+    domMain.append(node("h1", workshop.heading));
     const list = node("ol");
     list.className = "catalog";
     for (const u of domUnits) {
@@ -61,16 +66,16 @@ function renderDom() {
   const step = unit.steps[index];
   const key = step ? id + "/" + (index + 1) : id;
   domState.last = key;
-  window.YomikumuPaths?.remember("dom", key);
+  window.YomikumuPaths?.remember(workshop.id, key);
   saveDom();
   document.title = (step?.title || unit.title) + "｜よみくむ";
-  const chapter = node("p", step ? unit.title : "ブラウザでの実習");
+  const chapter = node("p", step ? unit.title : workshop.heading);
   chapter.className = "kind";
   domMain.append(chapter, node("h1", step?.title || unit.title));
   if (!step) {
     domMain.append(node("p", unit.intro));
     const demo = section("完成例を試す");
-    demo.append(node("p", unit.demo.tip), domFrame("操作できる完成例", unit.demo.html, unit.demo.code, [], unit.setup));
+    demo.append(node("p", unit.demo.tip), workshop.frame("操作できる完成例", unit.demo.html, unit.demo.code, [], unit.setup));
     const list = node("ol");
     list.className = "catalog";
     for (const [i, s] of unit.steps.entries()) {
@@ -88,7 +93,10 @@ function renderDom() {
   model.id = "example";
   model.tabIndex = -1;
   model.append(node("p", step.explain), node("pre", step.example));
-  const sample = domFrame("見本の実行結果", step.exampleHtml || step.html, step.example, [], unit.setup);
+  if (step.referenceHtml) {
+    model.append(node("pre", step.referenceHtml), domFrame("HTMLでの表示", step.referenceHtml, ""));
+  }
+  const sample = workshop.frame("見本の実行結果", step.exampleHtml || step.html, step.example, [], unit.setup);
   model.append(sample);
   if (id === "elements" && index > 0) {
     const css = node("details");
@@ -98,7 +106,7 @@ function renderDom() {
   if (step.compare) {
     const stage = node("div");
     model.append(button(step.compare.label, () => {
-      stage.replaceChildren(node("pre", step.compare.code), domFrame("変更後の実行結果", step.html, step.compare.code, [], unit.setup));
+      stage.replaceChildren(node("pre", step.compare.code), workshop.frame("変更後の実行結果", step.html, step.compare.code, [], unit.setup));
     }), stage);
   }
   const phone = section("タップで確かめる");
@@ -166,24 +174,37 @@ function renderDom() {
     }
     build.append(group);
   }
-  const label = node("label", "JavaScript");
-  label.className = "code-field";
-  const editor = node("textarea");
-  editor.value = typeof state.code === "string" ? state.code : step.starter ?? step.example;
-  editor.spellcheck = false;
+  const fields = node("div");
+  const editors = [];
+  const initial = typeof state.code === "string" ? state.code : step.starter ?? step.example;
+  const files = step.files ? workshop.splitFiles(initial) : { [step.language || workshop.language]: initial };
+  const readEditors = () => step.files ?
+    workshop.joinFiles(Object.fromEntries(editors.map(({ name, input }) => [name, input.value]))) : editors[0].input.value;
   const status = node("p", state.passed ? "前回のコードで達成しました。" : "");
   status.setAttribute("role", "status");
-  editor.addEventListener("input", () => {
-    stopRun();
-    state.code = editor.value;
-    state.passed = false;
-    status.textContent = "";
-    saveDom();
-  });
-  label.append(editor);
+  for (const name of step.files || Object.keys(files)) {
+    const label = node("label", name);
+    label.className = "code-field";
+    const input = node("textarea");
+    input.value = files[name] ?? "";
+    input.spellcheck = false;
+    input.oninput = () => {
+      stopRun();
+      state.code = readEditors();
+      state.file = name;
+      state.passed = false;
+      status.textContent = "";
+      saveDom();
+    };
+    editors.push({ name, input });
+    label.append(input);
+    fields.append(label);
+  }
+  const editor = (editors.find(item => item.name === state.file) || editors[0]).input;
   const preview = node("div");
   const markup = node("details");
   markup.append(node("summary", "実習ページのHTML"), node("pre", step.html));
+  markup.hidden = !step.html;
   const review = route("見本を読み直す", key + "/read");
   review.className = "review";
   const back = route("書きかけの課題へ戻る", key + "/practice");
@@ -197,11 +218,11 @@ function renderDom() {
     stopRun();
     output.replaceChildren();
     let code;
-    try { code = limitDomLoops(source); }
+    try { code = workshop.prepare(source); }
     catch (error) { result.textContent = "コードの実行で止まりました。 " + error.message; return; }
     result.textContent = "実行しています。";
-    const frame = domFrame("自分の実行結果", step.html, code, [], unit.setup);
-    const test = domFrame("操作の確認", step.html, code, step.tests, unit.setup);
+    const frame = workshop.frame("自分の実行結果", step.html, code, [], unit.setup);
+    const test = workshop.frame("操作の確認", step.html, code, step.tests, unit.setup);
     const beforeTest = document.activeElement;
     if (unit.focusTests) {
       test.className = "dom-focus-check";
@@ -221,7 +242,7 @@ function renderDom() {
     const timer = setTimeout(() => {
       result.textContent = "確認が時間内に終わりませんでした。繰り返しや待ち時間を見直してください。";
       stopRun();
-    }, 6000);
+    }, workshop.timeout || 6000);
     stopRun = () => { removeEventListener("message", receive); clearTimeout(timer); if (document.activeElement === test) beforeTest?.focus({preventScroll:true}); test.remove(); stopRun = () => {}; };
     output.append(frame, test);
   }
@@ -232,7 +253,7 @@ function renderDom() {
     }
     run(assemble(), "build");
   }), builtStatus, builtPreview);
-  write.append(label, button("実行して確かめる", () => run(editor.value, "write")), status, preview);
+  write.append(fields, button("実行して確かめる", () => run(readEditors(), "write")), status, preview);
   mode.value = state.mode || (matchMedia("(max-width: 720px)").matches ? "build" : "write");
   function showMode() {
     build.hidden = mode.value !== "build";
