@@ -33,7 +33,7 @@ function button(text, action) {
   return node;
 }
 function splitInput(text) { return text === "" ? [] : text.replace(/\r\n?/g, "\n").split("\n"); }
-let chapter, lesson, number, view, task, route, draft, mode, execution, generation = 0;
+let chapter, lesson, number, view, task, route, draft, mode, execution, reviewReturn, generation = 0;
 function showToc() {
   const toc = $("contents");
   toc.replaceChildren();
@@ -95,7 +95,7 @@ function showSlide() {
   $("example-code").textContent = lesson.code;
   renderFiles($("example-files"), lesson.files, false);
   $("sample-input").textContent = lesson.input === undefined ? "" : "この例の入力　" + lesson.input.split("\n").join(" → ");
-  $("example-output").textContent = lesson.output || "（表示なし）";
+  $("example-output").textContent = [lesson.output, lesson.error].filter(Boolean).join("\n") || "（表示なし）";
   const [question, choices, correct, reason] = lesson.quiz;
   $("quiz").querySelector("legend").textContent = question;
   function answer(index) {
@@ -125,7 +125,9 @@ function renderFiles(place, files = {}, editable) {
 function showExercise(demo) {
   $("task-heading").textContent = demo ? "完成例を動かす" : view === "guide" ? "見本を一か所変える" : "自分で解く";
   $("input").value = draft.input ?? (demo ? task.input : task.cases[0].input) ?? "";
-  renderFiles($("task-files"), task.files, !demo && mode === "code" && task.editFiles);
+  $("source").labels[0].textContent = (task.targetFile || "main.py") + " のコード";
+  const companion = task.targetFile ? { "main.py": task.main } : task.files;
+  renderFiles($("task-files"), companion, !demo && mode === "code" && task.editFiles);
   const supplied = !demo && task.cases[0].before;
   $("provided").hidden = !supplied;
   $("provided").textContent = supplied ? "練習実行の前に用意されるコード\n" + supplied : "";
@@ -153,9 +155,19 @@ function showSteps() {
   const path = chapter.id + "/" + number + "/";
   let next;
   if (view === "demo") next = link("最初のスライドを読む", chapter.id + "/1/slide");
-  else if (view === "slide") next = link("見本を変えてみる", path + "guide");
+  else if (view === "slide") {
+    const back = reviewReturn || history.state?.reviewReturn;
+    if (back === path + "guide" || back === path + "write") {
+      history.replaceState({ reviewReturn: back }, "", location.href);
+      nav.append(link("書き途中の課題に戻る", back));
+    }
+    next = link("見本を変えてみる", path + "guide");
+  }
   else {
-    nav.append(link("関連スライドを読み直す", path + "slide"));
+    reviewReturn = null;
+    const review = link("関連スライドを読み直す", path + "slide");
+    review.onclick = () => { reviewReturn = route; };
+    nav.append(review);
     if (view === "guide") next = link("自分で解く課題へ", path + "write");
     else if (number < chapter.lessons.length) next = link("次のスライドへ", chapter.id + "/" + (number + 1) + "/slide");
     else {
@@ -188,9 +200,11 @@ $("waiting").onsubmit = event => {
 async function execute(grade) {
   stop();
   const token = generation;
-  const source = $("source").value;
+  const edit = $("source").value;
+  const source = task.targetFile ? task.main : edit;
   const demo = view === "demo";
   const files = { ...task.files, ...(!demo && mode === "code" ? draft.files : {}), ...(!demo && mode === "tap" ? task.tapFiles : {}) };
+  if (task.targetFile) files[task.targetFile] = edit;
   const cases = grade ? task.cases : [{ before: !demo && task.cases[0].before, input: $("input").value }];
   $("checks").replaceChildren();
   $("output").textContent = "";
@@ -213,12 +227,15 @@ async function execute(grade) {
     }
     if (!passed(result, test)) {
       $("checks").append(element("p", test.label + "　" + (result.error || "期待する表示　" + (test.want || "（表示なし）"))));
+      if (!result.error && test.observe) {
+        $("checks").append(element("p", "確認した値　" + JSON.stringify(result.value) + "　期待する値　" + JSON.stringify(test.value)));
+      }
       const partial = result.output && test.want.startsWith(result.output);
       $("status").textContent = (matches || partial ? "途中までできました。 " : "もう一度試せます。 ") + (test.hint || task.hint);
       break;
     }
     matches++;
-    $("checks").append(element("p", "✓ " + test.label));
+    $("checks").append(element("p", "✓ " + test.label + (test.observe ? "　確認した値 " + JSON.stringify(result.value) : "")));
   }
   if (grade && matches === cases.length) {
     state.completed[route + "/" + mode] = true;

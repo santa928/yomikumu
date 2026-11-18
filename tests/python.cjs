@@ -33,7 +33,7 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
     await pc.getByRole("link", { name: "関連スライドを読み直す" }).click();
     await pc.getByRole("button", { name: "int(input()) + 1", exact: true }).click();
     await pc.locator("#quiz-result").getByText(/正解/).waitFor();
-    await pc.goBack();
+    await pc.getByRole("link", { name: "書き途中の課題に戻る" }).click();
     assert.equal(await source.inputValue(), "name = input()\nprint(name)");
     await source.fill("while True:\n    pass");
     await pc.locator("#run").click();
@@ -60,6 +60,7 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
     assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     if (process.env.SCREENSHOT_DIR) await phone.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "python-mobile.png") });
 
+    if (!only || only === "58") await require("./python-modules.cjs").verifyModules(pc, entry);
     const report = await pc.evaluate(async ({ requested, fixtures }) => {
       const errors = [];
       let count = 0;
@@ -78,13 +79,15 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
             for (const test of assignment.cases) {
               const files = { ...assignment.files, ...assignment.tapFiles };
               for (const source of [assignment.solution, fixture?.[step === "guide" ? 0 : 2] || assignment.solution]) {
-                const result = await run(source, test, files);
+                const result = assignment.targetFile
+                  ? await run(assignment.main, test, { ...files, [assignment.targetFile]: source })
+                  : await run(source, test, files);
                 if (!passed(result, test)) errors.push([id, step, test.label, result]);
               }
             }
             const incorrect = (step === "write" && fixture ? fixture[1] : assignment.starter);
             const wrong = [];
-            for (const test of assignment.cases) wrong.push(passed(await run(incorrect, test, assignment.files), test));
+            for (const test of assignment.cases) wrong.push(passed(assignment.targetFile ? await run(assignment.main, test, { [assignment.targetFile]: incorrect }) : await run(incorrect, test, assignment.files), test));
             if (wrong.every(Boolean)) errors.push([id, step, "典型誤答が通過"]);
             count++;
           }
