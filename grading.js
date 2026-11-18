@@ -40,6 +40,36 @@ function listItems(list) {
     .map((child) => child.textContent.trim());
 }
 
+function museumAnchorIn(parent) {
+  return [...parent.querySelectorAll("a")].some((a) =>
+    a.href === museumLinks[1] && a.textContent.trim() === "国立科学博物館");
+}
+
+function signProblem(parent) {
+  const signs = [...parent.querySelectorAll("img")].filter((img) => img.src === contactArrow);
+  if (!signs.length) return "受付の矢印を表示するため、img の src に arrow.png を指定しましょう。";
+  if (!signs.some((img) => img.alt.trim().replace(/[。！]$/, "") === "受付は右です"))
+    return "矢印は表示できました。alt に、画像の代わりに読める「受付は右です」を書きましょう。";
+  return "";
+}
+
+function memoInputIn(parent) {
+  const label = namedElement(parent, "label", "見学メモ");
+  const input = label?.control;
+  return input && parent.contains(input) && input.localName === "input" && input.type === "text" ? input : null;
+}
+
+function memoResetProblem(parent) {
+  const input = memoInputIn(parent);
+  if (!input) return "「見学メモ」というラベルをテキスト入力欄と結び、文字を押して入力できるようにしましょう。";
+  if (!input.form || !parent.contains(input.form))
+    return "欄とラベルは結べました。入力欄とボタンを同じ form で囲みましょう。";
+  if (input.defaultValue !== "") return "リセットしたとき空欄に戻るように、入力欄の初期値を空にしましょう。";
+  const reset = [...input.form.querySelectorAll("button")].some((b) =>
+    b.type === "reset" && b.textContent.trim() === "メモを消す");
+  return reset ? "" : "入力欄はできました。『メモを消す』というボタンを同じ form に置き、type を reset にしましょう。";
+}
+
 function exerciseResult(id, docs) {
   const doc = docs[0];
   const style = (node) => doc.defaultView.getComputedStyle(node);
@@ -147,6 +177,27 @@ function exerciseResult(id, docs) {
       if (!comesAfter(next, caution) || !namedElement(next, "em", "今日"))
         return "大切な注意はできました。次の段落の中で、ほかの日と区別したい「今日」だけを em で囲みましょう。";
       break;
+    }
+    case "museum-link":
+      if (!museumAnchorIn(doc))
+        return "リンクの文字は「国立科学博物館」にして、href の中を公式サイトのURLにしましょう。";
+      break;
+    case "sign-image":
+      return signProblem(doc);
+    case "field-name":
+      if (!memoInputIn(doc))
+        return "「見学メモ」を囲む label の for と、入力する欄の id を同じ名前にしましょう。";
+      break;
+    case "clear-form":
+      return memoResetProblem(doc);
+    case "contact-card": {
+      const card = namedElement(doc, "article h2", "森の展示窓口")?.closest("article");
+      if (!card) return "まず「森の展示窓口」の見出しを article に入れましょう。";
+      const sign = signProblem(card);
+      if (sign) return sign;
+      if (!museumAnchorIn(card))
+        return "受付の案内はできました。カードの中に国立科学博物館の公式サイトへのリンクを入れましょう。";
+      return memoResetProblem(card);
     }
     case "class": {
       const title = style(doc.querySelector(".title"));

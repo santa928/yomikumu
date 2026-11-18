@@ -1,7 +1,7 @@
 "use strict";
 
 const permittedTags = new Set(
-  "main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a strong em small ul ol li br hr figure figcaption b i code pre blockquote".split(
+  "main header footer nav section article aside div span h1 h2 h3 h4 h5 h6 p a strong em small ul ol li br hr figure figcaption b i code pre blockquote img form input label button".split(
     " ",
   ),
 );
@@ -20,8 +20,28 @@ function safeMarkup(source) {
       if (node.hasAttribute(attribute))
         element.setAttribute(attribute, node.getAttribute(attribute));
     }
-    if (node.localName === "a" && /^#[^\s#]+$/u.test(node.getAttribute("href") || "")) {
-      element.setAttribute("href", node.getAttribute("href"));
+    if (node.localName === "a") {
+      const href = (node.getAttribute("href") || "").trim();
+      if (/^#[^\s#]+$/u.test(href)) element.setAttribute("href", href);
+      if (/^https:\/\//i.test(href) && museumLinks.includes(node.href)) {
+        element.href = node.href;
+        element.target = "_blank";
+        element.rel = "noopener noreferrer";
+      }
+    }
+    if (node.localName === "img") {
+      if (["arrow.png", "./arrow.png"].includes(node.getAttribute("src")))
+        element.src = contactArrow;
+      if (node.hasAttribute("alt")) element.alt = node.getAttribute("alt");
+    }
+    if (node.localName === "label" && node.hasAttribute("for")) element.htmlFor = node.htmlFor;
+    if (node.localName === "input") {
+      if (!["text", "search", "email", "number", "checkbox"].includes(node.type)) return;
+      element.type = node.type;
+      if (node.hasAttribute("value")) element.defaultValue = node.defaultValue;
+    }
+    if (node.localName === "button") {
+      element.type = node.type;
     }
     for (const child of node.childNodes) copy(child, element);
     parent.append(element);
@@ -41,7 +61,7 @@ function pageSource(html, css, fallbackTitle = "作品紹介") {
   return (
     '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
-    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\">\n" +
+    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\">\n" +
     "<title>" +
     safeTitle.innerHTML +
     "</title>\n<style>\n" +
@@ -55,7 +75,7 @@ function pageSource(html, css, fallbackTitle = "作品紹介") {
 function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false) {
   const frame = document.createElement("iframe");
   frame.title = label;
-  frame.setAttribute("sandbox", "allow-same-origin");
+  frame.setAttribute("sandbox", "allow-same-origin allow-popups allow-popups-to-escape-sandbox");
   frame.referrerPolicy = "no-referrer";
   if (width) frame.style.width = width + "px";
   const view = document.createElement("div");

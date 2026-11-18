@@ -271,6 +271,7 @@ const lessons = [
     },
   },
   ...exhibitionLessons,
+  ...contactLessons,
   {
     id: "class",
     title: "指定した文字に色を付ける",
