@@ -28,8 +28,8 @@ async function verifyNext() {
     await pc.goto(base + "#routes");
     await pc.getByRole("button", { name: "/books/reed", exact: true }).click();
     await pc.locator(".code-result pre").filter({ hasText: "葦の小舟" }).waitFor();
-    const lessons = await pc.evaluate(() => nextLessons.map(({id, slides, right, quiz, answer, file}) =>
-      ({ id, count: slides.length, right, correct: quiz[2], answer, file })));
+    const lessons = await pc.evaluate(() => nextLessons.map(({id, slides, right, quiz, answer, file, task}) =>
+      ({ id, count: slides.length, right, correct: quiz[2], question: quiz[0], answer, file, task })));
     for (const lesson of lessons) {
       const { id, count, right, correct, answer, file } = lesson;
       for (let i = 1; i <= count; i++) {
@@ -38,18 +38,21 @@ async function verifyNext() {
         assert.ok(await pc.locator("main pre").textContent());
       }
       await phone.goto(base + "#" + id + "/quiz");
+      await phone.getByText(lesson.question, { exact: true }).first().waitFor();
       for (const [index, text] of [[(correct + 1) % 4, "もう一度"], [correct, "正解です"]]) {
         await phone.getByRole("radio").nth(index).check();
         await phone.getByRole("button", { name: "答えを確かめる" }).tap();
         await phone.locator("main [role=status]").filter({ hasText: text }).waitFor();
       }
       await phone.getByRole("link", { name: "コードを練習する" }).tap();
+      await phone.getByText(lesson.task, { exact: true }).first().waitFor();
       for (const [i, value] of right.entries()) {
         const options = phone.getByRole("group").nth(i);
         await options.getByRole("radio", { name: value, exact: true }).check();
         if (i === 0 && right.length > 1) {
           await phone.getByRole("button", { name: "組み立てを確かめる" }).tap();
-          await phone.locator("main [role=status]").filter({ hasText: "最初の指定は合っています" }).waitFor();
+          const status = await phone.locator("main [role=status]").innerText();
+          assert.match(status, /最初の指定は合っています/, id + " " + status);
         }
       }
       await phone.getByRole("button", { name: "組み立てを確かめる" }).tap();
@@ -85,6 +88,18 @@ async function verifyNext() {
           await upload.setInputFiles(reportFile);
           await pc.locator("main [role=status]").filter({ hasText: "採点したコードと記述欄が違います" }).waitFor();
           await editor.fill(lesson.answer);
+        }
+        if (lesson.id === "meeting-export") {
+          const project = lessons.find(item => item.id === "meeting-project");
+          const companion = pc.getByRole("textbox", { name: project.file, exact: true });
+          await pc.goto(base + "#meeting-project/write");
+          await companion.fill(project.answer + "\n// 別の版");
+          await pc.goto(base + "#meeting-export/write");
+          await upload.setInputFiles(reportFile);
+          await pc.locator("main [role=status]").filter({ hasText: "下書きも採点した内容とそろえ" }).waitFor();
+          await pc.goto(base + "#meeting-project/write");
+          await companion.fill(project.answer);
+          await pc.goto(base + "#meeting-export/write");
         }
         await upload.setInputFiles(reportFile);
         await pc.locator("main [role=status]").filter({ hasText: "手元のサーバーで動作を確認しました" }).waitFor();

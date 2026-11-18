@@ -137,6 +137,9 @@ async function verifyHttp(browser, lessons, restart) {
   if (restart) {
     const report = JSON.parse(await fs.readFile(path.join(folder, "reports/meeting-export.json"), "utf8"));
     const imported = await browser.newPage();
+    const project = lessons.find(lesson => lesson.id === "meeting-project");
+    await imported.goto(entry + "#meeting-project/write");
+    await imported.getByRole("textbox", { name: project.file }).fill(project.answer);
     await imported.goto(entry + "#meeting-export/write");
     const unit = lessons.find(lesson => lesson.id === "meeting-export");
     await imported.getByRole("textbox", { name: unit.file }).fill(unit.answer);

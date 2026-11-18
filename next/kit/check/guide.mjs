@@ -189,6 +189,7 @@ export const guideChecks = {
   "meeting-project": { file: "library/guide.jsx", checks: meetingTests },
   "meeting-export": {
     file: "app/meetings/layout.jsx",
+    companionFiles: ["library/guide.jsx"],
     checks: [
       ["一覧と詳細に「海辺の読書会場」があり、書き出した各本文も表示する", async ({ page }) => {
         for (const [url, main] of [["/meetings", "読書会の一覧"], ["/meetings/river", "川辺の読書会"]]) {

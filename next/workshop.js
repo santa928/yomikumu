@@ -208,6 +208,14 @@ function write(lesson, rec) {
           !Array.isArray(report.results) || !report.results.length || !report.results.every(row => typeof row.label === "string" && typeof row.passed === "boolean")) throw Error();
       const normal = source => source.replace(/\r\n/g, "\n").replace(/\n$/, "");
       if (normal(report.source) !== normal(area.value)) { result.textContent = "手元で採点したコードと記述欄が違います。採点したファイルの内容を記述欄に貼り、もう一度この結果を選んでください。"; return; }
+      for (const id of lesson.companionIds || []) {
+        const other = nextLessons.find(item => item.id === id);
+        const saved = report.companionSources?.[other.file];
+        if (typeof saved !== "string" || normal(saved) !== normal(state.units[id]?.code ?? other.source)) {
+          result.textContent = other.file + " の下書きも採点した内容とそろえ、同じZIPで再採点してください。";
+          return;
+        }
+      }
       const issue = report.results.find(row => !row.passed);
       if (!issue && report.passed === true) { rec.writeDone = true; save(); result.textContent = "できました。手元のサーバーで動作を確認しました。"; }
       else result.textContent = (report.results[0].passed ? "途中までできました。 " : "") + "次に確かめること　" + (issue?.label || lesson.hint);

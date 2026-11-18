@@ -198,7 +198,7 @@ export function MeetingDetail({ record }) {
     ],
     quiz: ["新しいフォルダーで持ち出しに成功したか確かめる操作は？", ["ZIP名を読むだけ", "元の画面を見続ける", "新しいサーバーを起動し、一覧から詳細を開き直す", "すべてを削除する"], 2, "書き出したソースに含まれるページを、再起動したサーバーで操作します。"],
     build: ["① で止める → ② で再開し、同じ詳細URLを再読", [["停止", "docker compose stop web", "docker compose start web"], ["再開", "docker compose start web", "docker compose stop web"]]],
-    right: ["docker compose stop web", "docker compose start web"], file: "app/meetings/layout.jsx", source: layout,
+    right: ["docker compose stop web", "docker compose start web"], file: "app/meetings/layout.jsx", source: layout, companionIds: ["meeting-project"],
     answer: layout.replace("試作中", "海辺の読書会場"), task: "会場の見出しを「海辺の読書会場」に変え、前の課題で書いた一覧・詳細と一緒にZIPへ保存しましょう。新しいフォルダーで起動し、停止・再開した後、春と秋の読書会を同じ住所で確かめます。", hint: "会場名が出ても本文が見えないときは children を見直します。読書会の一覧・詳細の下書きも一緒に書き出します。",
   });
 }
