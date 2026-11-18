@@ -381,6 +381,7 @@ function workshop(lesson) {
   const message = statusMessage();
   message.textContent = record.note || "";
   const preview = node("div", undefined, "slide-examples");
+  let manuscriptButton;
   let revision = 0;
   function refresh() {
     return practicePreview(preview, id, ex.field, html, css);
@@ -388,6 +389,7 @@ function workshop(lesson) {
   function change(key, value) {
     if (key === "html") html = value;
     else css = value;
+    if (manuscriptButton) manuscriptButton.hidden = html.length > 0;
     updateUnit(id, { [key]: value, note: "" });
     message.textContent = "";
     revision++;
@@ -398,25 +400,37 @@ function workshop(lesson) {
     project ? "卒業制作" : lesson.title,
     project ? "わたしの作品展" : "自分で書いて確かめる",
     project
-      ? "好きな作品を二つ選び、小さな展示ページを作ります。何を書くか迷ったら「月の切手」「紙のランプ」の紹介から始めてみましょう。"
+      ? "友人に見せたい作品を二つ選んで、小さな展示ページを作りましょう。題材に迷ったら、下の原稿の作品でも進められます。"
       : ex.task,
   );
   if (project) {
-    const requirements = node("ul");
-    for (const item of [
-      "ページ名をh1にする。各作品をarticleで囲み、作品名のh2・紹介文のp・作者メモへのページ内リンクを置く。",
-      "カードは360pxで縦並び、720pxで横並びにし、横スクロールなしで読めるようにする。",
-      "「作品を確認する」で条件を確かめ、できたページを単体のHTMLに書き出す。",
-    ])
-      requirements.append(node("li", item));
+    const manuscript = details("原稿を読む「夜の机の小さな作品展」", node("pre", studioManuscript));
+    const steps = node("ol", undefined, "studio-steps");
+    for (const step of studioSteps) {
+      const item = node("li");
+      const help = details("ヒント", node("p", step.hint));
+      help.append(link(step.reviewLabel, step.review + "/studio", "review"));
+      item.append(node("h2", step.task), node("p", step.brief), help);
+      steps.append(item);
+    }
     const example = node("div");
-    content.append(requirements, details("別の題材の完成例", example));
+    content.append(manuscript, steps, details("別の題材の完成例", example));
     makePreview(example, projectExample.html, projectExample.css, "小さな道具の展示室");
     if (narrowScreen.matches && currentRoute !== "studio/edit" && !record.html && !record.css) {
       content.append(node("p", "卒業制作ではHTMLとCSSを入力します。PCで続けるときは、目次から進捗を書き出せます。"),
         link("この端末で制作を始める", "studio/edit", "next"), link("コース目次へ", "home", "review"));
       return;
     }
+    manuscriptButton = button("この原稿をHTML欄に入れる", () => {
+      if (html.length > 0) return;
+      const area = content.querySelector("textarea");
+      area.value = studioManuscript;
+      change("html", area.value);
+      area.focus();
+      area.setSelectionRange(0, 0);
+    });
+    manuscriptButton.hidden = html.length > 0;
+    manuscript.append(manuscriptButton);
   }
   if (!project && ex.field !== "html")
     content.append(details("用意されているHTML", fields(html, "")));
@@ -446,18 +460,8 @@ function workshop(lesson) {
     message,
   );
   if (project) {
-    const a = link("カードの並べ方を見直す", "responsive/2/studio", "review");
-    const guide = node("div");
-    guide.append(
-      node(
-        "p",
-        "まずページ名と1件目を書き、表示を確かめます。2件になったら、外側を棚として並べましょう。",
-      ),
-    );
-    guide.append(details("別題材のコード例", fields(projectExample.html, projectExample.css)));
     content.append(
-      details("手が止まったとき", guide),
-      a,
+      details("別題材のコード例", fields(projectExample.html, projectExample.css)),
       button("作品をHTMLで書き出す", () => {
         downloadFile(
           "watashi-no-sakuhinten.html",

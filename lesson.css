@@ -81,6 +81,19 @@ a {
 .catalog small {
   color: #375740;
 }
+.studio-steps {
+  padding-left: 1.6rem;
+}
+.studio-steps li {
+  padding: 0.6rem 0 0.8rem 0.2rem;
+}
+.studio-steps h2 {
+  font-size: 1.05rem;
+}
+.studio-steps p,
+.studio-steps details {
+  margin: 0.3rem 0;
+}
 .parts {
   display: flex;
   flex-wrap: wrap;

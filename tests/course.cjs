@@ -85,6 +85,28 @@ async function run() {
     await says("できました");
 
     await open("studio");
+    const htmlEditor = page.getByLabel("HTML", { exact: true });
+    const mark = page.getByRole("button", { name: "作品を確認する" });
+    const useManuscript = page.getByRole("button", { name: "この原稿をHTML欄に入れる" });
+    await page.getByText("原稿を読む「夜の机の小さな作品展」", { exact: true }).click();
+    await useManuscript.click();
+    assert.match(await htmlEditor.inputValue(), /月の切手/);
+    assert.doesNotMatch(await htmlEditor.inputValue(), /<[a-z]/i);
+    assert.equal(await htmlEditor.evaluate((area) => area === document.activeElement), true);
+    assert.equal(await useManuscript.isVisible(), false);
+    const firstWork = "<h1>庭の作品展</h1><article><h2>石の笛</h2><p>庭で拾った石を削りました。</p></article>";
+    await htmlEditor.fill(firstWork);
+    await mark.click();
+    await says("1作品目の紹介ができました");
+    assert.equal(await page.evaluate(() => Boolean(readProgress().units.studio.writeDone)), false);
+    const linkStep = page.getByRole("listitem").filter({ has: page.getByRole("heading", { name: "2作品から同じ制作メモへ案内する" }) });
+    await linkStep.getByText("ヒント", { exact: true }).click();
+    await linkStep.getByRole("link", { name: "リンクと移動先を結ぶ例" }).click();
+    await page.getByRole("link", { name: "卒業制作に戻る →" }).click();
+    assert.equal(await htmlEditor.inputValue(), firstWork);
+    await says("1作品目の紹介ができました");
+    await page.getByText("原稿を読む「夜の机の小さな作品展」", { exact: true }).click();
+    assert.equal(await useManuscript.isVisible(), false);
     const artwork =
       '<h1>紙の作品</h1><section class="gallery">' +
       '<article><h2>春</h2><p>紙の花。</p><a href="#memo">作者へ</a></article>' +
@@ -92,8 +114,7 @@ async function run() {
       '</section><h2 id="memo">作者メモ</h2>';
     const styles =
       ".gallery {display:flex; flex-direction:column; gap:10px} @media(min-width:600px){.gallery {flex-direction:row}}";
-    await page.getByLabel("HTML", { exact: true }).fill(artwork);
-    const mark = page.getByRole("button", { name: "作品を確認する" });
+    await htmlEditor.fill(artwork);
     await mark.click();
     await says("スマホ幅はできました");
     await page.getByLabel("CSS", { exact: true }).fill(styles);
@@ -188,6 +209,13 @@ async function run() {
     await touch.getByRole("link", { name: "キーボードで書く" }).tap();
     assert.equal(await touch.getByRole("textbox").inputValue(), "作者ノートへ（下書き）");
     await touch.goto(base + "#studio");
+    await touch.getByText("原稿を読む「夜の机の小さな作品展」", { exact: true }).tap();
+    await touch.getByText(/青い紙に、雲からのぞく月を刷りました/).waitFor();
+    assert.equal(await touch.locator("textarea").count(), 0);
+    if (process.env.SCREENSHOT_DIR) {
+      await touch.evaluate(() => window.scrollTo(0, 0));
+      await touch.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "studio-manuscript.png") });
+    }
     await touch.getByRole("link", { name: "この端末で制作を始める" }).tap();
     await touch.getByLabel("HTML", { exact: true }).waitFor();
     for (const route of ["home", "padding/2", "responsive/2", "studio"]) {
