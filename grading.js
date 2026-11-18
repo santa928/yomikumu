@@ -25,6 +25,21 @@ function vertical([first, second]) {
   );
 }
 
+function namedElement(parent, selector, text) {
+  if (!parent) return null;
+  return [...parent.querySelectorAll(selector)].find((node) => node.textContent.trim() === text);
+}
+
+function comesAfter(node, previous) {
+  return Boolean(node && previous && !previous.contains(node) &&
+    (previous.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING));
+}
+
+function listItems(list) {
+  return [...list.children].filter((child) => child.localName === "li")
+    .map((child) => child.textContent.trim());
+}
+
 function exerciseResult(id, docs) {
   const doc = docs[0];
   const style = (node) => doc.defaultView.getComputedStyle(node);
@@ -69,6 +84,68 @@ function exerciseResult(id, docs) {
       const target = doc.getElementById(link.hash.slice(1));
       if (target?.textContent.trim() !== "作者ノート")
         return "リンクの文字はできました。href を行き先の id に結び付けましょう。";
+      break;
+    }
+    case "heading-levels": {
+      const heading = namedElement(doc, "h1", "小さな版画展");
+      if (!heading) return "展示全体の名前「小さな版画展」を h1 にしましょう。";
+      const chapter = namedElement(doc, "h2", "体験会");
+      if (!comesAfter(chapter, heading)) return "展示名の下に、章の見出し「体験会」を h2 で置きましょう。";
+      if (!comesAfter(namedElement(doc, "h3", "午前の部"), chapter))
+        return "章はできました。その後に、章の中の「午前の部」を一段下の見出しにしましょう。";
+      break;
+    }
+    case "material-list": {
+      if (!namedElement(doc, "p", "受付で使います。"))
+        return "「受付で使います。」は説明の文です。一つの段落にしましょう。";
+      const lists = [...doc.querySelectorAll("ul")].map(listItems);
+      const withTicket = lists.filter((items) => items.includes("入場券"));
+      if (!withTicket.length) return "順番が自由な持ち物を ul で囲み、中の一つの li に「入場券」を置きましょう。";
+      if (!withTicket.some((items) => items.includes("手帳")))
+        return "入場券はできました。同じ ul の中で、手帳を別の li にしましょう。";
+      break;
+    }
+    case "making-steps": {
+      const ordered = [...doc.querySelectorAll("ol")].map(listItems);
+      if (!ordered.some((items) => items.includes("切る")))
+        return "まず外側を ol にして、最初の作業「切る」を li で囲みましょう。";
+      if (!ordered.some((items) => {
+        const cut = items.indexOf("切る");
+        const punch = items.indexOf("穴をあける", cut + 1);
+        return cut >= 0 && punch > cut && items.indexOf("結ぶ", punch + 1) > punch;
+      })) return "番号付きのリストはできました。同じ ol の中で「切る」「穴をあける」「結ぶ」を一行ずつ、この順に並べましょう。";
+      break;
+    }
+    case "page-regions": {
+      const head = namedElement(doc, "header h1", "窓辺の作品展")?.closest("header");
+      if (!head) return "まず展示名を h1 にして、ページの入口となる header で囲みましょう。";
+      const heading = namedElement(doc, "main h2", "展示内容");
+      const main = heading?.closest("main");
+      if (!comesAfter(main, head) || doc.querySelectorAll("main").length !== 1)
+        return "入口はできました。header を閉じ、その後に一つの main を置き、「展示内容」の小見出しを入れましょう。";
+      if (!comesAfter(namedElement(main, "p", "木版画を二枚展示します。"), heading))
+        return "本文の見出しはできました。同じ main の中で、見出しの下に説明の段落を置きましょう。";
+      const foot = namedElement(doc, "footer p", "問い合わせは図書室へ。")?.closest("footer");
+      if (!comesAfter(foot, main)) return "本文はできました。main を閉じ、その後の footer に問い合わせの段落を置きましょう。";
+      break;
+    }
+    case "work-section": {
+      const topic = namedElement(doc, "section h2", "木の作品");
+      if (!topic) return "まず「木の作品」の見出しを含む章を section で囲みましょう。";
+      const section = topic.closest("section");
+      const title = namedElement(section, "article h3", "小さな舟");
+      const work = title?.closest("article");
+      if (!comesAfter(work, topic) || !comesAfter(namedElement(work, "p", "枝を削りました。"), title))
+        return "章はできました。章の見出しの後で、作品名と紹介文を同じ article に入れましょう。";
+      break;
+    }
+    case "word-emphasis": {
+      const caution = namedElement(doc, "p", "足元にご注意ください。");
+      if (!namedElement(caution, "strong", "足元にご注意"))
+        return "最初の文を一段落に保ち、その中の「足元にご注意」だけを strong で囲みましょう。";
+      const next = namedElement(doc, "p", "原画は今日だけです。");
+      if (!comesAfter(next, caution) || !namedElement(next, "em", "今日"))
+        return "大切な注意はできました。次の段落の中で、ほかの日と区別したい「今日」だけを em で囲みましょう。";
       break;
     }
     case "class": {
