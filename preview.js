@@ -48,7 +48,7 @@ function pageSource(html, css, title = "作品紹介") {
   );
 }
 
-function makePreview(host, html, css, label, width) {
+function makePreview(host, html, css, label, width, maxHeight = 310) {
   const frame = document.createElement("iframe");
   frame.title = label;
   frame.setAttribute("sandbox", "allow-same-origin");
@@ -74,7 +74,7 @@ function makePreview(host, html, css, label, width) {
         const height = Math.max(
           72,
           Math.min(
-            310,
+            maxHeight,
             Math.ceil(doc.body.getBoundingClientRect().height) +
               parseFloat(doc.defaultView.getComputedStyle(doc.body).marginTop || 0) +
               parseFloat(doc.defaultView.getComputedStyle(doc.body).marginBottom || 0) +

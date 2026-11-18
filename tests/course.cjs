@@ -137,6 +137,59 @@ async function run() {
     await phone.getByRole("link", { name: "前回の続きへ →" }).click();
     await phone.getByLabel("HTML", { exact: true }).waitFor();
     assert.equal(await phone.getByLabel("HTML", { exact: true }).inputValue(), artwork);
+    const touch = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });
+    touch.on("pageerror", (err) => errors.push(err.message));
+    await touch.goto(base + "#link/1");
+    const frame = touch.frameLocator("main iframe");
+    const memo = frame.getByRole("heading", { name: "作品メモ" });
+    assert.ok(await memo.evaluate((el) => el.getBoundingClientRect().top > el.ownerDocument.defaultView.innerHeight));
+    await frame.getByRole("link", { name: "メモを読む" }).tap();
+    await frame.locator("h2:target").waitFor();
+    assert.ok(await memo.evaluate((el) => el.getBoundingClientRect().top < el.ownerDocument.defaultView.innerHeight));
+    await touch.goto(base + "#link/quiz");
+    await touch.getByRole("link", { name: "タップでコードを組む →" }).tap();
+    await touch.getByRole("heading", { name: "タップでコードを組む" }).waitFor();
+    assert.equal(await touch.locator("textarea").count(), 0);
+    const group = (i) => touch.locator("main form").getByRole("group").nth(i);
+    const choose = (i, name) => group(i).getByRole("radio", { name, exact: true }).check();
+    const grade = touch.getByRole("button", { name: "組んだコードを確かめる" });
+    await choose(0, "href");
+    await choose(1, "artist");
+    await grade.tap();
+    await touch.getByRole("status").filter({ hasText: "行き先の id" }).waitFor();
+    await touch.getByRole("link", { name: "この問題のスライドを見直す" }).tap();
+    await touch.reload();
+    await touch.getByRole("link", { name: /解きかけの問題へ戻る/ }).tap();
+    await touch.getByRole("status").filter({ hasText: "行き先の id" }).waitFor();
+    const buildSolutions = {
+      structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
+      card: [".card", "border"], padding: ["8px", "16px"], layout: ["1fr 1fr", "gap"],
+      responsive: ["min-width", "1fr 1fr"],
+    };
+    for (const [id, answers] of Object.entries(buildSolutions)) {
+      await touch.goto(base + "#" + id + "/write");
+      await choose(0, answers[0]);
+      await choose(1, answers[1]);
+      await grade.tap();
+      await touch.getByRole("status").filter({ hasText: "できました" }).waitFor();
+      assert.ok(await touch.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    }
+    await touch.goto(base + "#home");
+    assert.equal(await touch.getByText("組み立てをクリア", { exact: true }).count(), 7);
+    await touch.goto(base + "#link/write");
+    if (process.env.SCREENSHOT_DIR) {
+      await touch.evaluate(() => window.scrollTo(0, 0));
+      await touch.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "link-build.png") });
+    }
+    await touch.getByRole("link", { name: "キーボードで書く" }).tap();
+    await touch.getByRole("textbox").fill("作者ノートへ（下書き）");
+    await touch.getByRole("link", { name: "タップでコードを組む" }).tap();
+    assert.ok(await group(1).getByRole("radio", { name: "#artist", exact: true }).isChecked());
+    await touch.getByRole("link", { name: "キーボードで書く" }).tap();
+    assert.equal(await touch.getByRole("textbox").inputValue(), "作者ノートへ（下書き）");
+    await touch.goto(base + "#studio");
+    await touch.getByRole("link", { name: "この端末で制作を始める" }).tap();
+    await touch.getByLabel("HTML", { exact: true }).waitFor();
     for (const route of ["home", "padding/2", "responsive/2", "studio"]) {
       await phone.goto(base + "#" + route);
       await phone.waitForFunction((expected) => currentRoute === expected, route);
@@ -149,7 +202,7 @@ async function run() {
     }
     assert.deepEqual(errors, []);
     console.log(
-      "7単元のスライド・四択・記述、部分正解と別解、卒業制作、HTML書き出し、進捗の端末間引き継ぎが通りました。",
+      "7単元のスライド・四択・記述・タップ組み立て、ページ内移動、下書き復帰、部分正解と別解、卒業制作、書き出しと引き継ぎが通りました。",
     );
   } finally {
     await browser.close();

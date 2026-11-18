@@ -134,6 +134,20 @@ a {
   font-weight: 650;
   margin: 14px 0;
 }
+.build-form fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.build-form legend {
+  font-weight: 650;
+  margin-bottom: 4px;
+}
+.build-form label:has(input) {
+  min-height: 44px;
+  margin: 0;
+  padding: 7px 11px;
+}
 .code-field textarea {
   font-weight: 400;
   min-height: 130px;

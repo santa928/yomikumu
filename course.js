@@ -9,6 +9,8 @@ const twoCards =
 const frameCard = "article { border: 1px solid; padding: 8px; }";
 const stack = ".shelf { display: grid; gap: 8px; }";
 const wideGrid = "@media (min-width: 600px) {\n  .shelf { grid-template-columns: 1fr 1fr; }\n}";
+const notesHeading = '<h2 id="notes">作品メモ</h2>';
+const notesLink = '<a href="#notes">メモを読む</a>';
 
 const lessons = [
   {
@@ -51,6 +53,10 @@ const lessons = [
       css: "",
       hint: "まず作品名だけを <h1> と </h1> で囲みます。次の行には段落のタグを使います。",
       answer: "<h1>夜の図書室</h1>\n<p>閉館前の十枚。</p>",
+      build: {
+        code: "<①>夜の図書室</①>\n<②>閉館前の十枚。</②>",
+        slots: [["作品名を囲むタグ", "p", "h1"], ["紹介文を囲むタグ", "p", "h1"]],
+      },
       review: 2,
     },
   },
@@ -61,14 +67,33 @@ const lessons = [
     goal: "リンクの文字と、クリックしたときの移動先を結び付ける。",
     slides: [
       {
-        title: "作品メモに名前を付ける",
-        body: "同じページの一部を指し示すために、id で名前を付けます。ここでは notes という目印です。目印を付けても、文字の見た目は同じです。",
-        html: '<h2 id="notes">作品メモ</h2>',
+        title: "読みたい場所へひと押しで移動する",
+        body: "作品が増えると、一番下のメモを探すのに何度もスクロールします。見本の「メモを読む」を押してみてください。作品を通り越して、同じページのメモまで移動できます。",
+        html: [
+          notesLink,
+          "<h2>雨の日の栞</h2>",
+          "<p>雨粒の形に切った紙の栞です。</p>",
+          "<h2>川辺の地図</h2>",
+          "<p>散歩道で見つけた橋を描きました。</p>",
+          notesHeading,
+          "<p>二つの作品は、一枚の紙から作りました。</p>",
+        ].join("\n"),
+        previewHeight: 124,
       },
       {
-        title: "目印をリンクで指す",
-        body: "押せる文字を a で囲み、href に移動先を書きます。先頭の # は、このページの中の目印を指します。",
-        html: '<a href="#notes">メモを読む</a>\n<h2 id="notes">作品メモ</h2>',
+        title: "タグに情報を足す",
+        body: 'h2 はページの中の小見出しです。画面に出る文字は「作品メモ」。開始タグの h2 の後ろには、空白を置いて情報を書き足せます。この情報を「属性」と呼び、属性名="値" の形で書きます。例では属性名が id、値が notes です。',
+        html: notesHeading,
+      },
+      {
+        title: "移動先の見出しに名前を付ける",
+        body: 'id="notes" は、この見出しをリンクの行き先として指定するための名前です。名前は自分で決められ、画面には表示されません。同じページの中で notes と名付ける場所は一つだけです。',
+        html: notesHeading,
+      },
+      {
+        title: "リンクに行き先を書く",
+        body: '押せる文字を a で囲みます。a の href 属性は行き先です。「#」に続けて名前を書くと、その名前を持つ場所へ移動します。押す側は #notes、着く側は notes。二つの値を見比べてください。',
+        html: notesLink + "\n" + notesHeading,
       },
     ],
     quiz: {
@@ -79,17 +104,21 @@ const lessons = [
         "これは別のファイルの名前です。",
         "これはリンクに表示する言葉です。",
         "# の後ろに、行き先と同じ id を書きます。",
-        "点で始まる名前は後でCSSのクラスに使います。",
+        "このページの中の行き先を指定するときは、名前の前に # を置きます。",
       ],
     },
     exercise: {
       field: "html",
-      task: "「作者ノートへ」を押すと、同じページの「作者ノート」へ移動できるリンクにしてください。行き先の目印は用意してあります。",
+      task: '「作者ノートへ」を押すと、同じページの「作者ノート」へ移動できるリンクを作りましょう。行き先の見出しには id="artist" と名前を付けてあります。',
       html: '作者ノートへ\n<h2 id="artist">作者ノート</h2>',
       css: "",
       hint: "リンクの文字を a で囲み、href の値に # と行き先の名前を続けます。",
       answer: '<a href="#artist">作者ノートへ</a>\n<h2 id="artist">作者ノート</h2>',
-      review: 1,
+      build: {
+        code: '<a ①="②">作者ノートへ</a>\n<h2 id="artist">作者ノート</h2>',
+        slots: [["リンクに付ける属性", "id", "href"], ["その属性の値", "artist", "#artist", "#notes"]],
+      },
+      review: 3,
     },
   },
   {
@@ -106,7 +135,7 @@ const lessons = [
       },
       {
         title: "変えたい箇所に名前を付ける",
-        body: "二つある段落のうち、作品名にだけ class で名前を付けました。CSSでは名前の前に点を付けます。同じ p でも、作品名だけが紺色になります。",
+        body: 'class も開始タグに書く属性です。同じ名前を複数の要素に付け、まとめて装飾できます。ここでは作品名の段落にだけ class="title" を付けました。CSSで .title と書くと、その段落だけが紺色になります。',
         html: book + "\n<p>窓辺で読んだ一冊。</p>",
         css: ".title { color: navy; }",
       },
@@ -135,6 +164,10 @@ const lessons = [
       css: ".title {\n  color: navy;\n}",
       hint: "すでに作品名の色は指定されています。同じ波かっこの中で文字の大きさを足しましょう。",
       answer: ".title {\n  color: navy;\n  font-size: 24px;\n}",
+      build: {
+        code: "① {\n  color: navy;\n  ②: 24px;\n}",
+        slots: [["色と大きさを変える対象", "p", ".title"], ["文字の大きさを決める指定", "font-size", "color"]],
+      },
       review: 2,
     },
   },
@@ -174,6 +207,10 @@ const lessons = [
       css: ".card {\n\n}",
       hint: "対象は .card です。border の値に、太さと solid を書いてみましょう。",
       answer: ".card { border: 2px solid navy; }",
+      build: {
+        code: "① {\n  ②: 2px solid navy;\n}",
+        slots: [["枠を付ける対象", ".card", "h2", "p"], ["枠を描く指定", "color", "border"]],
+      },
       review: 1,
     },
   },
@@ -216,6 +253,10 @@ const lessons = [
       css: "padding: 0;",
       hint: "上下の値を先に置き、半角スペースを空けて左右の値を書きます。",
       answer: "padding: 8px 16px;",
+      build: {
+        code: "padding: ① ②;",
+        slots: [["最初の値", "16px", "8px", "0"], ["二つ目の値", "0", "16px", "8px"]],
+      },
       review: 1,
     },
   },
@@ -257,6 +298,10 @@ const lessons = [
       html: twoCards,
       css: frameCard + "\n.shelf {\n  display: grid;\n}",
       hint: "棚に2列ぶんの幅を書きます。カードの間隔は棚の gap で決められます。",
+      build: {
+        code: frameCard + "\n.shelf {\n  display: grid;\n  grid-template-columns: ①;\n  ②: 12px;\n}",
+        slots: [["列の幅", "1fr", "1fr 1fr"], ["カードの間隔を決める指定", "gap", "padding"]],
+      },
       answer:
         frameCard +
         "\n.shelf {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}",
@@ -300,6 +345,10 @@ const lessons = [
       html: twoCards,
       css: frameCard + "\n" + stack,
       hint: "元の1列を残して、その後ろに広い画面だけのルールを足しましょう。",
+      build: {
+        code: frameCard + "\n" + stack + "\n@media (①: 600px) {\n  .shelf { grid-template-columns: ②; }\n}",
+        slots: [["幅の条件", "max-width", "min-width"], ["条件に合うときの列の幅", "1fr 1fr", "1fr"]],
+      },
       answer: frameCard + "\n" + stack + "\n" + wideGrid,
       review: 1,
     },

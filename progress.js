@@ -17,8 +17,14 @@ function validatedProgress(value) {
     const clean = {};
     for (const [key, field] of Object.entries(item)) {
       if (["html", "css", "note"].includes(key) && typeof field === "string") clean[key] = field;
-      else if (["quizDone", "writeDone", "quizChecked"].includes(key) && typeof field === "boolean")
+      else if (["quizDone", "writeDone", "quizChecked", "buildDone", "buildChecked"].includes(key) && typeof field === "boolean")
         clean[key] = field;
+      else if (key === "pieces" && Array.isArray(field)) {
+        const slots = lessons.find((lesson) => lesson.id === id)?.exercise.build.slots;
+        if (!slots || field.length !== slots.length || !field.every((piece, i) =>
+          piece === "" || slots[i].slice(1).includes(piece))) throw Error("組み立て");
+        clean.pieces = field;
+      }
       else if (key === "choice" && Number.isInteger(field) && field >= 0 && field < 4)
         clean[key] = field;
       else throw Error("項目");
