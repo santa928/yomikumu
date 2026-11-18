@@ -8,7 +8,7 @@ function pythonWorker() {
       nextInput?.(data.line);
       return;
     }
-    const { source, lines, before = "", observe, files = {}, interactive } = data;
+    const { source, lines, before = "", observe, afterError, files = {}, interactive } = data;
     let output = "";
     try {
       Sk.configure({
@@ -32,10 +32,15 @@ function pythonWorker() {
         },
       });
       let program = before ? before + "\n" + source : source;
+      if (afterError) {
+        const body = program.split("\n").map(line => "    " + line).join("\n");
+        program = "try:\n" + body + "\nexcept Exception as course_failure:\n    course_problem = type(course_failure).__name__\n    course_observation = (" + afterError + ")\n";
+      }
       if (observe) program += "\ncourse_observation = (" + observe + ")\n";
       const module = await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("main", false, program, true));
-      const value = observe ? Sk.ffi.remapToJs(module.$d.course_observation) : undefined;
-      postMessage({ kind: "end", output, value });
+      const value = module.$d.course_observation ? Sk.ffi.remapToJs(module.$d.course_observation) : undefined;
+      const error = module.$d.course_problem ? Sk.ffi.remapToJs(module.$d.course_problem) : undefined;
+      postMessage({ kind: "end", output, value, error });
     } catch (error) {
       postMessage({ kind: "end", output, error: String(error).slice(0, 500) });
     }

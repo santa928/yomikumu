@@ -127,7 +127,13 @@ function showSlide() {
 function renderFiles(place, files = {}, editable) {
   place.replaceChildren();
   for (const [name, content] of Object.entries(files)) {
-    if (!editable) { place.append(element("h3", name), element("pre", content)); continue; }
+    if (!editable) {
+      const details = document.createElement("details");
+      details.open = content.split("\n").length <= 10;
+      details.append(element("summary", name + " のコード"), element("pre", content));
+      place.append(details);
+      continue;
+    }
     const label = element("label", name + " のコード");
     const area = document.createElement("textarea");
     area.rows = 4;
@@ -220,7 +226,7 @@ async function execute(grade) {
   const source = task.targetFile ? task.main : edit;
   const demo = view === "demo";
   const files = { ...task.files, ...(!demo && mode === "code" ? draft.files : {}), ...(!demo && mode === "tap" ? task.tapFiles : {}) };
-  if (task.targetFile) files[task.targetFile] = edit;
+  if (task.targetFile) files[task.targetFile] = (task.filePrefix || "") + edit;
   const cases = grade ? task.cases : [{ before: !demo && task.cases[0].before, input: $("input").value }];
   $("checks").replaceChildren();
   $("output").textContent = "";
@@ -229,7 +235,7 @@ async function execute(grade) {
   let matches = 0;
   for (const test of cases) {
     $("status").textContent = grade ? "採点中　" + test.label : "実行中…";
-    execution = runPython({ source, files, before: test.before || "", observe: test.observe, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
+    execution = runPython({ source, files, before: test.before || "", observe: test.observe, afterError: test.afterError, lines: splitInput(test.input ?? ""), interactive: !grade }, output => {
       $("output").textContent = output;
       $("status").textContent = "入力を待っています。";
       $("waiting").hidden = false; $("line").value = ""; $("line").focus();

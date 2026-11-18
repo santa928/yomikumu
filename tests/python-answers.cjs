@@ -57,3 +57,10 @@ module.exports[60] = [
   ["def supply():\n    for n in [2, 7]:\n        yield n", "def supply(rows):\n    return rows", "def supply(rows):\n    return (n for n in rows)"],
   ["a, b = supply(), supply()\nprint(next(a))\nprint(next(b))", "def supply(rows):\n    return iter(rows)\na = supply(rows)\nb = a\nprint(next(a, 0))\nprint(next(a, 0))\nprint(next(b, 0))", "def supply(rows):\n    return iter(rows)\na, b = supply(rows), supply(rows)\nfor reader in [a, a, b]:\n    print(next(reader, 0))"],
 ];
+
+module.exports[61] = [
+  ["from memo import Memo, events\nr = Memo(input())\nx = r.read()\nr.close()\nprint(x)", "from memo import Memo, events\nr = Memo(input())\nprint(r.read() + 2)", "from memo import Memo, events\nwith Memo(input()) as r:\n    print(2 + r.read())"],
+  ["from memo import Memo, events\nwith Memo(input()) as r:\n    n = r.read()\nprint(n)", "from memo import Memo, events\nwith Memo(input()) as r:\n    print(r.read() * 2)\nr.close()", "from memo import Memo, events\nwith Memo(input()) as r:\n    val = r.read()\nprint(val + val)"],
+  ["from memo import Memo, events\ntry:\n    with Memo(input()) as r:\n        n = r.read()\n    print(n)\nexcept ValueError:\n    print('数字を確認')\nprint(events)", "from memo import Memo, events\nr = Memo(input())\nprint(r.read())\nr.close()", "from memo import Memo, events\nwith Memo(input()) as r:\n    n = r.read()\nprint(n)"],
+  ["class Session:\n    def __enter__(self):\n        return self\n    def __exit__(self, *details):\n        events.append('閉じる')", "class Session:\n    def __enter__(self):\n        events.append('開く')\n        return self\n    def __exit__(self, *args):\n        events.append('閉じる')\n        return True", "class Session:\n    def __enter__(self):\n        events.append('開く')\n        return self\n    def __exit__(self, *details):\n        events.append('閉じる')"],
+];
