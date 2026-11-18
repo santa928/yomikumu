@@ -96,4 +96,5 @@ const javascriptLessons = [
   ...javascriptFunctionLessons,
   ...javascriptCounterLessons,
   ...javascriptCardLessons,
+  ...javascriptTransformLessons,
 ];

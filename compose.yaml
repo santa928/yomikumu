@@ -29,6 +29,7 @@ services:
       - ./javascript-functions.js:/usr/share/nginx/html/javascript-functions.js:ro
       - ./javascript-counters.js:/usr/share/nginx/html/javascript-counters.js:ro
       - ./javascript-cards.js:/usr/share/nginx/html/javascript-cards.js:ro
+      - ./javascript-transforms.js:/usr/share/nginx/html/javascript-transforms.js:ro
       - ./javascript-runner.js:/usr/share/nginx/html/javascript-runner.js:ro
       - ./javascript-workbook.js:/usr/share/nginx/html/javascript-workbook.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
