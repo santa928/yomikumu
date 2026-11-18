@@ -22,7 +22,8 @@ function startScoreSandbox() {
     const probe = binding === "ticket" || binding === "score"
       ? 'let value, constant = false; try { value = ' + binding + '; ' + binding + ' = value; } catch (err) { constant = err instanceof TypeError; }'
       : 'const value = undefined, constant = false;';
-    const end = '\n;{\n' + probe + '\nself.postMessage({title, output, binding: { value, constant }});\n}\n}' +
+    const arrow = binding === "double" ? 'typeof double === "function" && !Object.hasOwn(double, "prototype")' : 'false';
+    const end = '\n;{\n' + probe + '\nself.postMessage({title, output, binding: { value, constant, arrow: ' + arrow + ' }});\n}\n}' +
       (pauseExample ? ', 1800);' : '');
     const blob = new Blob([prelude.join("\n"), "\n", code, end], { type: "text/javascript" });
     const url = URL.createObjectURL(blob);
@@ -44,7 +45,8 @@ function startScoreSandbox() {
           !data.output.every(row => Array.isArray(row) && row.length <= 8 && row.every(item =>
             typeof item?.text === "string" && item.text.length <= 500 && typeof item.type === "string"))) return;
         finish({ ok: true, title: data.title.slice(0, 240), output: data.output,
-          binding: { value: typeof data.binding?.value === "number" ? data.binding.value : null, constant: data.binding?.constant === true } });
+          binding: { value: typeof data.binding?.value === "number" ? data.binding.value : null,
+            constant: data.binding?.constant === true, arrow: data.binding?.arrow === true } });
       };
       worker.onerror = error => {
         error.preventDefault();
