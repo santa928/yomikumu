@@ -224,7 +224,8 @@ async function execute(grade) {
   stop();
   const token = generation;
   const edit = $("source").value;
-  const source = task.targetFile ? task.main : edit;
+  let source = task.targetFile ? task.main : edit;
+  if (grade && task.after) source += "\n" + task.after;
   const demo = view === "demo";
   const files = { ...task.files, ...(!demo && mode === "code" ? draft.files : {}), ...(!demo && mode === "tap" ? task.tapFiles : {}) };
   if (task.targetFile) files[task.targetFile] = (task.filePrefix || "") + edit;
