@@ -1,5 +1,5 @@
 "use strict";
-const domUnits = [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit];
+const domUnits = [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit];
 const domMain = document.querySelector("main");
 const domStateKey = "yomikumu/dom/v1";
 let domState = { last: "", tasks: {} };
