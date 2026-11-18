@@ -192,6 +192,17 @@ function slidePage(lesson, position) {
     slide.body,
   );
   const examples = node("div", undefined, "slide-examples");
+  if (slide.viewportSamples) {
+    for (const [suffix, label] of [["", "幅の指定なし"], ["?device", "端末の幅を指定"]]) {
+      const sample = node("a", label + "（新しいタブで開く）");
+      sample.href = "viewport-sample.html" + suffix;
+      sample.target = "_blank";
+      sample.rel = "noopener noreferrer";
+      const line = node("p");
+      line.append(sample);
+      content.append(line);
+    }
+  }
   content.append(examples);
   if (slide.before) makePreview(examples, slide.html, slide.before, "変更前", undefined, undefined, false, slide.measure);
   for (const width of slide.widths || [undefined]) {
@@ -337,7 +348,7 @@ function practicePreview(host, id, exercise, html, css) {
     : css;
   const widths = exercise.widths || (id === "studio" || id === "responsive" ? [360, 720] : [undefined]);
   return Promise.all(widths.map((width) =>
-    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle, exercise.measure),
+    makePreview(host, html, cssText, width ? width + "pxで表示" : "あなたの表示結果", width, undefined, exercise.showTitle, exercise.measure, exercise.usesViewportInput),
   ));
 }
 

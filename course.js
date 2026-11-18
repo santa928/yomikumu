@@ -465,6 +465,7 @@ const lessons = [
     },
   },
   ...gridLessons,
+  viewportLesson,
   {
     id: "responsive",
     title: "画面幅に合わせて並びを変える",
@@ -510,4 +511,5 @@ const lessons = [
       review: 1,
     },
   },
+  ...responsiveLessons,
 ];
