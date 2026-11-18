@@ -81,7 +81,7 @@ async function performTS(lesson, source, section, { execute = true, practice = f
     typeNote.textContent = "型検査を通りました。";
     if (!execute) return;
     if (practice && (!checked.contractOk || checked.missing)) {
-      feedback.textContent = "次の一手 · " + (checked.missing || lesson.contractHint);
+      feedback.textContent = checked.missing || lesson.contractHint;
       return;
     }
     if (lesson.dom) {
@@ -93,7 +93,7 @@ async function performTS(lesson, source, section, { execute = true, practice = f
       if (dom.error) { output.textContent = "実行時 · " + dom.error; return; }
       output.textContent = "下の画面を操作できます。";
       if (practice) {
-        if (dom.done !== lesson.dom.tests.length) feedback.textContent = (dom.done ? dom.done+"項目は合っています。" : "")+"次の一手 · "+dom.hint;
+        if (dom.done !== lesson.dom.tests.length) feedback.textContent = (dom.done ? dom.done+"項目は合っています。" : "")+dom.hint;
         else { onPass?.(); feedback.textContent = "できました。型と実行結果を確認しました。"; }
       }
       return;
@@ -111,7 +111,7 @@ async function performTS(lesson, source, section, { execute = true, practice = f
       const missing = passed.indexOf(false);
       if (missing >= 0) {
         const count = passed.filter(Boolean).length;
-        feedback.textContent = (count ? count + "項目は合っています。" : "") + "次の一手 · " + probes[missing].hint;
+        feedback.textContent = (count ? count + "項目は合っています。" : "") + probes[missing].hint;
       } else { onPass?.(); feedback.textContent = "できました。型と実行結果を確認しました。"; }
     }
   } catch (e) { if (current === requestTS) typeNote.textContent = "検査を完了できませんでした。" + e.message; }
@@ -119,7 +119,7 @@ async function performTS(lesson, source, section, { execute = true, practice = f
 function tsCatalogue() {
   const prev = tsLessons.find(s => s.id === stateTS.last.split("/")[0]);
   main.innerHTML = `<p class="kind">Web制作 · JavaScriptの次へ</p><h1>クイズから始めるTypeScript</h1>
-    <p>一問の内容や得点を読み違えたとき、画面に出す前にどの行を直せばよいか確かめます。</p>
+    <p>クイズの得点や回答に型を付けます。数値と文字列を取り違えたとき、型検査でどの行にエラーが出るかを確かめましょう。</p>
     ${prev ? `<a class="next" href="#${stateTS.last}">前回の続きへ · ${prev.title}</a>` : ""}
     ${tsChapters.map((ch,i) => `<section><h2>${ch.title}</h2><p>${ch.intro}</p><div class="ts-tools">
     ${ch.demo.map((text,n) => `<button type="button" data-ch="${i}" data-n="${n}">${text}</button>`).join("")}</div><div data-show></div>

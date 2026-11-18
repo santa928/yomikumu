@@ -40,15 +40,15 @@ if (title) title.textContent = "雨の問題";`,
       ],
     },
     {
-      title: "目印のクラスを付け外しする",
+      title: "クラスを付け外しして行を強調する",
       html: '<ul id="quiz"><li id="rain">雨音</li><li id="dawn" class="chosen">夜明け</li></ul>',
-      explain: "classList.addは要素に名前付きの目印を付け、removeはその目印を外します。このページではchosenのある行が黄色く太字になります。",
+      explain: "classList.add('chosen') は要素に chosen クラスを付け、classList.remove('chosen') はそのクラスを外します。このページでは chosen のある行が黄色く太字になります。",
       example: `const rain = document.querySelector("#rain");
 const dawn = document.querySelector("#dawn");
 dawn.classList.remove("chosen");
 dawn.classList.add("chosen");`,
-      question: "雨音だけに目印を移すには、夜明けから何を外しますか。",
-      options: ["行そのもの", "文字", "chosenクラス", "一覧のid"], correct: 2, feedback: "文字と行は残し、見た目を変える目印だけを外します。",
+      question: "「雨音」だけを強調するには、「夜明け」から何を外しますか。",
+      options: ["行そのもの", "文字", "chosenクラス", "一覧のid"], correct: 2, feedback: "chosen クラスを外すと、文字は残り、色と太さが元に戻ります。",
       task: "最後の行の対象を変え、雨音だけを目立たせてください。",
       tests: [
         [t => t.q("#rain")?.classList.contains("chosen"), "雨音にchosenを付けます。"],
@@ -58,7 +58,7 @@ dawn.classList.add("chosen");`,
     {
       title: "作った行を一覧につなぐ",
       html: quizLists,
-      explain: "createElementは新しい要素を手元に作ります。下の見本では「星図」を用意した段階です。画面に置くには、挿入先の要素へappend(作った要素)を呼びます。",
+      explain: "createElement で新しい要素を作れます。見本では「星図」という li を作りますが、まだ一覧には出ていません。list.append(row) を実行すると、その li が一覧の末尾に表示されます。",
       example: `const list = document.querySelector("#quiz");
 const row = document.createElement("li");
 row.textContent = "星図";
@@ -92,16 +92,16 @@ list.querySelectorAll("li").forEach(row => {
       ],
     },
     {
-      title: "別の原稿で問題を一行追加する",
+      title: "「灯台」を一覧に追加し、その行だけを強調する",
       html: quizLists,
       explain: "文字、クラス、一覧への接続を組み合わせます。見本は参考作品の末尾に「水輪」を追加します。作成したrowは追加後も同じ行を指すので、その行だけを選べます。",
       example: `const row = document.createElement("li");
 row.textContent = "水輪";
 document.querySelector("#books").append(row);
 row.classList.add("chosen");`,
-      question: "クイズ側で新しい行だけに目印を付けたいとき、どれを使いますか。",
+      question: "クイズに追加した行だけに chosen クラスを付けるには、どれを使いますか。",
       options: ["すべてのli", "作って追加したrow", "参考作品の一覧", "クイズの見出し"], correct: 1, feedback: "作った行を覚えておくと、追加後も同じ要素を変更できます。",
-      task: "白紙から実装しましょう。作品クイズの末尾に「灯台」を一行追加し、それだけをchosenで目立たせます。参考作品は一行のままにしてください。",
+      task: "作品クイズの末尾に「灯台」を一行追加し、その行だけに chosen クラスを付けてください。参考作品は一行のままにしてください。",
       starter: "",
       tests: [
         [t => t.all("#quiz > li").map(row => row.textContent.trim()).join("/") === "雨音/夜明け/灯台", "クイズの元の2行の後ろに「灯台」のliを1つ加えます。"],

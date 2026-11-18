@@ -43,7 +43,7 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
     const alternate = "visitor = input()\ntickets = input()\nprint(visitor)\nprint(3 + int(tickets))";
     await source.fill(alternate);
     await pc.locator("#grade").click();
-    await status.getByText(/できました。すべて/).waitFor();
+    await status.getByText("すべての条件で正解です。").waitFor();
     await pc.reload();
     assert.equal(await source.inputValue(), alternate);
 
@@ -53,7 +53,7 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
       await pieces.getByRole("button", { name: line, exact: true }).tap();
     }
     await phone.locator("#grade").tap();
-    await phone.locator("#status").getByText(/できました。すべて/).waitFor();
+    await phone.locator("#status").getByText("すべての条件で正解です。").waitFor();
     await phone.locator("#keyboard").tap();
     assert.equal(await phone.locator("#source").inputValue(), "");
     await phone.locator("#tap").tap();

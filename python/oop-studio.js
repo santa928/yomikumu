@@ -12,27 +12,27 @@
   const retry = "try:\n    a(-1)\nexcept ValueError:\n    problem = True\nelse:\n    problem = False\nnext_value = a(3, extra=2)";
   const obs = (name, expr, value, before) => check(name, "", { observe: expr, value, before });
   pythonChapters.push({
-    id: "67", engine: "cpython", title: "設定を切り替えられる読書記録を作る",
-    goal: "同じ記録係を複数の関数に渡し、別の会の記録を分けます。入力違いを記録してから、正しい入力で再開します。",
-    demo: { input: "-1", prompt: "最初に試すページ数を指定します。負の値の場合も次の受付が動き、青と赤の記録を別々に表示します。",
+    id: "67", engine: "cpython", title: "読書記録の成功と失敗を履歴に残す",
+    goal: "読書記録の関数を呼ぶたびに、成功か失敗かを履歴に残します。同じ設定を使う関数は一つの履歴を共有します。",
+    demo: { input: "-1", prompt: "最初のページ数に -1 を入力すると「もう一度」と表示されます。そのあと4ページと2ページの記録が続き、最後に青と赤それぞれの履歴が表示されます。",
       code: record + "\n" + twoJobs + "\n" + arrange + "\ntry:\n    print(a(int(input())))\nexcept ValueError:\n    print('もう一度')\nprint(a(4))\nprint(c(2))\nprint(a.history)\nprint(c.history)" },
     lessons: [
       {
-        engine: "skulpt", title: "設定を渡す時点を見る", text: "設定付きの記録係は関数を二段返します。まず mark('青') を呼んで設定を選ぶと、次に関数を受け取る decorate が戻ります。まだ元の関数に適用していません。",
+        engine: "skulpt", title: "設定を渡す時点を見る", text: "mark('青') を呼ぶと、events に「設定青」が追加され、関数 decorate が返ります。この時点で選んだのはラベルだけです。どの関数に適用するかは次の手順で指定します。",
         code: "events = []\n" + setting + "\nblue = mark('青')\nprint(events)", output: "['設定青']",
         quiz: ["mark('青') を呼んだ直後に終わっていることは？", ["元の関数の実行", "設定の選択", "すべての読書記録", "料金計算"], 1, "まだどの関数に付けるかも、いつ呼ぶかも決まっていません。"],
         guide: exercise("設定の「青」を「赤」に変え、設定時点の記録を一件だけ表示しましょう。mark と events は用意されています。", "plan = mark('青')\nprint(events)", "plan = mark('赤')\nprint(events)", [check("設定だけ記録", "['設定赤']\n", { before: "events = []\n" + setting, observe: "callable(plan)", value: true })], "mark に渡すラベルを変え、返った関数はまだ呼びません。"),
-        write: exercise("朝、夜の二つの設定をこの順で選び、返った道具を morning と night に保管しましょう。まだ関数には適用しません。", "", "morning = mark('朝')\nnight = mark('夜')", [obs("設定が二回", "[events, callable(morning), callable(night)]", [["設定朝", "設定夜"], true, true], "events = []\n" + setting)], "異なるラベルで mark を二度呼び、それぞれの返り値を保管します。"),
+        write: exercise("mark に「朝」、「夜」を順に渡し、返ってきた関数を morning と night に代入しましょう。ここでは代入までを書きます。", "", "morning = mark('朝')\nnight = mark('夜')", [obs("設定が二回", "[events, callable(morning), callable(night)]", [["設定朝", "設定夜"], true, true], "events = []\n" + setting)], "異なるラベルで mark を二度呼び、それぞれの返り値を保管します。"),
       },
       {
         engine: "skulpt", title: "関数に適用する時点を見る", text: "plan = mark('青') の次に plan(pages) とすると、内側の decorate が一度動きます。ここで初めてどの関数を扱うかが決まります。まだページ数を渡してはいません。",
         code: "events = []\n" + apply + "\n" + job + "\nplan = mark('青')\ntracked = plan(pages)\nprint(events)", output: "['設定青', '適用青']",
         quiz: ["適用はどの行？", ["def pages の説明文", "plan = mark('青')", "tracked = plan(pages)", "tracked(4)"], 2, "受け取った設定に、関数そのものを渡す行です。"],
-        guide: exercise("計算結果を渡す誤りを直し、ページ関数自体を設定へ渡して tracked を作りましょう。", "plan = mark('青')\ntracked = plan(pages(3))", "plan = mark('青')\ntracked = plan(pages)", [obs("関数へ適用", "[events, tracked(4)]", [["設定青", "適用青"], 4], "events = []\n" + apply + "\n" + job)], "plan に渡すときは pages の後ろの丸かっこを外します。"),
-        write: exercise("「夜」を一度設定し、同じ設定を pages と title の二つの関数へ順に適用して a、b に入れましょう。", "", "night = mark('夜')\na = night(pages)\nb = night(title)", [obs("一設定を二関数へ", "[events, a(2), b('雲')]", [["設定夜", "適用夜", "適用夜"], 2, "本:雲"], "events = []\n" + apply + "\n" + twoJobs)], "同じ night を二度使い、関数は値のまま順番に渡します。"),
+        guide: exercise("plan に pages(3) の計算結果を渡すと、そのあと tracked(4) を呼べません。関数 pages を plan に渡すように直しましょう。", "plan = mark('青')\ntracked = plan(pages(3))", "plan = mark('青')\ntracked = plan(pages)", [obs("関数へ適用", "[events, tracked(4)]", [["設定青", "適用青"], 4], "events = []\n" + apply + "\n" + job)], "plan に渡すときは pages の後ろの丸かっこを外します。"),
+        write: exercise("「夜」を一度設定し、同じ設定を pages と title の二つの関数へ順に適用して a、b に入れましょう。", "", "night = mark('夜')\na = night(pages)\nb = night(title)", [obs("一設定を二関数へ", "[events, a(2), b('雲')]", [["設定夜", "適用夜", "適用夜"], 2, "本:雲"], "events = []\n" + apply + "\n" + twoJobs)], "night を2回呼び、1回目に pages、2回目に title を渡します。"),
       },
       {
-        engine: "skulpt", title: "最後に呼び出す時点を見る", text: "内側の wrapper は、関数を呼んだそのときに動きます。設定と適用は一度だけでも、実際の呼び出しが二回なら呼出の記録は二件です。",
+        engine: "skulpt", title: "関数を呼ぶたびに1件記録する", text: "内側の wrapper は、関数を呼んだそのときに動きます。設定と適用は一度だけでも、実際の呼び出しが二回なら呼出の記録は二件です。",
         code: "events = []\n" + call + "\n" + job + "\ntracked = mark('青')(pages)\nprint(tracked(3))\nprint(events)", output: "3\n['設定青', '適用青', '呼出青']",
         quiz: ["正しい順番は？", ["設定→適用→呼出", "適用→設定→呼出", "呼出→設定→適用", "設定→呼出→適用"], 0, "設定を選び、関数に付けてから、値を渡して使います。"],
         guide: exercise("tracked をもう一度呼び、3、5の二件を表示してから events を表示しましょう。", "tracked = mark('青')(pages)\nprint(tracked(3))\nprint(events)", "tracked = mark('青')(pages)\nprint(tracked(3))\nprint(tracked(5))\nprint(events)", [check("二回の呼出", "3\n5\n['設定青', '適用青', '呼出青', '呼出青']\n", { before: "events = []\n" + call + "\n" + job })], "設定をやり直さず、tracked(5) を追加します。"),
@@ -46,11 +46,11 @@
         write: exercise("counter(label) を作り、一つの設定を付けた関数は履歴を共有し、別の設定は独立させましょう。呼び出すとラベルを一つ記録し、関数の結果を返します。", "", counts, [obs("二つの設定と三つの関数", "[a.history, b.history, c.history, result]", [["青", "青"], ["青", "青"], ["赤"], 5], twoJobs)], "history を外側の設定関数の中に置きます。返す wrapper には同じ history を持たせます。", { after: "blue = counter('青')\nred = counter('赤')\na = blue(pages)\nb = blue(title)\nc = red(pages)\nresult = a(5)\nb('月')\nc(2)" }),
       },
       {
-        title: "別の読書会の記録と復帰を作る", text: "成功したら「成功」、数字違いの ValueError なら「失敗」を履歴に加えます。except の中で raise だけを書くと、受け取った同じ例外を呼出元へ戻せます。次の呼び出しも同じ設定を使えます。",
+        title: "失敗を履歴に残し、次の呼び出しを試す", text: "青の設定で負のページ数を渡すと「青失敗」が履歴に残ります。except の中に raise とだけ書くと、その ValueError を呼び出し元でも受け取れます。そこで例外を処理したあと、次の呼び出しが成功すると「青成功」が追加されます。",
         code: record + "\n" + twoJobs + "\n" + arrange + "\n" + retry + "\nprint(next_value)\nprint(a.history)\nprint(c.history)", output: "5\n['青失敗', '青成功']\n[]",
         quiz: ["青で一度失敗し、同じ青で成功した後の履歴は？", ["失敗だけ", "成功だけ", "青失敗・青成功の順", "赤に両方残る"], 2, "失敗も記録し、例外を外で扱った後は次の呼び出しでまた使えます。"],
         guide: exercise("元の例外を消してしまう recorder を直します。失敗を記録し、呼出元が受け取った後に、同じ関数で成功できるようにします。", record.replace("                raise\n", "                return 0\n"), record, [obs("失敗後に同じ関数で復帰", "[problem, next_value, a.history]", [true, 5, ["青失敗", "青成功"]], twoJobs)], "except で失敗を記録した後、raise で同じ ValueError を外へ渡します。", { after: arrange + "\n" + retry }),
-        write: exercise("海と森の二会場で使える recorder(label) を作りましょう。同じ会場の関数は履歴を共有します。名前と説明、引数、戻り値を保ち、失敗は記録して外へ返し、次の受付を続けます。", "", record, [obs("元の名前と説明", "[a.__name__, a.__doc__, b.__name__]", ["pages", "読んだページ", "title"], twoJobs), obs("失敗・復帰・設定の独立", "[problem, next_value, b('舟'), c(4), a.history, c.history]", [true, 5, "本:舟", 4, ["海失敗", "海成功", "海成功"], ["森成功"]], twoJobs)], "wraps、設定ごとの history、ValueError の再送出を一つずつ確かめます。", { after: arrange.replaceAll("'青'", "'海'").replaceAll("'赤'", "'森'") + "\n" + retry }),
+        write: exercise("recorder(label) を定義し、「海」と「森」の履歴を別々に残しましょう。同じ設定を適用した関数は履歴を共有します。元の関数の名前・説明・引数・返り値を保ち、ValueError が起きたら失敗を記録して、同じ例外を呼び出し元に伝えてください。", "", record, [obs("元の名前と説明", "[a.__name__, a.__doc__, b.__name__]", ["pages", "読んだページ", "title"], twoJobs), obs("失敗・復帰・設定の独立", "[problem, next_value, b('舟'), c(4), a.history, c.history]", [true, 5, "本:舟", 4, ["海失敗", "海成功", "海成功"], ["森成功"]], twoJobs)], "wraps、設定ごとの history、ValueError の再送出を一つずつ確かめます。", { after: arrange.replaceAll("'青'", "'海'").replaceAll("'赤'", "'森'") + "\n" + retry }),
       },
     ],
   });

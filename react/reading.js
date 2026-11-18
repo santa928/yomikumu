@@ -90,16 +90,16 @@ const bookFilterChecks=[
  [t=>{readingClick("解除");return t.all("#root li").length===2 && t.q("#root p").textContent==="2冊";},"解除で元の二冊へ戻します。"],
 ];
 const reactReading = {
- id:"reading-project",title:"読書リストを部品設計から作る",
- intro:"本を一冊ずつ表示する部品から始め、借りた本と未読の本を探す読書リストへ進みます。温度計にも同じ分け方を試した後、別の条件と原稿から自分の一覧を仕上げます。",
+ id:"reading-project",title:"本を追加・絞り込みできる読書リストを作る",
+ intro:"本を一冊ずつ表示する部品から始め、借りた本と未読の本を探す読書リストへ進みます。途中で温度計を使い、親が持つ値を子に表示する方法も試します。最後は、本の追加・絞り込み・リセットができる一覧を作ります。",
  setup:readingSetup,demo:{code:library,tip:"「未読の本」で0冊を確かめ、新しい書名を追加してください。「借りた本」「解除」「リセット」で一覧と件数を見比べます。"},
  steps:[
   {
    title:"一冊の本を表示する部品を書く",
    explain:"一冊分のデータをbookとして受け取り、そのtitleをliに出します。親のulの中に部品を置けば、ブラウザにも一覧の行が一つできます。",
    example:oneBook.replace("{book.title}</li>","一冊目</li>"),
-   question:"原稿が変わった時に同じ部品を使うには、作品名をどこから読みますか。",options:["最初の文字を固定","propsのbook.title","画面の幅","配列の長さ"],correct:1,feedback:"部品へ渡された一冊から名前を読みます。",
-   task:"liに渡された本のtitleを表示し、別の本のデータを渡した時にも名前が変わるようにします。",
+   question:"Book に別の本を渡したとき、その本の書名を表示するには、どこから値を読みますか。",options:["最初の文字を固定","propsのbook.title","画面の幅","配列の長さ"],correct:1,feedback:"部品へ渡された一冊から名前を読みます。",
+   task:"Book が受け取った本の title を li に表示してください。別の本を渡すと、その本の書名に変わります。",
    build:reactBuild(oneBook,["{book.title}</li>","一冊目</li>"],['title:"野の手紙"','title:"砂の道"']),
    tests:[[t=>t.q("#root li")?.textContent==="野の手紙","一冊目の名前を表示します。"],[t=>{const book=training.elements.find(e=>e.props?.book);if(!book)return false;training.mount(book.type,{book:{title:"別の旅"}});return t.q("#root li").textContent==="別の旅";},"本を渡し替えてもtitleから名前を読める部品を作ります。"]],
   },
@@ -121,13 +121,13 @@ const reactReading = {
    starter:bookSeed+"\n"+bookRow+"\n",build:reactBuild(filterBooks,["visible.length","initial.length"],["!b.read","b.read"]),tests:bookFilterChecks,
   },
   {
-   title:"本とは別の温度表示へ考え方を移す",
-   explain:"表示用の部品に数値を渡す考え方は、本以外にも使えます。親に温度を持ち、一枚の札へ渡す例を試します。",
+   title:"親の数値を温度として表示する",
+   explain:"親の App は気温を value に保存します。Temperature が受け取った数値に「℃」を付けると、ボタンで値を変えたときも最新の気温を表示できます。",
    example:pureTemperature.replace("celsius={value}","celsius={18}"),
-   question:"一度押して19℃にした後、札に渡す値はどれですか。",options:["最初の18","部屋名","更新後のvalue","ボタンのid"],correct:2,feedback:"親の最新値を表示部品へ渡します。",
-   task:"親の数値をTemperature部品に渡し、押すたびに札が18℃、19℃、20℃と変わるようにします。",
+   question:"「1度上げる」を押して19℃にした後、Temperature に渡す値はどれですか。",options:["最初の18","部屋名","更新後のvalue","ボタンのid"],correct:2,feedback:"親の最新値を表示部品へ渡します。",
+   task:"親の value を Temperature に渡してください。最初は18℃で、「1度上げる」を押すたびに19℃、20℃と表示が変わります。",
    build:reactBuild(pureTemperature,["celsius={value}","celsius={18}"],["v=>v+1","v=>v-1"]),
-   tests:[[t=>t.q("#root p").textContent==="18℃","現在の温度を札に表示します。"],[t=>{training.click("#root button");training.click("#root button");return t.q("#root p").textContent==="20℃";},"二度押した後も親の最新値を札へ渡します。"]],
+   tests:[[t=>t.q("#root p").textContent==="18℃","p に現在の温度を表示します。"],[t=>{training.click("#root button");training.click("#root button");return t.q("#root p").textContent==="20℃";},"二度押した後は、親の最新値を渡して20℃と表示します。"]],
   },
   {
    title:"上限温度のフォーム送信を自分で書く",
@@ -159,13 +159,13 @@ const reactReading = {
   },
   {
    title:"追加・解除・リセットのある読書リストを制作する",
-   explain:"一冊を描く部品と、全冊や選択中の条件を持つ親を自分で設計します。見本は別の原稿一冊です。完成後は、読書リストと温度表示で何を親に置いたかを書き残せます。",
+   explain:"見本では、Book が親から受け取った一冊を表示しています。練習では一覧と選んだ条件を親に保存し、表示する本を一冊ずつ子に渡します。完成後は、読書リストと温度表示で何を親に置いたかを書き残せます。",
    example:oneBook,
-   question:"未読の本を表示しながら一冊追加した時、件数を決めるのは誰ですか。",options:["一冊分の札","フォームのラベル","表示用の一覧を作る親","ボタン"],correct:2,feedback:"親が今の条件に合う一覧を求め、その長さを表示します。",
-   task:"二冊の原稿は「波の地図」（借りた・既読）と「森の便り」（自分の本・既読）。「借りた本」「未読の本」「解除」で絞り込み、ulの行とpの冊数をそろえます。フォームから書名を追加したら自分の未読本にし、空白だけは登録しません。「リセット」で初期の二冊と全件表示・空の入力欄へ戻してください。親と一冊分の部品は自分で書きます。",
+   question:"未読の本を表示しながら一冊追加した時、表示する冊数を計算するのはどの部分ですか。",options:["一冊を表示する Book","フォームのラベル","表示用の一覧を作る親","ボタン"],correct:2,feedback:"親が今の条件に合う一覧を求め、その長さを表示します。",
+   task:"最初に「波の地図」（借りた本・既読）と「森の便り」（自分の本・既読）の二冊を表示してください。「借りた本」「未読の本」「解除」で絞り込み、ulの行とpの冊数をそろえます。フォームから書名を追加したら自分の未読本にし、空白だけは登録しません。「リセット」で初期の二冊と全件表示・空の入力欄へ戻してください。親と一冊分の部品は自分で書きます。",
    reflection:"一冊を描く部品と、条件や件数を扱う部品に分けた理由を自分の言葉で残す",
    starter:"",build:reactBuild(library,["visible.length","books.length"],["borrowed:false,read:false","borrowed:true,read:true"],["setBooks(initial);setMode","setBooks([]);setMode"]),
-   tests:[...bookFilterChecks,[t=>{readingClick("未読の本");training.input("input"," ");training.click("form button");return !t.q("#root li");},"空白だけの書名は追加しません。"],[t=>{training.input("input"," 星図 ");training.click("form button");return t.all("#root li").map(n=>n.textContent).join()==="星図" && t.q("#root p").textContent==="1冊" && t.q("input").value==="";},"追加した本を未読として表示し、入力を空にします。"],[t=>{readingClick("解除");if(t.all("#root li").length!==3)return false;readingClick("借りた本");training.input("input","途中");readingClick("リセット");return t.all("#root li").map(n=>n.textContent).join("/")==="波の地図/森の便り" && t.q("#root p").textContent==="2冊" && t.q("input").value==="";},"解除で全3冊へ、リセットで最初の原稿・件数・空欄に戻します。"]],
+   tests:[...bookFilterChecks,[t=>{readingClick("未読の本");training.input("input"," ");training.click("form button");return !t.q("#root li");},"空白だけの書名は追加しません。"],[t=>{training.input("input"," 星図 ");training.click("form button");return t.all("#root li").map(n=>n.textContent).join()==="星図" && t.q("#root p").textContent==="1冊" && t.q("input").value==="";},"追加した本を未読として表示し、入力を空にします。"],[t=>{readingClick("解除");if(t.all("#root li").length!==3)return false;readingClick("借りた本");training.input("input","途中");readingClick("リセット");return t.all("#root li").map(n=>n.textContent).join("/")==="波の地図/森の便り" && t.q("#root p").textContent==="2冊" && t.q("input").value==="";},"解除で全3冊へ、リセットで最初の二冊と冊数・空の入力欄に戻します。"]],
   },
  ],
 };

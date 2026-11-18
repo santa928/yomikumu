@@ -101,7 +101,7 @@ function pcSetup(step, message) {
 }
 
 function catalog() {
-  title("Next.js", "水辺の図書室を開こう", "作品を部品で表示した経験を生かして、住所を持つページを作ります。スマホでは図書室の見本を読み、コードを組めます。PCの実行と採点にはDockerを使います。");
+  title("Next.js", "水辺の図書室を開こう", "本の一覧から詳細ページへ移動できるサイトを作ります。スマホでは表示例を読んでコードを組み立てます。PC では Docker で Next.js を起動して自分のコードを試せます。");
   if (state.last) screen.append(jump("前回の続きへ", state.last, "next"));
   for (const chapter of nextChapters) {
     const section = el("section");
@@ -123,7 +123,7 @@ function chapterPage(chapter) {
     actions.append(option);
   }
   actions.firstElementChild.click();
-  sample.append(el("h2", "完成例を見比べる"), el("p", "住所や操作を選ぶと、そのときの結果を読めます。PCでは手元のサーバーで同じ操作を試せます。"), actions, output);
+  sample.append(el("h2", "完成例を見比べる"), el("p", "URL や操作を選ぶと、そのときの表示例を確認できます。PCでは手元のサーバーで同じ操作を試せます。"), actions, output);
   const list = el("ol");
   for (const item of nextLessons.filter(lesson => lesson.chapter === chapter.id)) {
     const row = el("li");

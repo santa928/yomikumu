@@ -2,21 +2,21 @@
 
 const javascriptLessons = [
   {
-    id: "js-sign", topic: "JavaScriptの入口", title: "展示の看板を書き換える",
-    goal: "HTMLで書いた看板を開き、JavaScriptを動かして文字を変える。",
+    id: "js-sign", topic: "JavaScriptの入口", title: "JavaScriptで見出しの文字を変える",
+    goal: "HTMLの見出しに表示する文字を、JavaScriptで書き換える。",
     slides: [
-      { title: "閉館したら、看板に何を出そう？", body: "いまは「開館中」と表示されています。HTMLの h2 が見出しを作り、CSSが紺色を付けています。「見本を実行」を押すと、JavaScriptが看板の文字を入れ替えます。色も見比べてください。",
+      { title: "「開館中」を「本日は閉館」に変える", body: "見出しの最初の表示は「開館中」です。「見本を実行」を押すと「本日は閉館」に変わります。見出しを作っているのは HTML の h2、文字の色を紺色にしているのは CSS です。",
         code: 'showTitle("本日は閉館");', sign: true, markup: true, pauseExample: true },
-      { title: "二つの引用符の間を読む", body: "showTitle は、この教材が用意した看板の操作です。丸かっこの中に、出したい文字を引用符で囲んで書きます。見本を実行すると「準備中」が看板に出ます。コード練習ではこの文字だけを変えましょう。",
+      { title: "表示したい文字を引用符で囲む", body: "showTitle は、見出しの文字を変えるためにこの教材が用意した関数（名前を付けた処理）です。丸かっこの中に、表示したい文字を引用符で囲んで書きます。「見本を実行」を押すと、見出しが「準備中」に変わります。",
         code: 'showTitle("準備中");', sign: true },
     ],
-    quiz: { prompt: 'showTitle("明日また開館"); を実行したとき、看板に出る文字は？', options: ["showTitle", "明日また開館", "紺色", "二つの引用符"], correct: 1,
-      reasons: ["これは用意された操作の名前です。", "引用符の内側に書いた文字が出ます。", "看板の色はCSSで設定しました。", "引用符は文字の範囲を伝える印です。"] },
+    quiz: { prompt: 'showTitle("明日また開館"); を実行したとき、見出しに出る文字は？', options: ["showTitle", "明日また開館", "紺色", "二つの引用符"], correct: 1,
+      reasons: ["これは用意された操作の名前です。", "引用符の内側に書いた文字が出ます。", "文字の色はCSSで設定しています。", "引用符は文字の範囲を伝える印です。"] },
     exercise: {
-      field: "javascript", sign: true, task: "原稿は「夜の展示」です。showTitle の引用符の中だけを書き換えて、看板にこの名前を出してください。",
+      field: "javascript", sign: true, task: "showTitle の引用符の中を書き換えて、見出しに「夜の展示」と表示してください。",
       code: 'showTitle("昼の展示");', answer: 'showTitle("夜の展示");', review: 1, hint: "丸かっこと引用符を残して「昼」を「夜」に変えます。",
-      build: { code: 'showTitle("①");', slots: [["看板に出す文字", "昼の展示", "夜の展示"]] },
-      judge: ({ title }) => title === "夜の展示" ? "" : "看板には「夜の展示」を出しましょう。引用符の間を見直せます。",
+      build: { code: 'showTitle("①");', slots: [["見出しに表示する文字", "昼の展示", "夜の展示"]] },
+      judge: ({ title }) => title === "夜の展示" ? "" : "見出しに「夜の展示」と表示するには、引用符の間を「夜の展示」に変えましょう。",
     },
   },
   {
@@ -25,25 +25,25 @@ const javascriptLessons = [
     slides: [
       { title: "途中の値を見たいとき", body: "console.log は丸かっこの中の値を、作る人が確認するための欄に出します。この欄をコンソールと呼びます。二行を上から実行すると、引用符のある「2」は文字、引用符のない 2 は数です。ここでは違いを読めるように種類も添えています。",
         code: 'console.log("2");\nconsole.log(2);' },
-      { title: "はい・いいえを表す値", body: "入場できるかを「はい」と記録するときは true、「いいえ」なら false と書けます。この二つの値の種類は真偽です。引用符で囲むと文字になります。",
+      { title: "はい・いいえを表す値", body: "true は「はい」、false は「いいえ」に当たる値です。この二つを真偽値と呼びます。コンソールで、引用符のない false と、引用符で囲んだ文字の「false」を見比べましょう。",
         code: 'console.log(false);\nconsole.log("false");' },
     ],
     quiz: { prompt: 'console.log("2"); の値の種類は？', options: ["数", "真偽", "文字", "見出し"], correct: 2, reasons: ["数の 2 は引用符を付けずに書きます。", "真偽は true と false の二つです。", "引用符で囲んだ「2」は文字です。", "今回はコンソールに出しています。"] },
     exercise: {
-      field: "javascript", task: "三行の記録を作ります。上から、整理券に印刷する文字「3」、人数を表す数 3、入場できることを表す真偽 true を一行ずつ表示してください。",
+      field: "javascript", task: "コンソールに三行表示してください。一行目は文字の「3」、二行目は数の 3、三行目は真偽値の true です。",
       code: 'console.log("3");\nconsole.log("3");\nconsole.log("true");', answer: 'console.log("3");\nconsole.log(3);\nconsole.log(true);', review: 1,
       hint: "一行目には引用符を残します。二行目の数と三行目の真偽には引用符が要りません。",
-      build: { code: 'console.log("3");\nconsole.log(①);\nconsole.log(②);', slots: [["人数の値", '"3"', "3"], ["入場できるという値", "true", '"true"']] },
-      expected: () => ["3", 3, true], hints: ["一行目は「3」を文字で表示しましょう。", "整理券はできました。人数は数の 3 を出してください。", "人数もできました。最後に、引用符を外した真偽の true を表示しましょう。"],
+      build: { code: 'console.log("3");\nconsole.log(①);\nconsole.log(②);', slots: [["二行目に出す数", '"3"', "3"], ["三行目に出す真偽値", "true", '"true"']] },
+      expected: () => ["3", 3, true], hints: ["一行目は「3」を文字で表示しましょう。", "二行目の 3 には引用符を付けず、数として表示してください。", "最後の true は引用符を外し、真偽値として表示しましょう。"],
     },
   },
   {
     id: "js-constant", topic: "値に名前を付ける", title: "同じ値を名前で呼ぶ",
-    goal: "入場点に名前を付けておき、その名前で同じ値を二度表示する。",
+    goal: "開始点を変数に保存し、その変数を使って同じ数を二度表示する。",
     slides: [
       { title: "同じ点数を二度使う", body: "const ticket = 2; と書くと、数の 2 に ticket という名前が付きます。= の右が値、左がその名前です。次の行で ticket を使うと 2 が出ます。const で付けた名前には、後から別の値を入れ直せません。",
         code: "const ticket = 2;\nconsole.log(ticket);\nconsole.log(ticket);" },
-      { title: "入場点を入れ替えて試す", body: "この教材では、開始時の点数を initialScore という名前で用意しています。「開始点」で数を選び直して実行すると、ticket を使う二つの行が一緒に変わります。",
+      { title: "開始点を変えて試す", body: "この教材では、開始時の点数を initialScore という名前で用意しています。「開始点」で数を選び直して実行すると、ticket を使う二つの行が一緒に変わります。",
         code: "const ticket = initialScore;\nconsole.log(ticket);\nconsole.log(ticket);", variableStart: true },
     ],
     quiz: { prompt: "const ticket = 4; の後で console.log(ticket); に出る値は？", options: ["ticket という文字", "true", "0", "数の4"], correct: 3,
@@ -62,7 +62,7 @@ const javascriptLessons = [
     slides: [
       { title: "同じ + でも何が変わる？", body: "数どうしの + は足し算です。どちらかが文字のときはつなげます。見本を実行して、2 + 1 と引用符の付いた「2」に 1 を足したときの違いを見ましょう。",
         code: 'console.log(2 + 1);\nconsole.log("2" + 1);' },
-      { title: "その日の開始点から数える", body: "正解一つにつき2点なら、開始点に 2 を足します。開始点が変わっても同じ式が使えます。この一行は計算した結果を表示します。", code: "console.log(initialScore + 2);", variableStart: true },
+      { title: "選んだ開始点に2を足す", body: "正解一つにつき2点なら、開始点に 2 を足します。開始点が変わっても同じ式が使えます。この一行は計算した結果を表示します。", code: "console.log(initialScore + 2);", variableStart: true },
     ],
     quiz: { prompt: 'console.log("2" + 1); に出るのは？', options: ["数の3", "文字の21", "数の21", "文字の3"], correct: 1,
       reasons: ["最初が文字なので足し算にはなりません。", "文字の「2」と「1」が順につながります。", "つないだ結果の種類は文字です。", "3になるのは数どうしを足したときです。"] },
@@ -79,13 +79,13 @@ const javascriptLessons = [
     slides: [
       { title: "同じ名前の中身を入れ替える", body: "正解するたびに変わる得点には let で名前を付けます。score = score + 1 は、右側で今の点に1を足し、その結果を左の score に入れ直す一行です。上から実行し、更新する前と後を比べましょう。",
         code: "let score = 2;\nconsole.log(score);\nscore = score + 1;\nconsole.log(score);" },
-      { title: "別の開始点でも同じ手順で", body: "最初の数が違う大会では、let score = initialScore; から始めます。開始点を選び、実行して、最初の行と最後の行の差がいつも1か確かめましょう。",
+      { title: "別の開始点でも同じ手順で", body: "let score = initialScore; と書くと、選んだ開始点から計算できます。開始点を変えて実行し、コンソールの二行目が一行目より1大きくなることを確かめましょう。",
         code: "let score = initialScore;\nconsole.log(score);\nscore = score + 1;\nconsole.log(score);", variableStart: true },
     ],
     quiz: { prompt: "score が4のとき、score = score + 1; の直後に読む値は？", options: ["数の5", "数の4", "文字の41", "真偽のtrue"], correct: 0,
       reasons: ["右で4に1を足し、その5を同じ名前に入れました。", "右側の結果で以前の値を更新しています。", "どちらの値も数です。", "足し算をして数を得ています。"] },
     exercise: {
-      field: "javascript", variableStart: true, task: "夜の部は正解で2点増えます。let で score を開始点から始め、まずその数を表示してください。次に score を2点増やし、更新した数をもう一行に表示してください。",
+      field: "javascript", variableStart: true, task: "let で score に開始点を入れ、その数を表示してください。次に score を2点増やし、更新した数を二行目に表示してください。",
       code: "let score = initialScore;\nconsole.log(score);", answer: "let score = initialScore;\nconsole.log(score);\nscore = score + 2;\nconsole.log(score);", review: 1, binding: { name: "score", offset: 2 },
       hint: "最初の表示の後に score = score + 2; を置き、もう一度 score を表示します。",
       build: { code: "let score = ①;\nconsole.log(score);\nscore = score + ②;\nconsole.log(score);", slots: [["最初の点", "0", "initialScore"], ["正解で増える点", "2", '"2"']] },

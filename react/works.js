@@ -83,12 +83,12 @@ const workFormChecks = [
 ];
 const reactWorks = {
  id:"work-list",title:"入力した作品を一覧に加え、件数をそろえる",
- intro:"作品名を書き、登録すると一覧と件数の両方に反映される小さな展示台帳を作ります。",
+ intro:"作品名を入力して登録すると、一覧に一行増え、件数も増える画面を作ります。",
  demo:{code:liveShelf,tip:"作品を二つ登録した後、三つ目を書きかけのまま、先頭の「注目」を切り替えてみましょう。入力欄と件数を確かめてください。"},
  steps:[
   {
    title:"クリックしてstateを更新する",
-   explain:"次に画面を描く時も覚えていたい値をstateと呼びます。useState(0)は現在の値と、更新を頼む関数を返します。onClickに関数を渡すと、押すたびにReactが新しい票数を描きます。この教材ではuseStateをすぐ使えます。",
+   explain:"React の部品が次の表示にも引き継ぐ値を state と呼びます。useState(0) は、現在の値と、その値を更新する関数を返します。onClickに関数を渡すと、押すたびにReactが新しい票数を描きます。この教材ではuseStateをすぐ使えます。",
    example:voteApp.replace("n + 1","n + 2"),
    question:"現在値を使って一票増やす指定はどれですか。",options:["countを表示するだけ","setCount(n => n + 1)","useStateを押すたびに呼ぶ","戻り値を捨てる"],correct:1,feedback:"更新関数に前の値から次の値を作る関数を渡します。",
    task:"一回で2票の見本を、押すたびに一票ずつ増えるよう変えます。",
@@ -100,7 +100,7 @@ const reactWorks = {
    explain:"一回のクリックの中では、countは描画した時の値です。setCount(count + 1)を二度呼んでも同じ値を指定します。n => n + 1なら、一つ前の更新結果にさらに足せます。",
    example:twiceApp.replaceAll("setCount(n => n + 1);","setCount(count + 1);"),
    question:"0票から更新関数で1ずつ二度足すと、画面には何票と出ますか。",options:["0票","1票","2票","4票"],correct:2,feedback:"二つ目の更新は一つ目が作った1を受け取り、2になります。",
-   task:"一押しで1ずつ二度、二回押せば計4票へ更新してください。",
+   task:"一回のクリックで票数を1ずつ二度増やしてください。最初のクリックで2票、次のクリックで4票と表示されます。",
    build:reactBuild(twiceApp,["setCount(n => n + 1);\n    setCount(n => n + 1);","setCount(count + 1);\n    setCount(count + 1);"],["onClick={vote}","onClick={() => {}}"]),
    tests:[[t=>{training.click("button");return t.q("button").textContent==="2票";},"一回の操作で合計2票にします。"],[t=>{training.click("button");return t.q("button").textContent==="4票";},"次の操作でも前回から2票増やします。"]],
   },
@@ -109,7 +109,7 @@ const reactWorks = {
    explain:"mapで一件ずつliを作ります。keyはReactが前回と今回の同じ行を対応づける目印です。ここでは作品名を重複させません。[...works, 新しい値]は元の配列を残して新しい配列を作ります。",
    example:addListApp.replace('[...works, "作品" + (works.length + 1)]','["作品" + (works.length + 1)]'),
    question:"元の水玉を残したまま新しい作品を追加する値はどれですか。",options:['["作品2"]',"works.length",'[...works, "作品2"]',"空の配列"],correct:2,feedback:"元の作品を展開した後に一件を付け足します。",
-   task:"コピー更新にして、水玉・作品2・作品3の順に行が増えるようにします。",
+   task:"元の一覧をコピーして新しい作品を末尾に追加してください。ボタンを二度押すと、「水玉」「作品2」「作品3」の三行になります。",
    build:reactBuild(addListApp,['[...works, "作品" + (works.length + 1)]','["作品" + (works.length + 1)]'],["{name}</li>","作品</li>"]),
    tests:[[t=>t.q("li")?.textContent==="水玉","初めの一件を表示します。"],[t=>{const first=t.q("li");training.click("button");training.click("button");return t.q("li")===first && t.all("li").map(n=>n.textContent).join("/")==="水玉/作品2/作品3";},"元の行を保ち、コピーした配列の末尾に新しい行を加えます。"]],
   },

@@ -7,7 +7,7 @@ const creditSize = { selector: ".credit", label: "撮影者の文字" };
 
 const typeLessons = [
   {
-    id: "linked-css", title: "別のファイルから作者名の色を読み込む", topic: "CSS",
+    id: "linked-css", title: "CSSファイルを読み込んで作者名の色を変える", topic: "CSS",
     goal: "HTMLに一行足して、別ファイルに書いたCSSを読み込む。",
     slides: [
       {
@@ -17,7 +17,7 @@ const typeLessons = [
       },
       {
         title: "HTMLにファイルの場所を知らせる",
-        body: "link の rel=\"stylesheet\" は見た目のルールを読むという意味。href に同じフォルダーのファイル名を書きます。作品の本文はそのままで、作者名だけが下のCSSで指定した紺色になりました。link は画面に文字を出さないタグです。",
+        body: "link タグでCSSファイルを読み込みます。rel=\"stylesheet\" でCSSであることを示し、href にファイル名を書きます。作品の本文はそのままで、作者名だけが下のCSSで指定した紺色になりました。link は画面に文字を出さないタグです。",
         html: '<link rel="stylesheet" href="ink.css">\n' + captionText, sheetCode: true,
       },
     ],
@@ -29,7 +29,7 @@ const typeLessons = [
     exercise: {
       field: "html", css: "", html: '<link rel="stylesheet" href="paper.css">\n' + captionText,
       task: "作者名だけを紺色にしましょう。用意した ink.css を読むように、ファイルの場所を直してください。",
-      hint: "rel はすでに指定されています。href の紙の名前を ink.css に変更します。",
+      hint: "rel はすでに指定されています。href のファイル名を paper.css から ink.css に変更します。",
       answer: '<link href="ink.css" rel="stylesheet">\n' + captionText,
       build: { code: '<link rel="①" href="②">\n' + captionText, slots: [["ファイルの役割", "stylesheet", "author"], ["読むファイル", "paper.css", "ink.css"]] }, review: 1,
     },

@@ -53,12 +53,12 @@ const retryCheck=[
 ];
 const reactTypedQuiz = {
  id:"retry-quiz",title:"型付きクイズで、誤答の後に再回答する",setup:{typed:true},
- intro:"型で問題原稿と結果の値を決め、表示する部品と採点規則をつなぎます。誤答から修正し、正答の後も最初から試せます。",
+ intro:"問題文と正答の型を決め、フォームの回答を採点するクイズを作ります。間違えたときは回答を書き直し、正解したらリセットしてもう一度挑戦できます。",
  demo:{code:integrated,tip:"「船」を送ってから「灯台」に直し、採点をやり直してください。正解した後はリセットで最初に戻ります。"},
  steps:[
   {
    language:"App.tsx",title:"型付きの問題を部品へ渡す",
-   explain:"TSXなら、JSXに渡す材料の型も書けます。Questionは問題文と正答を持つ原稿です。受け取る値を{ question: Question }と決めると、存在しない名前は表示する前に型検査で見つかります。上部のimportはReactをこのファイルから使うための宣言です。",
+   explain:"TSX では、JSX と一緒に値の型を書けます。この例の Question は、問題文と正答を持つデータの型です。受け取る値を{ question: Question }と決めると、存在しない名前は表示する前に型検査で見つかります。上部のimportはReactをこのファイルから使うための宣言です。",
    example:typedPrompt.replace("question.prompt}</h2>","question.answer}</h2>"),
    question:"出題する見出しで読む値はどれですか。",options:["question.answer","Questionという文字","question.prompt","正誤の状態"],correct:2,feedback:"問題文を入れたpromptを読み、正答は採点するときに使います。",
    task:"型付きの問題をPrompt部品へ渡し、正答でなく「海を照らす建物は？」という問題文をh2に表示してください。",
@@ -83,7 +83,7 @@ const reactTypedQuiz = {
    build:reactBuild(integrated,['disabled={result === "正解"}','disabled={result !== "未回答"}'],['setResult("未回答");','setResult("再回答");']),tests:retryCheck,
   },
   {
-   language:"App.tsx",title:"別の許容回答から天体クイズを設計する",
+   language:"App.tsx",title:"「月」と「つき」の両方を正解にする",
    explain:"二つの言い方を正解にするには、問題と正答の配列を一組にしてincludesで判定できます。見本の短い部品は「月」と「つき」の二つを表示します。",
    example:reactImport+'function App() {\n  const accepted: string[] = ["月", "つき"];\n  return <p>{accepted.join("・")}</p>;\n}',
    question:"「星」で誤答したあとに「つき」と送り直した結果はどれですか。",options:["誤答のまま","正解","未回答に戻る","送れない"],correct:1,feedback:"修正した回答を正答の配列で調べ直し、つきも正解として扱います。",

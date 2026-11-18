@@ -78,7 +78,7 @@ const boxLessons = [
       },
       {
         title: "一行の幅いっぱいをリンクにする",
-        body: "display: block をリンクに付けると、一行を使う箱になり、外側の枠の幅まで広がります。今度は同じ枠の右端を押してみましょう。文字から離れた場所でも受付時間に移れます。",
+        body: "このリンクに display: block を指定すると、押せる範囲が親要素の幅いっぱいに広がります。今度は同じ枠の右端を押してみましょう。文字から離れた場所でも受付時間に移れます。",
         html: hoursMarkup, css: deskStyles + "\n.desk a { display: block; }", previewHeight: 78,
       },
     ],

@@ -246,7 +246,7 @@ async function run() {
     const flexCases = [
       ["flex-parent", ".bar span{display:flex}", "二枚を囲んでいる", ".bar{display:inline-flex;flex-flow:column}"],
       ["along-axis", ".bar{width:180px;display:flex;justify-content:center}", "余りを二枚の間", ".bar{display:flex;width:180px}.bar span:last-child{margin-left:auto}"],
-      ["across-axis", ".bar{height:80px;display:flex}", "交差軸", ".bar{display:flex;height:80px}.bar span{align-self:center}"],
+      ["across-axis", ".bar{height:80px;display:flex}", "上下の中央にそろえ", ".bar{display:flex;height:80px}.bar span{align-self:center}"],
       ["wrap-works", ".row{display:flex;width:200px;gap:8px}.row article{flex:0 0 84px}", "次の行", ".row{display:flex;flex-flow:row wrap;gap:8px;width:200px}.row article{flex:0 0 84px}"],
     ];
     for (const [id, wrong, message, alternate] of flexCases) {
@@ -280,7 +280,7 @@ async function run() {
     await flexPreview.locator("h2:target").filter({ hasText: "受付" }).waitFor();
     const gridCases = [
       ["equal-tracks", ".gallery{display:grid;gap:8px;grid-template-columns:repeat(2,1fr)}", "等幅の三列", ".gallery{display:grid;gap:8px;grid-template-columns:1fr 1fr 1fr}"],
-      ["fitting-tracks", ".gallery{display:grid;gap:8px;grid-template-columns:1fr 1fr}", "広い棚に三枚", ".gallery{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}"],
+      ["fitting-tracks", ".gallery{display:grid;gap:8px;grid-template-columns:1fr 1fr}", "広い幅では三枚", ".gallery{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}"],
       ["grid-lines", ".gallery{display:grid;grid-template-columns:1fr 1fr}.pick{grid-column:1/2}", "右端の線", ".gallery{display:grid;grid-template-columns:1fr 1fr}.pick{grid-column:1/-1}"],
     ];
     for (const [id, wrong, message, alternate] of gridCases) {

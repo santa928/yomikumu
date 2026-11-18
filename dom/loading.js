@@ -52,7 +52,7 @@ const loadingUnit = {
   steps:[
     {
       title:"あとで届く結果をthenで受け取る",html:loadHtml,
-      explain:"loadQuestions()は教材に用意した関数です。少し待つと問題名の配列が届きます。すぐ返るのは、あとで結果を渡す約束を表すPromiseです。thenに渡した関数が届いた配列を受け取ります。見本は「遅い成功」で試しましょう。",
+      explain:"loadQuestions()は教材に用意した関数です。少し待つと問題名の配列が届きます。loadQuestions() がすぐに返すのは Promise です。読み込みに成功すると、then に渡した関数が問題名の配列を受け取ります。見本は「遅い成功」で試しましょう。",
       example:loadBindings+'\nbutton.onclick = () => {\n  loadQuestions().then(names => {\n    notice.textContent = names.length;\n  });\n};',
       question:"thenの中のnamesに入るものはどれですか。",options:["待ち時間","読込ボタン","届いた問題名の配列","空の画面"],correct:2,feedback:"サンプルの読込が成功したときに、問題名の配列が渡されます。",
       task:"遅い成功で、件数の代わりに先頭の問題名「白い帆」を表示します。",
