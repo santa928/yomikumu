@@ -12,7 +12,7 @@ async function verifyDom(id, answers, demo, course = "dom") {
     const base = process.env.DOM_URL || pathToFileURL(path.resolve(__dirname, "../" + course + "/index.html")).href;
     await pc.goto(base + "#" + id);
     await demo(pc.frameLocator('iframe[title="操作できる完成例"]'));
-    for (const [i, [primary, alternative, typical]] of answers.entries()) {
+    for (const [i, [primary, alternative, typical, typicalFeedback]] of answers.entries()) {
       const route = base + "#" + id + "/" + (i + 1);
       await Promise.all([pc.goto(route), phone.goto(route)]);
       const editor = pc.locator("main textarea").first();
@@ -28,7 +28,7 @@ async function verifyDom(id, answers, demo, course = "dom") {
       }
       if (typical !== undefined) await fillCode(typical);
       await run.click();
-      await feedback.filter({ hasText: /項目を確認|実行で止まりました/ }).waitFor();
+      await feedback.filter({ hasText: typicalFeedback || /項目を確認|実行で止まりました/ }).waitFor();
       const model = await pc.evaluate(([id, index]) => {
         const step = domUnits.find(u=>u.id===id).steps[index];
         const [template, ...slots] = step.build || domBuilders[id][index];
