@@ -27,9 +27,9 @@ const sampleBase = `@layer reset, scenery; @layer scenery {
   button { padding: 3px; background: white; border: 1px solid #596e62; }
 }`;
 
-async function renderSample(frame, values, { titles = sampleBookNames, plain = false, probe = false, state = "" } = {}) {
+async function renderSample(frame, values, { titles = sampleBookNames, plain = false, probe = false, state = "", compiledCss } = {}) {
   const classes = Object.entries(values).filter(([key]) => key !== "theme").flatMap(([, v]) => classTokens(v));
-  let css = await window.readingStyles(classes, values.theme || "");
+  let css = compiledCss ?? await window.readingStyles(classes, values.theme || "");
   if (probe || state) {
     // タッチの状態見本と採点用コピーでも、生成された宣言そのものを使う。
     css = css.replace(/(?<!\\):hover\b/g, ":is(:hover,[data-hover])")
@@ -48,6 +48,7 @@ async function renderSample(frame, values, { titles = sampleBookNames, plain = f
   });
   if (frame.renderStamp !== stamp || !frame.isConnected) return;
   const doc = frame.contentDocument;
+  frame.themeVariable = (values.theme || "").match(/--color-[\w-]+/)?.[0];
   const style = doc.createElement("style");
   style.textContent = sampleBase + css + (plain ? plainCard : "");
   doc.head.append(style);
@@ -85,6 +86,14 @@ function checkInFrames(left, right, check) {
     return check.properties.every(property => normalizedProperty(current, property) === normalizedProperty(target, property));
   }
   if (!same()) return false;
+  if (check.sharedColor) {
+    if (!left.themeVariable || !right.themeVariable) return false;
+    const elements = [left, right];
+    for (const frame of elements) frame.contentDocument.documentElement.style.setProperty(frame.themeVariable, "#ab45ef");
+    const followsTheme = same();
+    for (const frame of elements) frame.contentDocument.documentElement.style.removeProperty(frame.themeVariable);
+    return followsTheme;
+  }
   if (!check.state) return true;
   for (const element of [current, target]) {
     if (check.state === "disabled") element.disabled = true;
@@ -98,7 +107,7 @@ function checkInFrames(left, right, check) {
   return matched;
 }
 
-async function evaluateReading(unit, values) {
+async function evaluateReading(unit, values, compiledCss) {
   const expected = Object.fromEntries(unit.fields.map(field => [field.part, field.solution]));
   const frames = [];
   const checks = unit.checks;
@@ -109,10 +118,13 @@ async function evaluateReading(unit, values) {
         const frame = frameElement(width, i ? "採点用の基準" : "採点用の記述");
         frame.setAttribute("aria-hidden", "true");
         frame.tabIndex = -1;
-        frame.style.cssText = "position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none";
+        frame.style.cssText = "border:0;position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none";
         document.body.append(frame);
         frames.push(frame);
-        return renderSample(frame, { ...unit.base, ...source }, { probe: true }).then(() => frame);
+        const base = unit.fields.some(field => field.part === "other") ? { other: "" } : {};
+        return renderSample(frame, { ...base, ...unit.base, ...source }, {
+          probe: true, compiledCss: i === 0 ? compiledCss : undefined
+        }).then(() => frame);
       });
       const [left, right] = await Promise.all(pair);
       for (const check of checks.filter(item => (item.width || 420) === width)) {

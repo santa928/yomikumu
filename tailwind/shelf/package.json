@@ -1,0 +1,11 @@
+{
+  "name": "dusk-reading-shelf",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./input.css -o ./shelf.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.2",
+    "tailwindcss": "4.3.2"
+  }
+}

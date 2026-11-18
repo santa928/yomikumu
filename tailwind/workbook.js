@@ -14,7 +14,7 @@ function validProgress(input) {
     const unit = readingUnits.find(item => item.id === id);
     if (!unit || !state || typeof state !== "object") return false;
     return Object.entries(state).every(([key, value]) => {
-      if (["quizDone", "tapDone", "writeDone"].includes(key)) return typeof value === "boolean";
+      if (["quizDone", "tapDone", "writeDone", "localDone"].includes(key)) return typeof value === "boolean";
       if (key === "choice") return Number.isInteger(value) && value >= 0 && value <= 3;
       if (!["tap", "write"].includes(key) || !value || typeof value !== "object") return false;
       return Object.entries(value).every(([part, text]) => unit.fields.some(f => f.part === part) && typeof text === "string");
@@ -51,16 +51,22 @@ function catalogue() {
     <p>HTML の中に短い名前を書いて、読書カードの見た目を作ります。CSS の文字と余白を試したあとに選べます。JavaScript へは全コース目次から直接進めます。</p>
     ${previous ? `<a class="next" href="#${progress.last}">前回の続きへ · ${previous.title}</a>` : ""}
     ${readingChapters.map((chapter, i) => `<section><h2>${chapter.title}</h2><p>${chapter.intro}</p>
-      <iframe class="reading-frame" src="${chapter.sample}" title="${chapter.title}の完成例"></iframe>
+      <div class="sample-window"><iframe class="reading-frame" src="${chapter.sample}" title="${chapter.title}の完成例"></iframe></div>
+      ${chapter.widths ? widthTools() : ""}
       <a class="review" href="${chapter.sample}">完成例を広い画面で操作する</a>
       <ol class="catalog">${readingUnits.filter(unit => unit.chapter === i).map(unit => {
         const state = progress.units[unit.id] || {};
         const done = views.slice(1).map((v,n) => state[v+"Done"] && viewNames[n+1]).filter(Boolean);
+        if (state.localDone) done.push("手元のCSS");
         return `<li><a href="#${addr(unit, "slide")}">${unit.title}</a>${done.length ? `<small>　確認済み · ${done.join("、")}</small>` : ""}</li>`;
       }).join("")}</ol></section>`).join("")}
     <details><summary>進捗と下書きの引き継ぎ</summary><p>記述したクラス名と途中の選択をファイルに保存できます。読み込むとこのコースの進捗を置き換えます。</p>
     <button id="export" type="button">進捗を保存</button><label>進捗を読み込む <input id="import" type="file" accept=".json,application/json"></label>
     <p role="status" id="transfer"></p></details>`;
+  main.querySelectorAll("[data-widths]").forEach(tools => {
+    const frame = tools.previousElementSibling.querySelector("iframe");
+    bindWidths(tools, 300, width => { frame.style.maxWidth = "none"; frame.style.width = width + "px"; });
+  });
   document.getElementById("export").onclick = () => saveFile("reading-progress.json", JSON.stringify(progress), "application/json");
   document.getElementById("import").onchange = async e => {
     try {
@@ -85,28 +91,43 @@ function windowHtml() {
   return '<div class="sample-window" tabindex="0" aria-label="読書カードの表示。大きい幅は横にスクロールできます"></div>';
 }
 
+function widthTools() {
+  return '<div class="tools" data-widths><button type="button" data-width="300">狭い幅（300px）</button><button type="button" data-width="680">広い幅（680px）</button></div>';
+}
+
+function bindWidths(group, initial, change) {
+  function select(width) {
+    for (const button of group.querySelectorAll("button")) button.setAttribute("aria-pressed", String(Number(button.dataset.width) === width));
+    change(width);
+  }
+  group.onclick = e => { if (e.target.dataset.width) select(Number(e.target.dataset.width)); };
+  select(initial);
+}
+
 async function showSample(unit, values, name, settings, container, width) {
   const frame = frameElement(width || unit.width || 300, name);
   container.replaceChildren(frame);
-  await renderSample(frame, { ...unit.base, ...values }, settings);
+  const base = unit.fields.some(field => field.part === "other") ? { other: "" } : {};
+  await renderSample(frame, { ...base, ...unit.base, ...values }, settings);
 }
 
 function slide(unit) {
   const ex = unit.example;
   const state = unit.checks.find(check => check.state)?.state;
   main.insertAdjacentHTML("beforeend", `<p>${unit.why}</p><p><strong>${partLabels[ex.part]}</strong>の変更する箇所</p>
-    <pre class="reading-code" id="snippet"></pre>${windowHtml()}
+    <pre class="reading-code" id="snippet"></pre>${windowHtml()}${unit.widths ? widthTools() : ""}
     <div class="tools"><button id="switch" type="button" aria-pressed="false">${ex.after ? "見本を一か所変える" : "指定を外して比べる"}</button>
     ${state && state !== "disabled" ? '<button type="button" id="state" aria-pressed="false">状態見本に切り替える</button>' : ""}</div>
     <p id="result" role="status"></p><a class="next" href="#${addr(unit, "quiz")}">表示を予測する</a>`);
   let changed = false;
+  let width = ex.width;
   let statePreview = false;
   const draw = () => {
     const value = changed ? ex.after : ex.before;
     document.getElementById("snippet").textContent = ex.part === "theme" ? value : `class="${value}"`;
     document.getElementById("switch").setAttribute("aria-pressed", String(changed));
     const settings = { state: statePreview ? state : "" };
-    showSample(unit, { ...ex.base, [ex.part]: value }, "見本の読書カード", settings, main.querySelector(".sample-window"), ex.width);
+    showSample(unit, { ...ex.base, [ex.part]: value }, "見本の読書カード", settings, main.querySelector(".sample-window"), width);
     document.getElementById("result").textContent = changed ? unit.result : "変更前の見本です。";
   };
   document.getElementById("switch").onclick = () => { changed = !changed; draw(); };
@@ -115,7 +136,8 @@ function slide(unit) {
     e.target.setAttribute("aria-pressed", String(statePreview));
     draw();
   };
-  draw();
+  if (unit.widths) bindWidths(main.querySelector("[data-widths]"), width || 300, value => { width = value; draw(); });
+  else draw();
 }
 
 function quizView(unit, state) {
@@ -146,9 +168,9 @@ function practice(unit, mode, state) {
     `<fieldset data-field="${field.part}"><legend>${partLabels[field.part]}の指定を選ぶ</legend><div class="tokens">
       ${field.options.map(option => `<button type="button" data-token="${escapeText(option)}">${escapeText(option)}</button>`).join("")}
       </div><output class="reading-code"></output></fieldset>`).join("")}<button type="submit">表示と答えを確かめる</button></form>
-    <p id="feedback" role="status"></p>${windowHtml()}
+    <p id="feedback" role="status"></p>${windowHtml()}${unit.widths ? widthTools() : ""}
     <a class="review" href="#${addr(unit, "slide")}">この課題の見本を読み返す</a>
-    ${unit.local ? unit.local : ""}
+    ${unit.local ? localInstructions(mode) : ""}
     <a class="next" href="#${next ? addr(next, "slide") : "contents"}">${next ? "次へ · "+next.title : "コース目次に戻る"}</a>`);
   const windowBox = main.querySelector(":scope > .sample-window");
   if (unit.plain) showSample(unit, {}, "素のCSSの読書カード", { plain: true, titles: nightBookNames }, main.querySelector("#plain .sample-window"));
@@ -177,8 +199,11 @@ function practice(unit, mode, state) {
   }
   const validTheme = () => !unit.fields.some(f => f.part === "theme") || !draft.theme ||
     /^\s*@theme\s*\{\s*--color-[\w-]+\s*:\s*(?:#[\da-f]{3,8}|[a-z]+|(?:rgb|hsl|oklch)\([\d\s.,%/-]+\))\s*;?\s*\}\s*$/i.test(draft.theme);
-  const display = () => showSample(unit, validTheme() ? draft : { ...draft, theme: "" }, "入力した読書カード", { titles: nightBookNames }, windowBox);
-  display();
+  let width = 300;
+  const display = () => showSample(unit, validTheme() ? draft : { ...draft, theme: "" }, "入力した読書カード", { titles: nightBookNames }, windowBox, width);
+  if (unit.widths) bindWidths(main.querySelector("[data-widths]"), width, value => { width = value; display(); });
+  else display();
+  if (unit.local) bindLocal(unit, draft, state, validTheme);
   const form = main.querySelector("form");
   form.onsubmit = async e => {
     e.preventDefault();
