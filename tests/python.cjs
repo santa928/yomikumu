@@ -73,6 +73,7 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
     }
     if (!only || only === "62") await require("./python-cpython.cjs").verifyCPython(pc, entry);
     await require("./python-demos.cjs").verifyDemos(pc, entry, only);
+    if (!only || only === "67") await require("./python-tap.cjs").verifyTapExercises(phone, entry);
     const report = await pc.evaluate(async ({ requested, fixtures, replacements }) => {
       const errors = [];
       let count = 0;
