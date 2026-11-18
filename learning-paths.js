@@ -37,7 +37,7 @@ const pathCourses = {
   },
   dom: {
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
-    project: "問題を一行追加できる作品クイズ。ボタンや入力欄で選んだ回答を一度だけ登録します。",
+    project: "作品クイズに得点と再挑戦を付けます。ヒントを閉じるとキーボードで回答の続きへ戻れます。",
     first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
     question: "二つの一覧に同じ li があります。作品クイズの行だけを探すとき、先に選ぶのは？",
     choices: ["ページ全体", "作品クイズの一覧"], correct: 1,
