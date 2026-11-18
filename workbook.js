@@ -459,6 +459,7 @@ function buildPage(lesson) {
     return template.replace(/[①②]/g, (mark) => pieces[marks.indexOf(mark)] || mark);
   }
   heading(lesson.title, "タップでコードを組む", ex.build.task || ex.task);
+  if (ex.files) content.append(moduleSources(ex.files, ex.filename), node("strong", ex.filename));
   const blanks = marks.slice(0, slots.length).join("と");
   content.append(node("p", blanks + "に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
   if (ex.calls) content.append(details("続けて実行する確認用コード", node("pre", ex.calls)));
