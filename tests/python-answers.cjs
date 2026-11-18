@@ -17,3 +17,12 @@ module.exports = {
     ["for i in range(1, count + 1):\n    print(i)", "for i in range(10, count):\n    print(i)", "for i in range(10, 10 + count):\n    print(i)"],
   ],
 };
+
+module.exports[56] = [
+  ["second = cards[1]\nprint(second)", "cards = [4, 7]\nprint(cards[1])", "cards = list((4, 7))\nprint(cards[0])"],
+  ["cards[0] = 3 * 3\nprint(cards)", "cards[0] += 1\nprint(cards)", "cards[1] += 1\nprint(cards)"],
+  ["print(sum(loans))", "total = 0\nfor n in loans:\n    total += n\nprint(total)", "print(3 + sum(loans))"],
+  ["desk = cards\ncards[0] = 5\nprint(desk[0])", "shelf = cards[:]\nshelf[1] = 8\nprint(cards)", "shelf = cards\nshelf[1] = 4 + 4\nprint(shelf)"],
+  ["trial = list(cards)\ntrial[0] = 7\nprint(cards[0])\nprint(trial[0])", "trial = cards\ntrial[1] = 0\nprint(cards)\nprint(trial)", "trial = list(cards)\ntrial[1] = 0\nprint(cards)\nprint(trial)"],
+  ["works['月'] = 4\nkey = '雲'\nprint(works[key])", "print(works['月'])", "print(works[input()])"],
+];
