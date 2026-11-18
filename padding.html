@@ -3,80 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>札の内側に余白をつくる | よみくむ</title>
+  <meta name="description" content="HTMLとCSSをスライドで読み、自分で書いて、作品紹介ページを作る無料の学習サイト。">
+  <title>よみくむ｜HTMLとCSSで作品を紹介する</title>
   <link rel="stylesheet" href="lesson.css">
-  <script src="lesson.js" defer></script>
+  <script src="course.js" defer></script>
+  <script src="progress.js" defer></script>
+  <script src="preview.js" defer></script>
+  <script src="grading.js" defer></script>
+  <script src="workbook.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#lesson">教材本文へ</a>
-  <header class="mast"><div><strong>よみくむ</strong><span>HTML / CSS 入門</span></div></header>
+  <a class="skip" href="#content" id="skip">教材本文へ</a>
+  <header class="mast"><div><a class="brand" href="#home">よみくむ</a><span>HTML / CSS 入門</span></div></header>
   <div class="layout">
-    <nav aria-label="単元の目次">
-      <h2>札の内側に余白をつくる</h2>
-      <a href="#inside">文字と枠を離す</a>
-      <a href="#axes">上下と左右を変える</a>
-      <a href="#read">コードを読んで選ぶ</a>
-      <a href="#write">余白を自分で書く</a>
-    </nav>
-    <main id="lesson" tabindex="-1">
-      <section id="inside">
-        <p class="kind">スライド 1 / 2</p>
-        <h1 tabindex="-1">文字と枠を離す</h1>
-        <p>本に「読書中」の札を付けました。文字が枠に近すぎます。<code>padding</code> を使って、枠の内側にすき間をつくりましょう。</p>
-        <div class="examples">
-          <figure><figcaption>変更前</figcaption><div class="sample" data-padding="0"></div><pre></pre></figure>
-          <figure><figcaption>変更後</figcaption><div class="sample" data-padding="12px"></div><pre></pre></figure>
-        </div>
-        <p>文字も枠の太さも同じです。上下左右に12pxずつ、文字から枠までの距離が広がりました。</p>
-        <details><summary>見本のHTMLとCSS</summary><pre data-source="12px"></pre></details>
-        <a class="next" href="#axes">次へ　上下と左右を変える →</a>
-      </section>
-      <section id="axes" hidden>
-        <p class="kind">スライド 2 / 2</p>
-        <h1 tabindex="-1">上下と左右を変える</h1>
-        <p>横にゆったりした札にするには、値を2つ書きます。<strong>先に上下、次に左右</strong>です。</p>
-        <div class="examples">
-          <figure><figcaption>四方とも4px</figcaption><div class="sample" data-padding="4px"></div><pre></pre></figure>
-          <figure><figcaption>横だけ広げる</figcaption><div class="sample" data-padding="4px 12px"></div><pre></pre></figure>
-        </div>
-        <p>2つ目の値だけを変えたので、札の高さは同じです。左右の枠が文字から離れました。</p>
-        <details><summary>見本のHTMLとCSS</summary><pre data-source="4px 12px"></pre></details>
-        <a class="next" href="#read">四択を試す →</a>
-      </section>
-      <section id="read" hidden>
-        <p class="kind">四択</p>
-        <h1 tabindex="-1">コードを読んで選ぶ</h1>
-        <form id="quiz">
-          <fieldset><legend><code>padding: 6px 14px;</code> の14pxは、どこのすき間ですか？</legend>
-            <label><input type="radio" name="side" value="inner-y" required> 枠の内側の上下</label>
-            <label><input type="radio" name="side" value="outer-x"> 枠の外側の左右</label>
-            <label><input type="radio" name="side" value="inner-x"> 枠の内側の左右</label>
-            <label><input type="radio" name="side" value="outer-y"> 枠の外側の上下</label>
-          </fieldset>
-          <button>答えを確かめる</button>
-        </form>
-        <p role="status" id="quiz-result"></p>
-        <a class="review" href="#axes">この問題のスライドを見直す</a>
-        <a class="next" href="#write">次へ　自分で書く →</a>
-      </section>
-      <section id="write" hidden>
-        <p class="kind">記述</p>
-        <h1 tabindex="-1">余白を自分で書く</h1>
-        <p>「貸出中」の札を作ります。文字と枠の間を<strong>上下8px、左右16px</strong>にしてください。入力すると「あなたの札」に反映されます。</p>
-        <form id="editor">
-          <div class="examples">
-            <div><label for="answer">札に適用するCSSの宣言</label><textarea id="answer" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off">padding: 0;</textarea></div>
-            <figure><figcaption>あなたの札</figcaption><div class="sample" id="result-label"></div></figure>
-          </div>
-          <button>余白を確かめる</button>
-        </form>
-        <p role="status" id="write-result"></p>
-        <details><summary>ヒント</summary><p>上下の値を先に、左右の値を次に書いてみましょう。数字には長さの単位を付けます。</p></details>
-        <a class="review" href="#axes">この問題のスライドを見直す</a>
-      </section>
-      <a id="resume" hidden>解きかけの問題へ戻る →</a>
-      <p id="storage-note" role="status"></p>
-    </main>
+    <nav aria-label="コースの目次" id="course-nav"></nav>
+    <main id="content" tabindex="-1"></main>
   </div>
+  <p id="storage-note" role="status"></p>
+  <noscript>教材の表示と演習にはブラウザのJavaScriptを有効にしてください。</noscript>
 </body>
 </html>
