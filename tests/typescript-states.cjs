@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const {chromium} = require("playwright");
 const path = require("node:path");
 const {pathToFileURL} = require("node:url");
-const url = pathToFileURL(path.join(__dirname, "../typescript/index.html")).href;
+const url = process.env.TS_URL || pathToFileURL(path.join(__dirname, "../typescript/index.html")).href;
 
 async function verifyChapter(chapter, alternatives, failures, retryId) {
   const browser = await chromium.launch();
