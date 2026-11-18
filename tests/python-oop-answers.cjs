@@ -27,3 +27,11 @@ module.exports[65] = [
   [["'記録' + str(len(self))", "'記録{}'.format(len(self))"], ["'件数=' + str(len(self))", "len(self)"], ["'件数=' + str(len(self))", "'件数={}'.format(len(self))"]],
   [["Log(self.marks[:])", "Log(list(self.marks))"], ["Log(self.marks[:])", "Log(self.marks)"], ["Log(self.marks[:])", "Log(list(self.marks))"]],
 ];
+
+module.exports[66] = [
+  [["work = plus", "work, = (plus,)"], ["return fn(value)", "return plus(value)"], ["return fn(value)", "answer = fn(value)\n    return answer"]],
+  [["x + amount", "amount + x"], ["value * rate", "value + rate"], ["value * rate", "rate * value"]],
+  [["return fn(*args, **kwargs)", "result = fn(*args, **kwargs)\n        return result"], ["return fn(*args, **kwargs)", "return fn(*args)"], ["return fn(*args, **kwargs)", "result = fn(*args, **kwargs)\n        return result"]],
+  [["@logged\ndef plus(x):\n    return x + 1", "def plus(x):\n    return 1 + x\nplus = logged(plus)"], ["@logged\ndef minus", "def minus"], ["return n * 2", "return n + n"]],
+  [["@wraps(fn)", "@wraps(wrapped=fn)"], ["    @wraps(fn)\n", ""], ["return fn(*args, **kwargs)", "result = fn(*args, **kwargs)\n        return result"]],
+];

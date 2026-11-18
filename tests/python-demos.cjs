@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const defaults = {
   54: "つばき\n3\n", 55: "団体受付\n1\n2\n3\n", 56: "6\n2\n", 57: "280\n", 58: "2\n7\n",
   59: "[0.5, 1.0, 2.0]\n", 60: "3\n5\n3\n", 61: "5\n['開く', '読む', '閉じる']\n",
-  62: "90\n1\n", 63: "12\n12\n12\n", 64: "12\n11\n8\n", 65: "9\n",
+  62: "90\n1\n", 63: "12\n12\n12\n", 64: "12\n11\n8\n", 65: "9\n", 66: "6\n1\ncharge\n",
 };
 async function verifyDemos(page, entry, only) {
   for (const [id, output] of Object.entries(defaults)) {

@@ -81,8 +81,8 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
         return runPython({ engine, source, before: test.before, lines: splitInput(test.input || ""), files, observe: test.observe, afterError: test.afterError, interactive: false }).result;
       }
       for (const ch of pythonChapters.filter(ch => !requested || ch.id === requested)) {
-        engine = ch.engine;
         for (const [i, lesson] of ch.lessons.entries()) {
+          engine = lesson.engine || ch.engine;
           const id = ch.id + "/" + (i + 1);
           const ex = await run(lesson.code, lesson, lesson.files);
           const expected = lesson.output ? lesson.output + "\n" : "";
