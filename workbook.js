@@ -160,11 +160,13 @@ function home(isJs = false) {
   );
   const state = readProgress();
   const course = isJs ? "javascript" : "html";
-  const resume = savedPath().positions[course];
+  const saved = savedPath();
+  const lastCourse = isJs ? course : saved.last;
+  const resume = pathHref(lastCourse, saved.positions[lastCourse]);
   content.append(
-    link(
+    pathLink(
       resume ? "前回の続きへ →" : "最初のスライドへ →",
-      resume || unitRoute(units[0].id),
+      resume || "#" + unitRoute(units[0].id),
       "next",
     ),
   );
