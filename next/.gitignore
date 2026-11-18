@@ -1,0 +1,3 @@
+kit/reports/*.json
+kit/.next/
+kit/node_modules/

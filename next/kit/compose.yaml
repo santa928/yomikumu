@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    network_mode: bridge
+    ports:
+      - "127.0.0.1:${BOOK_PORT:-3090}:3000"
+    volumes:
+      - ./app:/app/app
+      - ./library:/app/library
+      - ./public:/app/public
+  check:
+    profiles: ["check"]
+    build: ./check
+    network_mode: "service:web"
+    depends_on: [web]
+    volumes:
+      - ./app:/source/app:ro
+      - ./library:/source/library:ro
+      - ./reports:/reports

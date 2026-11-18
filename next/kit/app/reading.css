@@ -1,0 +1,11 @@
+body { max-width: 48rem; margin: 0 auto; padding: 1rem; background: #fbf7e9; color: #193d32; font: 1rem/1.7 system-ui, sans-serif; }
+a { color: #23533a; }
+header { border-bottom: 1px solid #718672; padding-bottom: .8rem; }
+header a { font-weight: bold; }
+main { margin: 2rem 0; }
+li { margin: .6rem 0; }
+button, input, select { font: inherit; }
+button { padding: .45rem .8rem; }
+:focus-visible { outline: 3px solid #a64e18; outline-offset: 3px; }
+.skip { position: absolute; left: -200vw; }
+.skip:focus { position: static; }
