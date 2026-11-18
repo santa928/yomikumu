@@ -15,6 +15,7 @@ services:
       - ./ink.css:/usr/share/nginx/html/ink.css:ro
       - ./boxes.js:/usr/share/nginx/html/boxes.js:ro
       - ./profiles.js:/usr/share/nginx/html/profiles.js:ro
+      - ./flex.js:/usr/share/nginx/html/flex.js:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro

@@ -235,7 +235,8 @@ function slidePage(lesson, position) {
     });
     content.append(toggle);
   }
-  content.append(slide.previewHeight ? details("見本のHTMLを読む", source) : source);
+  const sourceLabel = slide.css ? "見本のHTMLとCSSを読む" : "見本のHTMLを読む";
+  content.append(slide.previewHeight ? details(sourceLabel, source) : source);
   if (revisit && revisit.lesson === lesson.id)
     content.append(link("解きかけの問題へ戻る →", revisit.route, "return"));
   if (revisit?.lesson === "studio") content.append(link("卒業制作に戻る →", revisit.route, "return"));

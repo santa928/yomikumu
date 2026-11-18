@@ -41,7 +41,8 @@ async function run() {
       "museum-link", "sign-image", "field-name", "clear-form", "contact-card",
       "class", "linked-css", "rule-order", "specific-rule", "inherited-size", "root-size",
       "card", "padding", "outer-space", "border-width", "link-area", "narrow-card",
-      "bio-lines", "name-colors", "picked-mark", "shared-ink", "author-pair", "layout", "responsive",
+      "bio-lines", "name-colors", "picked-mark", "shared-ink", "author-pair",
+      "flex-parent", "along-axis", "across-axis", "wrap-works", "flex-guide", "layout", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -229,6 +230,41 @@ async function run() {
     await pairCss.fill(pair.answerCss.replace("teal", "#008080"));
     await confirm.click();
     await says("できました。条件を満たしています");
+    const flexCases = [
+      ["flex-parent", ".bar span{display:flex}", "二枚を囲んでいる", ".bar{display:inline-flex;flex-flow:column}"],
+      ["along-axis", ".bar{width:180px;display:flex;justify-content:center}", "余りを二枚の間", ".bar{display:flex;width:180px}.bar span:last-child{margin-left:auto}"],
+      ["across-axis", ".bar{height:80px;display:flex}", "交差軸", ".bar{display:flex;height:80px}.bar span{align-self:center}"],
+      ["wrap-works", ".row{display:flex;width:200px;gap:8px}.row article{flex:0 0 84px}", "次の行", ".row{display:flex;flex-flow:row wrap;gap:8px;width:200px}.row article{flex:0 0 84px}"],
+    ];
+    for (const [id, wrong, message, alternate] of flexCases) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
+    await open("flex-guide/write");
+    const guide = units.find((u) => u.id === "flex-guide");
+    const guideHtml = page.getByRole("textbox", { name: "HTML", exact: true });
+    const guideStyle = page.getByRole("textbox", { name: "CSS", exact: true });
+    await guideHtml.fill(guide.answer.replace("aria-current", "data-current"));
+    await guideStyle.fill(guide.answerCss);
+    await confirm.click();
+    await says("現在地と伝わり");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.ok((await guideHtml.inputValue()).includes("data-current"));
+    await guideHtml.fill(guide.answer.replace("</article>\n</div>", "</article><article>夕暮れの散歩道</article>\n</div>"));
+    await confirm.click();
+    await says("できました。条件を満たしています");
+    const flexPreview = page.frameLocator("main iframe");
+    const works = await flexPreview.locator(".row article").evaluateAll((cards) => cards.map(c => c.offsetTop));
+    assert.equal(works.length, 4);
+    assert.ok(works[0] === works[1] && works[2] === works[3] && works[0] < works[2]);
+    await flexPreview.getByRole("link", { name: "受付へ" }).click();
+    await flexPreview.locator("h2:target").filter({ hasText: "受付" }).waitFor();
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -394,6 +430,9 @@ async function run() {
       "bio-lines": ["line-height", "1.5"], "name-colors": ["white", "navy"],
       "picked-mark": [".picked", "border-left"], "shared-ink": [".name", "var(--ink)"],
       "author-pair": ["profile", "profile picked"],
+      "flex-parent": [".bar", "column"], "along-axis": ["justify-content", "space-between"],
+      "across-axis": ["align-items", "center"], "wrap-works": ["wrap", "flex-basis"],
+      "flex-guide": ["aria-current", "窓辺"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],

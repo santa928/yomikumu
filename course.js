@@ -415,6 +415,7 @@ const lessons = [
   },
   ...boxLessons,
   ...profileLessons,
+  ...flexLessons,
   {
     id: "layout",
     title: "二つの作品を並べる",

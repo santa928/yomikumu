@@ -16,7 +16,7 @@ function safeMarkup(source) {
     }
     if (node.nodeType !== Node.ELEMENT_NODE || !permittedTags.has(node.localName)) return;
     const element = document.createElement(node.localName);
-    for (const attribute of ["class", "id", "style", "lang", "aria-label"]) {
+    for (const attribute of ["class", "id", "style", "lang", "aria-label", "aria-current"]) {
       if (node.hasAttribute(attribute))
         element.setAttribute(attribute, node.getAttribute(attribute));
     }
