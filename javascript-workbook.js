@@ -16,10 +16,10 @@ async function executeCode(code, start, binding, pauseExample = false) {
   return result;
 }
 
-function startSelector() {
-  const label = node("label", "開始点 ");
+function startSelector(ex) {
+  const label = node("label", (ex.inputLabel || "開始点") + " ");
   const select = node("select");
-  for (const value of [2, 5]) select.append(node("option", String(value)));
+  for (const value of ex.inputs || [2, 5]) select.append(node("option", String(value)));
   label.append(select);
   return { label, select };
 }
@@ -58,7 +58,7 @@ function scoreProblem(ex, result, start) {
     if (row?.length !== 1 || row[0].type !== typeof value || row[0].text !== String(value))
       return ex.hints[index] || ex.hints.at(-1);
   }
-  if (result.output.length !== expected.length) return "必要な値は出ました。指定された行数だけを表示しましょう。";
+  if (result.output.length !== expected.length) return ex.extraHint || "必要な値は出ました。指定された行数だけを表示しましょう。";
   if (ex.binding?.constant && (!result.binding.constant || result.binding.value !== start))
     return "表示はできました。開始点を受け取る ticket には const で名前を付けましょう。";
   if (ex.binding?.offset !== undefined && (result.binding.constant || result.binding.value !== start + ex.binding.offset))
@@ -67,14 +67,14 @@ function scoreProblem(ex, result, start) {
 }
 
 async function checkScoreCode(ex, code, start, host, current) {
-  const inputs = ex.testInputs ? ex.testInputs(start) : ex.variableStart ? [start, start === 2 ? 5 : 2] : [start];
+  const inputs = ex.variableStart ? [...new Set([start, ...(ex.inputs || [2, 5])])] : [start];
   for (const [index, input] of inputs.entries()) {
     const result = await executeCode(code, input, ex.binding?.name);
     if (!current()) return "";
     if (!result.ok) return executionMessage(result);
     if (index === 0) showCodeOutput(host, result, ex.sign);
     const problem = scoreProblem(ex, result, input);
-    if (problem) return (index ? "開始点を" + input + "に変えた場合も確かめましょう。 " : "") + problem;
+    if (problem) return (index ? (ex.inputLabel || "開始点") + "を" + input + "に変えた場合も確かめましょう。 " : "") + problem;
   }
   return "";
 }
@@ -83,7 +83,7 @@ function scoreSlide(slide) {
   const output = node("div");
   const feedback = statusMessage();
   const actions = node("div", undefined, "code-actions");
-  const { label, select } = startSelector();
+  const { label, select } = startSelector(slide);
   let revision = 0;
   if (slide.markup) content.append(fields("<h2>開館中</h2>", "h2 { color: navy; }"));
   const source = node("div", undefined, "sources");
@@ -128,7 +128,7 @@ function scoreWorkshop(lesson) {
   const message = statusMessage();
   message.textContent = saved.note || "";
   const output = node("div");
-  const { label, select } = startSelector();
+  const { label, select } = startSelector(ex);
   const actions = node("div", undefined, "code-actions");
   function resetResult() {
     revision++;

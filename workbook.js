@@ -486,7 +486,7 @@ function buildPage(lesson) {
     const result = assembled();
     let problem;
     if (ex.field === "javascript") {
-      problem = await checkScoreCode(ex, result, 2, preview, () => at === revision && preview.isConnected);
+      problem = await checkScoreCode(ex, result, ex.inputs?.[0] ?? 2, preview, () => at === revision && preview.isConnected);
     } else {
       const buildsHtml = ex.field === "html" || ex.field === "both";
       const docs = await practicePreview(preview, id, ex,
