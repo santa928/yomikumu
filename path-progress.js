@@ -2,7 +2,30 @@
 
 const courseStores = {
   python: { key: "yomikumu-python-v1", position: "route", groups: ["drafts", "completed", "quizzes"], validate: validatePythonRecord },
+  dom: { key: "yomikumu/dom/v1", position: "last", groups: ["tasks"], validate: validateDomRecord },
+  tailwind: { key: "yomikumu/tailwind/v1", position: "last", groups: ["units"], version: 1, validate: validateReadingRecord },
 };
+
+function validateDomRecord(group, route, item) {
+  if (!/^[a-z][a-z0-9-]*\/[1-9]\d*$/.test(route) || !validMap(item)) return false;
+  return Object.entries(item).every(([key, value]) => {
+    if (key === "choice") return Number.isInteger(value) && value >= 0 && value < 4;
+    if (key === "pieces") return Array.isArray(value) && value.every(piece => piece === null || typeof piece === "string");
+    if (key === "mode") return value === "build" || value === "write";
+    if (key === "code") return typeof value === "string";
+    return ["tap", "built", "passed"].includes(key) && typeof value === "boolean";
+  });
+}
+
+function validateReadingRecord(group, id, item) {
+  if (!/^[a-z][a-z0-9-]*$/.test(id) || !validMap(item)) return false;
+  return Object.entries(item).every(([key, value]) => {
+    if (key === "choice") return Number.isInteger(value) && value >= 0 && value < 4;
+    if (key === "tap" || key === "write") return validMap(value) && Object.entries(value).every(
+      ([part, code]) => ["card", "shelf", "action", "first", "other", "theme"].includes(part) && typeof code === "string");
+    return ["quizDone", "tapDone", "writeDone", "localDone"].includes(key) && typeof value === "boolean";
+  });
+}
 
 function validMap(value) {
   return isObject(value) && Object.getPrototypeOf(value) === Object.prototype;

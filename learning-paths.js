@@ -26,6 +26,24 @@ const pathCourses = {
     choices: ["来た人の名前", "名前を受け取る手順"], correct: 0,
     feedback: ["そうです。同じ手順に違う名前を渡して結果を試せます。", "手順は何度も使えます。変わるのは、そのとき来た人の名前です。"],
   },
+  tailwind: {
+    title: "Tailwind CSS", page: "tailwind/index.html", catalog: "tailwind/index.html", start: "tailwind/index.html#padding/slide",
+    project: "余白と文字をそろえた読書カード。しおりを押せる本と貸出中の本を見分けます。",
+    first: "CSSの余白を指定した経験があれば選べます。最初は class の p-2 を変え、紙の端と文字の間を広げます。",
+    question: "カードの文字と紙の端の間を空けるCSSの指定はどちら？",
+    choices: ["padding", "margin"], correct: 0,
+    feedback: ["そうです。同じ余白をTailwindで付けて、二つの結果を見比べます。", "margin は紙の外側を空けます。内側を変える例を試してみましょう。"],
+    review: ["CSSの余白を試す", "#padding/1"],
+  },
+  dom: {
+    title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
+    project: "問題を一行追加できる作品クイズ。ボタンや入力欄で選んだ回答を一度だけ登録します。",
+    first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
+    question: "二つの一覧に同じ li があります。作品クイズの行だけを探すとき、先に選ぶのは？",
+    choices: ["ページ全体", "作品クイズの一覧"], correct: 1,
+    feedback: ["ページ全体には参考作品の行もあります。", "そうです。探す場所を決めると、ほかの一覧を保てます。"],
+    review: ["問題の一覧を試す", "#js-file-audit/1"],
+  },
 };
 
 function pathLink(label, href, className) {

@@ -190,6 +190,9 @@ function home(isJs = false) {
     list.append(item);
   }
   if (isJs) {
+    const more = node("li");
+    more.append(pathLink("ブラウザで問題一覧と回答フォームを作る", "dom/index.html"), node("p", pathCourses.dom.project));
+    list.append(more);
     content.append(list, transfer());
     return;
   }

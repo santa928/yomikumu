@@ -43,6 +43,8 @@ services:
       - ./path-progress.js:/usr/share/nginx/html/path-progress.js:ro
       - ./learning-paths.js:/usr/share/nginx/html/learning-paths.js:ro
       - ./python:/usr/share/nginx/html/python:ro
+      - ./dom:/usr/share/nginx/html/dom:ro
+      - ./tailwind:/usr/share/nginx/html/tailwind:ro
   test:
     profiles: ["test"]
     build: ./tests

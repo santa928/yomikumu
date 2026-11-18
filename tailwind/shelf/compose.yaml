@@ -1,0 +1,9 @@
+services:
+  build:
+    image: node:24-bookworm
+    network_mode: bridge
+    working_dir: /book
+    volumes:
+      - .:/book
+      - /book/node_modules
+    command: sh -c "npm ci --no-audit --no-fund && npm run build"

@@ -1,0 +1,17 @@
+{
+  "name": "yomikumu-reading-shelf",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:cards && npm run build:shelf && npm run build:compiler && npm run build:project",
+    "build:shelf": "tailwindcss -i ./shelf/input.css -o ./shelf/shelf.css --minify",
+    "build:project": "esbuild ./project-source.js --bundle --minify --format=iife --loader:.html=text --loader:.css=text --loader:.yaml=text --outfile=./project.js",
+    "build:cards": "tailwindcss -i ./input.css -o ./reading.css --minify",
+    "build:compiler": "esbuild ./compiler-source.js --bundle --minify --format=iife --loader:.css=text --outfile=./compiler.js"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.2",
+    "esbuild": "0.25.12",
+    "fflate": "0.8.2",
+    "tailwindcss": "4.3.2"
+  }
+}
