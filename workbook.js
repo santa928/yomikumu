@@ -354,7 +354,7 @@ function buildPage(lesson) {
   function assembled() {
     return code.replace(/[①②]/g, (mark) => pieces[marks.indexOf(mark)] || mark);
   }
-  heading(lesson.title, "タップでコードを組む", ex.task);
+  heading(lesson.title, "タップでコードを組む", ex.build.task || ex.task);
   const blanks = marks.slice(0, slots.length).join("と");
   content.append(node("p", blanks + "に入れるコードを選んでください。選び直すと、その部分が入れ替わります。"), snippet);
   snippet.textContent = assembled();
@@ -385,8 +385,9 @@ function buildPage(lesson) {
   async function check() {
     const at = ++revision;
     const result = assembled();
+    const buildsHtml = ex.field === "html" || ex.field === "both";
     const docs = await practicePreview(preview, id, ex,
-      ex.field === "html" ? result : ex.html, ex.field === "html" ? ex.css : result);
+      buildsHtml ? result : ex.html, buildsHtml ? (ex.answerCss ?? ex.css) : result);
     if (at !== revision || !preview.isConnected) return;
     const problem = exerciseResult(id, docs);
     feedback.textContent = problem || "できました。組んだコードの表示を見てみましょう。";
@@ -462,9 +463,9 @@ function workshop(lesson) {
     manuscriptButton.hidden = html.length > 0;
     manuscript.append(manuscriptButton);
   }
-  if (!project && ex.field !== "html")
+  if (ex.field === "css" || ex.field === "declaration")
     content.append(details("用意されているHTML", fields(html, "")));
-  if (project || ex.field === "html")
+  if (ex.field === "both" || ex.field === "html")
     content.append(editor("HTML", html, (val) => change("html", val)));
   if (project || ex.field !== "html")
     content.append(
@@ -504,7 +505,7 @@ function workshop(lesson) {
   } else {
     content.append(
       details("ヒント", node("p", ex.hint)),
-      details("書き方の一例", node("pre", ex.answer)),
+      details("書き方の一例", ex.field === "both" ? fields(ex.answer, ex.answerCss) : node("pre", ex.answer)),
       reviewLink(lesson),
       nextLessonLink(id),
       link("タップでコードを組む", unitRoute(id, "build"), "review"),

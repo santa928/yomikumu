@@ -414,6 +414,7 @@ const lessons = [
     },
   },
   ...boxLessons,
+  ...profileLessons,
   {
     id: "layout",
     title: "二つの作品を並べる",
