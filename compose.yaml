@@ -17,6 +17,10 @@ services:
       - ./profiles.js:/usr/share/nginx/html/profiles.js:ro
       - ./flex.js:/usr/share/nginx/html/flex.js:ro
       - ./grid.js:/usr/share/nginx/html/grid.js:ro
+      - ./responsive-works.js:/usr/share/nginx/html/responsive-works.js:ro
+      - ./viewport-sample.html:/usr/share/nginx/html/viewport-sample.html:ro
+      - ./harbor.png:/usr/share/nginx/html/harbor.png:ro
+      - ./moon.png:/usr/share/nginx/html/moon.png:ro
       - ./course.js:/usr/share/nginx/html/course.js:ro
       - ./preview.js:/usr/share/nginx/html/preview.js:ro
       - ./progress.js:/usr/share/nginx/html/progress.js:ro

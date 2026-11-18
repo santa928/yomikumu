@@ -43,7 +43,8 @@ async function run() {
       "card", "padding", "outer-space", "border-width", "link-area", "narrow-card",
       "bio-lines", "name-colors", "picked-mark", "shared-ink", "author-pair",
       "flex-parent", "along-axis", "across-axis", "wrap-works", "flex-guide", "layout",
-      "equal-tracks", "fitting-tracks", "grid-lines", "grid-catalog", "responsive",
+      "equal-tracks", "fitting-tracks", "grid-lines", "grid-catalog",
+      "device-width", "responsive", "content-break", "reading-width", "photo-fit", "four-widths",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -300,6 +301,53 @@ async function run() {
     assert.equal(await shelf.locator(".gallery article").count(), 5);
     await shelf.locator(".gallery article").last().getByRole("link", { name: "受付" }).click();
     await shelf.locator("#desk:target").waitFor();
+    const mobileViewport = await browser.newPage({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+    await mobileViewport.goto(base + "#device-width/1");
+    async function observedWidth(name) {
+      const opened = mobileViewport.waitForEvent("popup");
+      await mobileViewport.getByRole("link", { name }).tap();
+      const sample = await opened;
+      await sample.locator("#width").waitFor();
+      const width = await sample.evaluate(() => document.documentElement.clientWidth);
+      await sample.close();
+      return width;
+    }
+    assert.ok(await observedWidth("幅の指定なし（新しいタブで開く）") > 375);
+    assert.equal(await observedWidth("端末の幅を指定（新しいタブで開く）"), 375);
+    await mobileViewport.close();
+    const responsiveCases = [
+      ["device-width", 'width=device-width, initial-scale=2', "最初の倍率", 'initial-scale=1.0, width=device-width'],
+      ["content-break", "@media(min-width:481px){.prints{display:grid;grid-template-columns:1fr 1fr}}", "ちょうど480px", ".prints{display:flex;flex-direction:column}@media(min-width:480px){.prints{display:grid;grid-template-columns:repeat(2,1fr)}}"],
+      ["reading-width", ".page{max-width:560px}", "左右の余り", ".page{max-inline-size:560px;margin:0 auto}"],
+      ["photo-fit", "img{width:96px;height:96px;object-fit:contain}", "右は", "img{inline-size:96px;block-size:96px;object-fit:contain}.crop{object-fit:cover}"],
+    ];
+    for (const [id, wrong, message, alternate] of responsiveCases) {
+      const unit = units.find(unit => unit.id === id);
+      const answerFor = value => id === "device-width" ? unit.answer.replace("width=device-width, initial-scale=1", value) : value;
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(answerFor(wrong));
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(answerFor(alternate));
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
+    const exhibit = units.find(unit => unit.id === "four-widths");
+    await open("four-widths/write");
+    const distorted = exhibit.answer.replace("object-fit: contain", "object-fit: fill");
+    await page.getByRole("textbox").fill(distorted);
+    await confirm.click();
+    await says("二枚とも幅いっぱい");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.equal(await page.getByRole("textbox").inputValue(), distorted);
+    await page.getByRole("textbox").fill(exhibit.answer.replace("1fr 1fr", "repeat(2,1fr)"));
+    await confirm.click();
+    await says("できました。条件を満たしています");
+    const narrowPrints = page.frameLocator("main iframe").first();
+    const ratios = await narrowPrints.locator("img").evaluateAll(images => images.map(img => img.naturalWidth / img.naturalHeight));
+    assert.ok(ratios[0] > 1 && ratios[1] < 1);
+    assert.equal(await page.locator("main iframe").count(), 4);
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -470,6 +518,8 @@ async function run() {
       "flex-guide": ["aria-current", "窓辺"],
       "equal-tracks": ["3", "1fr"], "fitting-tracks": ["auto-fit", "100px"],
       "grid-lines": [".pick", "3"], "grid-catalog": ["gallery", "星の紙"],
+      "device-width": ["device-width", "1"], "content-break": ["min-width", "1fr 1fr"],
+      "reading-width": ["max-width", "auto"], "photo-fit": ["contain", "cover"], "four-widths": ["480px", "contain"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],

@@ -30,8 +30,9 @@ function safeMarkup(source) {
       }
     }
     if (node.localName === "img") {
-      if (["arrow.png", "./arrow.png"].includes(node.getAttribute("src")))
-        element.src = contactArrow;
+      const filename = (node.getAttribute("src") || "").replace(/^\.\//, "");
+      if (filename === "arrow.png") element.src = contactArrow;
+      else if (pictureFiles.has(filename)) element.src = pictureFiles.get(filename);
       if (node.hasAttribute("alt")) element.alt = node.getAttribute("alt");
     }
     if (node.localName === "label" && node.hasAttribute("for")) element.htmlFor = node.htmlFor;
@@ -51,12 +52,13 @@ function safeMarkup(source) {
   return {
     body: container.innerHTML,
     title: template.content.querySelector("title")?.textContent.trim(),
+    viewport: template.content.querySelector('meta[name="viewport" i]')?.getAttribute("content"),
     usesInk: [...template.content.querySelectorAll("link")].some((link) =>
       link.relList.contains("stylesheet") && ["ink.css", "./ink.css"].includes(link.getAttribute("href")?.trim())),
   };
 }
 
-function pageSource(html, css, fallbackTitle = "作品紹介", preview = false) {
+function pageSource(html, css, fallbackTitle = "作品紹介", preview = false, usesViewportInput = false) {
   const page = safeMarkup(html);
   // 配信中は本物の別ファイルを読み、持ち出した作品では同じCSSを同梱する。
   let linkedSheet = "";
@@ -72,9 +74,12 @@ function pageSource(html, css, fallbackTitle = "作品紹介", preview = false) 
   }
   const safeTitle = document.createElement("span");
   safeTitle.textContent = page.title || fallbackTitle;
+  const viewport = document.createElement("meta");
+  viewport.name = "viewport";
+  viewport.content = usesViewportInput ? (page.viewport ?? "") : "width=device-width, initial-scale=1";
   return (
     '<!doctype html>\n<html lang="ja">\n<head>\n<meta charset="utf-8">\n' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+    (viewport.content ? viewport.outerHTML + "\n" : "") +
     "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'" + styleSource + "; base-uri 'none'; form-action 'none'\">\n" +
     linkedSheet +
     "<title>" +
@@ -87,7 +92,7 @@ function pageSource(html, css, fallbackTitle = "作品紹介", preview = false) 
   );
 }
 
-function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false, measure) {
+function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false, measure, usesViewportInput = false) {
   const frame = document.createElement("iframe");
   frame.title = label;
   frame.setAttribute("sandbox", "allow-same-origin allow-popups allow-popups-to-escape-sandbox");
@@ -134,7 +139,7 @@ function makePreview(host, html, css, label, width, maxHeight = 310, showTitle =
       { once: true },
     ),
   );
-  frame.srcdoc = pageSource(html, css, showTitle ? "" : "作品紹介", true);
+  frame.srcdoc = pageSource(html, css, showTitle ? "" : "作品紹介", true, usesViewportInput);
   view.append(frame);
   return ready;
 }

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>幅を比べる見本｜よみくむ</title>
+  <script>
+    if (location.search === "?device") {
+      const meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content = "width=device-width, initial-scale=1";
+      document.head.append(meta);
+    }
+  </script>
+</head>
+<body>
+  <h1>窓辺の作品展</h1>
+  <p>入口の窓に、小さな版画を並べました。</p>
+  <p id="setting"></p>
+  <p id="width"></p>
+  <a href="index.html#device-width/1">教材に戻る</a>
+  <script>
+    document.getElementById("setting").textContent = document.querySelector('meta[name="viewport"]')
+      ? "端末の幅を指定したページです。" : "端末の幅を指定していないページです。";
+    function reportWidth() {
+      document.getElementById("width").textContent = "ページを並べる幅は " + document.documentElement.clientWidth + "px です。";
+    }
+    window.addEventListener("resize", reportWidth);
+    reportWidth();
+  </script>
+</body>
+</html>
