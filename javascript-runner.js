@@ -9,6 +9,7 @@ function startScoreSandbox() {
     const prelude = [
       '"use strict";',
       'const initialScore = ' + JSON.stringify(initialScore) + ';',
+      'const questionCount = initialScore;',
       'const output = [];',
       'let title = "";',
       'const showTitle = value => { title = String(value).slice(0, 240); };',

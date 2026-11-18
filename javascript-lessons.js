@@ -92,4 +92,5 @@ const javascriptLessons = [
       expected: start => [start, start + 2], hints: ["まず更新する前の開始点を数で表示しましょう。", "最初の点は出せました。2点増やしたあとの score も次の行に出しましょう。"],
     },
   },
+  ...javascriptChoiceLessons,
 ];
