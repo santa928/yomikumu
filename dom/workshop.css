@@ -6,3 +6,6 @@ main button { margin-top: 0.5rem; }
 main pre { max-height: 24rem; overflow: auto; }
 main textarea { min-height: 12rem; }
 #storage-note { padding-inline: 1rem; }
+main fieldset { min-width: 0; }
+main label code { min-width: 0; overflow-wrap: anywhere; }
+main select { max-width: 100%; font: inherit; }

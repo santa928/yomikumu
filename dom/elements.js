@@ -31,7 +31,7 @@ list.onclick = event => {
       example: `const title = document.querySelector("#heading");
 if (title) title.textContent = "雨の問題";`,
       question: "存在しない #notice を探したら、どんな値が返りますか。",
-      options: ["空の見出し", "null（見つからない）", "最後の要素"], correct: 1,
+      options: ["空の見出し", "null（見つからない）", "最後の要素", "0という数"], correct: 1,
       feedback: "見つからない結果はnullです。そのままtextContentを指定すると実行が止まります。",
       task: "見本の文字を一か所変えて、見出しを「光の問題」にしてください。",
       tests: [
@@ -48,7 +48,7 @@ const dawn = document.querySelector("#dawn");
 dawn.classList.remove("chosen");
 dawn.classList.add("chosen");`,
       question: "雨音だけに目印を移すには、夜明けから何を外しますか。",
-      options: ["行そのもの", "文字", "chosenクラス"], correct: 2, feedback: "文字と行は残し、見た目を変える目印だけを外します。",
+      options: ["行そのもの", "文字", "chosenクラス", "一覧のid"], correct: 2, feedback: "文字と行は残し、見た目を変える目印だけを外します。",
       task: "最後の行の対象を変え、雨音だけを目立たせてください。",
       tests: [
         [t => t.q("#rain")?.classList.contains("chosen"), "雨音にchosenを付けます。"],
@@ -67,7 +67,7 @@ row.textContent = "星図";
 row.textContent = "星図";
 document.querySelector("#quiz").append(row);` },
       question: "見本の最後に list.append(row) を追加したら、クイズの行数はどう変わりますか。",
-      options: ["2行から3行", "2行のまま", "3行から2行"], correct: 0, feedback: "作っただけでは表示されません。appendでクイズの一覧につなぐと3行になります。",
+      options: ["2行から3行", "2行のまま", "3行から2行", "一覧が空になる"], correct: 0, feedback: "作っただけでは表示されません。appendでクイズの一覧につなぐと3行になります。",
       task: "最後のコメントをlist.append(row);に置き換えて、星図をクイズの末尾に表示してください。",
       tests: [
         [t => t.q("#quiz > li:last-child")?.textContent.trim() === "星図", "新しい行を作った後、クイズの一覧につないでください。"],
@@ -83,7 +83,7 @@ list.querySelectorAll("li").forEach(row => {
   row.classList.add("chosen");
 });`,
       question: "クイズの行だけを集める書き方はどれですか。",
-      options: ['document.querySelectorAll("li")', 'document.querySelectorAll("#quiz li")'], correct: 1,
+      options: ['document.querySelectorAll("li")', 'document.querySelectorAll("#quiz li")', 'document.querySelectorAll("#books li")', 'document.querySelector("li")'], correct: 1,
       feedback: "#quizの内側にあるliへ範囲を絞ります。",
       task: "一覧を選ぶ箇所を変えて、クイズの2行だけを目立たせてください。",
       tests: [
@@ -100,7 +100,7 @@ row.textContent = "水輪";
 document.querySelector("#books").append(row);
 row.classList.add("chosen");`,
       question: "クイズ側で新しい行だけに目印を付けたいとき、どれを使いますか。",
-      options: ["すべてのli", "作って追加したrow", "参考作品の一覧"], correct: 1, feedback: "作った行を覚えておくと、追加後も同じ要素を変更できます。",
+      options: ["すべてのli", "作って追加したrow", "参考作品の一覧", "クイズの見出し"], correct: 1, feedback: "作った行を覚えておくと、追加後も同じ要素を変更できます。",
       task: "白紙から実装しましょう。作品クイズの末尾に「灯台」を一行追加し、それだけをchosenで目立たせます。参考作品は一行のままにしてください。",
       starter: "",
       tests: [

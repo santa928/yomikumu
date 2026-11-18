@@ -1,5 +1,5 @@
 "use strict";
-const domUnits = [elementsUnit];
+const domUnits = [elementsUnit, eventsUnit];
 const domMain = document.querySelector("main");
 const domStateKey = "yomikumu/dom/v1";
 let domState = { last: "", tasks: {} };
@@ -38,7 +38,7 @@ if (matchMedia("(min-width: 721px)").matches) nav.parentElement.open = true;
 let stopRun = () => {};
 function renderDom() {
   stopRun();
-  const [id, part] = location.hash.slice(1).split("/");
+  const [id, part, position] = location.hash.slice(1).split("/");
   const unit = domUnits.find(u => u.id === id);
   domMain.replaceChildren();
   for (const a of nav.children) {
@@ -77,7 +77,7 @@ function renderDom() {
       const li = node("li");
       const progress = domState.tasks[id + "/" + (i + 1)] || {};
       li.append(route(s.title, id + "/" + (i + 1)));
-      if (progress.tap || progress.passed) li.append(node("small", [progress.tap && "タップ正解", progress.passed && "コード達成"].filter(Boolean).join("・")));
+      if (progress.tap || progress.built || progress.passed) li.append(node("small", [progress.tap && "予測正解", progress.built && "組み立て達成", progress.passed && "コード達成"].filter(Boolean).join("・")));
       list.append(li);
     }
     domMain.append(demo, node("h2", "小課題"), list);
@@ -90,6 +90,11 @@ function renderDom() {
   model.append(node("p", step.explain), node("pre", step.example));
   const sample = domFrame("見本の実行結果", step.exampleHtml || step.html, step.example, [], unit.setup);
   model.append(sample);
+  if (id === "elements" && index > 0) {
+    const css = node("details");
+    css.append(node("summary", "見本で使う目印のCSS"), node("pre", chosenStyle));
+    model.append(css);
+  }
   if (step.compare) {
     const stage = node("div");
     model.append(button(step.compare.label, () => {
@@ -117,7 +122,50 @@ function renderDom() {
       (state.tap ? "正解です。 " : "もう一度。 ") + step.feedback;
     saveDom();
   }), reply);
-  const write = section("コードで試す");
+  const exercise = section("自分で試す");
+  const modeLabel = node("label", "練習方法　");
+  const mode = node("select");
+  for (const [value, text] of [["build", "タップでコードを組み立てる"], ["write", "コードを記述する"]]) {
+    const option = node("option", text);
+    option.value = value;
+    mode.append(option);
+  }
+  modeLabel.append(mode);
+  const write = node("div");
+  const build = node("div");
+  const builtStatus = node("p", state.built ? "前回の組み立てで達成しました。" : "");
+  builtStatus.setAttribute("role", "status");
+  const builtPreview = node("div");
+  const [template, ...slots] = domBuilders[id][index];
+  const assembled = node("pre");
+  const pieces = Array.isArray(state.pieces) ? state.pieces : [];
+  const assemble = () => template.replace(/《(\d+)》/g, (mark, n) => pieces[n - 1] || mark);
+  assembled.textContent = assemble();
+  build.append(node("p", "《番号》に入れるコードを選んでください。"), assembled);
+  for (const [j, choices] of slots.entries()) {
+    const group = node("fieldset");
+    group.append(node("legend", "《" + (j + 1) + "》に入れるコード"));
+    const order = (index + j) % 2 === 0 ? [...choices].reverse() : choices;
+    for (const choice of order) {
+      const radio = node("input");
+      radio.name = "piece-" + j;
+      radio.type = "radio";
+      radio.checked = pieces[j] === choice;
+      radio.onchange = () => {
+        stopRun();
+        pieces[j] = choice;
+        state.pieces = pieces;
+        state.built = false;
+        assembled.textContent = assemble();
+        builtStatus.textContent = "";
+        saveDom();
+      };
+      const label = node("label");
+      label.append(radio, node("code", choice));
+      group.append(label);
+    }
+    build.append(group);
+  }
   const label = node("label", "JavaScript");
   label.className = "code-field";
   const editor = node("textarea");
@@ -136,39 +184,58 @@ function renderDom() {
   const preview = node("div");
   const markup = node("details");
   markup.append(node("summary", "実習ページのHTML"), node("pre", step.html));
-  const review = button("見本を読み直す", () => {
-    back.hidden = false;
-    model.focus();
-    model.scrollIntoView();
-  });
-  const back = button("書きかけのコードへ戻る", () => editor.focus());
-  back.hidden = true;
+  const review = route("見本を読み直す", key + "/read");
+  review.className = "review";
+  const back = route("書きかけの課題へ戻る", key + "/practice");
+  back.className = "review";
   model.append(back);
-  function run() {
+  function run(source, kind) {
+    const isBuild = kind === "build";
+    const result = isBuild ? builtStatus : status;
+    const output = isBuild ? builtPreview : preview;
+    const progressField = isBuild ? "built" : "passed";
     stopRun();
-    preview.replaceChildren();
-    status.textContent = "実行しています。";
-    const frame = domFrame("自分の実行結果", step.html, editor.value, [], unit.setup);
-    const test = domFrame("操作の確認", step.html, editor.value, step.tests, unit.setup);
+    output.replaceChildren();
+    let code;
+    try { code = limitDomLoops(source); }
+    catch (error) { result.textContent = "コードの実行で止まりました。 " + error.message; return; }
+    result.textContent = "実行しています。";
+    const frame = domFrame("自分の実行結果", step.html, code, [], unit.setup);
+    const test = domFrame("操作の確認", step.html, code, step.tests, unit.setup);
     test.hidden = true;
     function receive(event) {
       if (event.source !== test.contentWindow || !event.data?.domWorkshop) return;
       const { error, done, hint } = event.data;
-      state.passed = !error && done === step.tests.length;
-      status.textContent = error ? "コードの実行で止まりました。 " + error :
-        state.passed ? "できました。すべての動作を確認しました。" : done + " / " + step.tests.length + " 項目を確認。 " + hint;
+      state[progressField] = !error && done === step.tests.length;
+      result.textContent = error ? "コードの実行で止まりました。 " + error :
+        state[progressField] ? "できました。すべての動作を確認しました。" : done + " / " + step.tests.length + " 項目を確認。 " + hint;
       saveDom();
       stopRun();
     }
     addEventListener("message", receive);
     const timer = setTimeout(() => {
-      status.textContent = "確認が時間内に終わりませんでした。繰り返しや待ち時間を見直してください。";
+      result.textContent = "確認が時間内に終わりませんでした。繰り返しや待ち時間を見直してください。";
       stopRun();
     }, 6000);
     stopRun = () => { removeEventListener("message", receive); clearTimeout(timer); test.remove(); stopRun = () => {}; };
-    preview.append(frame, test);
+    output.append(frame, test);
   }
-  write.append(node("p", step.task), markup, label, button("実行して確かめる", run), status, review, preview);
+  build.append(button("組んだコードを確かめる", () => {
+    if (!slots.every((choices, j) => choices.includes(pieces[j]))) {
+      builtStatus.textContent = "各欄のコードを一つずつ選んでください。";
+      return;
+    }
+    run(assemble(), "build");
+  }), builtStatus, builtPreview);
+  write.append(label, button("実行して確かめる", () => run(editor.value, "write")), status, preview);
+  mode.value = state.mode || (matchMedia("(max-width: 720px)").matches ? "build" : "write");
+  function showMode() {
+    build.hidden = mode.value !== "build";
+    write.hidden = mode.value !== "write";
+  }
+  mode.onchange = () => { state.mode = mode.value; saveDom(); showMode(); };
+  showMode();
+  exercise.append(node("p", step.task), markup, modeLabel, build, write, review);
   const links = node("div");
   links.className = "parts";
   links.append(route("単元の目次へ", id));
@@ -177,8 +244,10 @@ function renderDom() {
     const following = domUnits[domUnits.indexOf(unit) + 1];
     if (following) links.append(route("次の単元へ　" + following.title, following.id));
   }
-  domMain.append(model, phone, write, links);
+  domMain.append(model, phone, exercise, links);
+  if (position === "read") model.focus();
+  if (position === "practice") (mode.value === "write" ? editor : build.querySelector("input")).focus();
 }
 document.querySelector("#skip").onclick = event => { event.preventDefault(); domMain.focus(); };
-window.addEventListener("hashchange", () => { renderDom(); domMain.focus(); });
+window.addEventListener("hashchange", () => { domMain.focus(); renderDom(); });
 renderDom();
