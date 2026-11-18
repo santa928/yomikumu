@@ -84,6 +84,20 @@ async function performTS(lesson, source, section, { execute = true, practice = f
       feedback.textContent = "次の一手 · " + (checked.missing || lesson.contractHint);
       return;
     }
+    if (lesson.dom) {
+      await loadDomTools();
+      if (current !== requestTS || !section.isConnected) return;
+      execution = typedDomRun(lesson, checked.js, section.querySelector("[data-dom]"), practice);
+      const dom = await execution.result;
+      if (current !== requestTS || !section.isConnected) return;
+      if (dom.error) { output.textContent = "実行時 · " + dom.error; return; }
+      output.textContent = "下の画面を操作できます。";
+      if (practice) {
+        if (dom.done !== lesson.dom.tests.length) feedback.textContent = (dom.done ? dom.done+"項目は合っています。" : "")+"次の一手 · "+dom.hint;
+        else { onPass?.(); feedback.textContent = "できました。型と実行結果を確認しました。"; }
+      }
+      return;
+    }
     const probes = practice ? lesson.probes || [] : [];
     const inspections = probes.map(q => "console.log(" + q.expr + ");");
     execution = runScoreCode(checked.js + "\n" + inspections.join("\n"));
@@ -121,7 +135,7 @@ function tsCatalogue() {
     const source = chapter.code(Number(button.dataset.n));
     const box = button.closest("section").querySelector("[data-show]");
     box.innerHTML = "<pre>" + escTS(source) + "</pre>" + panelTS();
-    performTS({}, source, box);
+    performTS(chapter, source, box);
   };
   document.getElementById("save-ts").onclick = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(stateTS)], {type:"application/json"}));
