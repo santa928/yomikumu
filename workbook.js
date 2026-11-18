@@ -194,6 +194,12 @@ function sectionTabs(lesson, part) {
     links.append(a);
   }
   content.append(links);
+  if (lesson.exercise.further) {
+    const extra = node("div", undefined, "parts");
+    extra.append(node("strong", "選んで練習する"));
+    for (const [label, id] of lesson.exercise.further) extra.append(link(label, unitRoute(id)));
+    content.append(extra);
+  }
 }
 
 // 見本だけで二つの設定を比較する。端末の設定は変更しない。

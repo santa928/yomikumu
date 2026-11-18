@@ -77,7 +77,7 @@ async function checkScoreCode(ex, code, start, host, current) {
     if (!current()) return "";
     if (!result.ok) {
       if (ex.calls && result.line > code.split("\n").length)
-        return "確認用の呼び出しで止まりました。用意する関数の名前と、その関数が返す値を確かめましょう。 " + result.error;
+        return "確認用の呼び出しで止まりました。" + (ex.callErrorHint || "用意する関数の名前と、その関数が返す値を確かめましょう。") + " " + result.error;
       if (ex.scopeHint && result.error.includes("ReferenceError")) return executionMessage(result) + " " + ex.scopeHint;
       return executionMessage(result);
     }
@@ -89,6 +89,10 @@ async function checkScoreCode(ex, code, start, host, current) {
 }
 
 function scoreSlide(slide) {
+  if (slide.actions) {
+    counterSlide(slide);
+    return;
+  }
   const output = node("div");
   const feedback = statusMessage();
   const actions = node("div", undefined, "code-actions");
@@ -126,6 +130,49 @@ function scoreSlide(slide) {
   if (slide.sign) showCodeOutput(output, { title: "開館中", output: [] }, true);
   content.append(source, actions, output, feedback);
   if (!slide.sign) run.click();
+}
+
+function counterSlide(slide) {
+  const history = [];
+  const output = node("div");
+  const calls = node("pre");
+  const feedback = statusMessage();
+  const controls = node("div", undefined, "code-actions");
+  const { label, select } = startSelector(slide);
+  let revision = 0;
+  async function show() {
+    const at = ++revision;
+    calls.textContent = history.join("\n") || "まだ呼んでいません。";
+    const result = await executeCode([slide.code, ...history].join("\n"), Number(select.value));
+    if (at !== revision || !output.isConnected) return;
+    if (!result.ok) {
+      feedback.textContent = executionMessage(result);
+      return;
+    }
+    showCodeOutput(output, result, false);
+    feedback.textContent = history.length ? history.length + "回の呼び出しを実行しました。" : "受付を用意するコードを実行しました。";
+  }
+  if (slide.variableStart) {
+    controls.append(label);
+    select.addEventListener("change", show);
+  }
+  for (const action of slide.actions) {
+    controls.append(button(action.label, () => {
+      if (history.length >= 12) {
+        feedback.textContent = "12回分を表示しました。「最初から試す」で別の順番を試せます。";
+        return;
+      }
+      history.push(action.code);
+      show();
+    }));
+  }
+  controls.append(button("最初から試す", () => {
+    history.length = 0;
+    show();
+  }));
+  content.append(details("受付を用意するJavaScript", node("pre", slide.code)), controls,
+    node("strong", "追加した呼び出し"), calls, output, feedback);
+  show();
 }
 
 function scoreWorkshop(lesson) {
