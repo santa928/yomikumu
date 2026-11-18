@@ -11,6 +11,7 @@ const { verifyFunctions } = require("./functions.cjs");
 const { verifyCounters } = require("./counters.cjs");
 const { verifyCards } = require("./cards.cjs");
 const { verifyTransforms } = require("./transforms.cjs");
+const { verifyModules } = require("./modules.cjs");
 const base = process.env.COURSE_URL || pathToFileURL(path.resolve(__dirname, "../index.html")).href;
 
 async function run() {
@@ -698,6 +699,7 @@ async function run() {
     await verifyCounters(browser, base);
     await verifyCards(browser, base);
     await verifyTransforms(browser, base);
+    await verifyModules(browser, base);
     console.log(
       expectedIds.length + "単元のスライド・四択・記述・組み立て、ページ内移動、下書き復帰、部分正解と別解、卒業制作、書き出しと引き継ぎが通りました。",
     );

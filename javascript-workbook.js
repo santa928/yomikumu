@@ -1,15 +1,24 @@
 "use strict";
 
 let activeCodeRun;
+let codeRunVersion = 0;
 
 function stopCodeRun() {
+  codeRunVersion++;
   activeCodeRun?.stop();
   activeCodeRun = null;
 }
 
-async function executeCode(code, start, binding, pauseExample = false) {
+async function executeCode(code, start, binding, pauseExample = false, files) {
   stopCodeRun();
-  const task = runScoreCode(code, start, binding, pauseExample);
+  const version = codeRunVersion;
+  let modules;
+  if (files) {
+    try { modules = await prepareModuleFiles(files); }
+    catch (error) { return { ok: false, error: error.message }; }
+    if (version !== codeRunVersion) return { ok: false, stopped: true, error: "実行を停止しました。" };
+  }
+  const task = runScoreCode(code, start, binding, pauseExample, modules);
   activeCodeRun = task;
   const result = await task.result;
   if (activeCodeRun === task) activeCodeRun = null;
@@ -47,7 +56,7 @@ function executionMessage(result) {
   let hint = "";
   if (result.error.includes("ReferenceError")) hint = "名前のつづりと、その名前を用意した行を確かめましょう。 ";
   if (result.error.includes("SyntaxError")) hint = "引用符、かっこ、記号の並びを見直しましょう。 ";
-  return (result.line ? result.line + "行目で止まりました。 " : "") + hint + result.error;
+  return (result.file ? result.file + " の" : "") + (result.line ? result.line + "行目で止まりました。 " : "") + hint + result.error;
 }
 
 function scoreProblem(ex, result, start) {
@@ -75,10 +84,11 @@ async function checkScoreCode(ex, code, start, host, current) {
   const inputs = ex.variableStart ? [...new Set([start, ...(ex.inputs || [2, 5])])] : [start];
   for (const [index, input] of inputs.entries()) {
     const program = ex.calls ? code + "\n;\n" + ex.calls : code;
-    const result = await executeCode(program, input, ex.binding?.name || ex.arrowName);
+    const files = ex.files && { ...ex.files, [ex.filename]: program };
+    const result = await executeCode(program, input, ex.binding?.name || ex.arrowName, false, files);
     if (!current()) return "";
     if (!result.ok) {
-      if (ex.calls && result.line > code.split("\n").length)
+      if (ex.calls && (!result.file || result.file === ex.filename) && result.line > code.split("\n").length)
         return "確認用の呼び出しで止まりました。" + (ex.callErrorHint || "用意する関数の名前と、その関数が返す値を確かめましょう。") + " " + result.error;
       if (ex.scopeHint && result.error.includes("ReferenceError")) return executionMessage(result) + " " + ex.scopeHint;
       return executionMessage(result);
@@ -86,6 +96,12 @@ async function checkScoreCode(ex, code, start, host, current) {
     if (index === 0) showCodeOutput(host, result, ex.sign);
     const problem = scoreProblem(ex, result, input);
     if (problem) return (index ? (ex.inputLabel || "開始点") + "を" + input + "に変えた場合も確かめましょう。 " : "") + problem;
+    if (ex.moduleTrial) {
+      const trial = await executeCode(program, input, undefined, false, { ...files, ...ex.moduleTrial.files });
+      if (!current()) return "";
+      if (!trial.ok) return executionMessage(trial);
+      if (scoreProblem({ ...ex, expected: () => ex.moduleTrial.values }, trial, input)) return ex.moduleTrial.hint;
+    }
   }
   return "";
 }
@@ -111,8 +127,9 @@ function scoreSlide(slide) {
   if (slide.setup) content.append(details("用意した問題集と関数", node("pre", slide.setup)));
   if (slide.markup) content.append(fields("<h2>開館中</h2>", "h2 { color: navy; }"));
   const source = node("div", undefined, "sources");
+  if (slide.files) source.append(moduleSources(slide.files, slide.filename));
   const displayedCode = node("pre", slide.code);
-  source.append(node("strong", "JavaScript"), displayedCode);
+  source.append(node("strong", slide.filename || "JavaScript"), displayedCode);
   const run = button("見本を実行", async () => {
     const at = ++revision;
     if (slide.pauseExample) {
@@ -124,7 +141,8 @@ function scoreSlide(slide) {
       ? "const " + slide.variant.name + " = " + JSON.stringify(variant.value) + ";\n" + slide.code
       : slide.code;
     const program = slide.setup ? slide.setup + "\n" + displayedCode.textContent : displayedCode.textContent;
-    const result = await executeCode(program, Number(select.value), undefined, slide.pauseExample);
+    const files = slide.files && { ...slide.files, [slide.filename]: program };
+    const result = await executeCode(program, Number(select.value), undefined, slide.pauseExample, files);
     if (revision !== at || !output.isConnected) return;
     stop.disabled = true;
     if (result.ok) {
@@ -239,11 +257,14 @@ function scoreWorkshop(lesson) {
     resetResult();
     updateUnit(id, { note: "" });
   });
-  content.append(editor("JavaScript", code, value => {
+  if (ex.files) content.append(moduleSources(ex.files, ex.filename));
+  const codeEditor = editor(ex.filename || "JavaScript", code, value => {
     code = value;
     resetResult();
     updateUnit(id, { js: code, note: "" });
-  }));
+  });
+  if (ex.importFile) content.append(localModuleFile(ex, codeEditor.querySelector("textarea"), message));
+  content.append(codeEditor);
   if (ex.calls) content.append(details("続けて実行する確認用コード", node("pre", ex.calls)));
   if (ex.variableStart) actions.append(label);
   actions.append(run, stop);

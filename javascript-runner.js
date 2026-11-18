@@ -5,7 +5,7 @@ function startScoreSandbox() {
   window.addEventListener("message", event => {
     if (event.source !== parent || !event.ports[0]) return;
     const channel = event.ports[0];
-    const { code, initialScore, binding, pauseExample } = event.data;
+    const { code, initialScore, binding, pauseExample, modules } = event.data;
     const prelude = [
       '"use strict";',
       'const initialScore = ' + JSON.stringify(initialScore) + ';',
@@ -32,7 +32,22 @@ function startScoreSandbox() {
     const arrow = binding === "double" ? 'typeof double === "function" && !Object.hasOwn(double, "prototype")' : 'false';
     const end = '\n;{\n' + probe + '\nself.postMessage({title, output, binding: { value, constant, arrow: ' + arrow + ' }});\n}\n}' +
       (pauseExample ? ', 1800);' : '');
-    const blob = new Blob([prelude.join("\n"), "\n", code, end], { type: "text/javascript" });
+    const moduleUrls = new Map();
+    let source = prelude.join("\n") + "\n" + code + end;
+    if (modules) {
+      for (const file of modules) {
+        let text = file.source;
+        for (const path of file.paths.slice().reverse()) {
+          text = text.slice(0, path.start) + moduleUrls.get(path.file) + text.slice(path.end);
+        }
+        moduleUrls.set(file.name, URL.createObjectURL(new Blob([text], { type: "text/javascript" })));
+      }
+      const entry = JSON.stringify(moduleUrls.get("main.js"));
+      source = prelude.slice(0, -1).join("\n") + "\nimport(" + entry + ")" +
+        ".then(() => self.postMessage({title,output}))" +
+        ".catch(err => self.postMessage({moduleError:String(err.message),stack:String(err.stack)}));";
+    }
+    const blob = new Blob([source], { type: "text/javascript" });
     const url = URL.createObjectURL(blob);
     let worker;
     channel.onmessage = event => {
@@ -41,6 +56,7 @@ function startScoreSandbox() {
     function finish(result) {
       worker?.terminate();
       URL.revokeObjectURL(url);
+      for (const address of moduleUrls.values()) URL.revokeObjectURL(address);
       channel.postMessage(result);
       channel.close();
     }
@@ -48,6 +64,25 @@ function startScoreSandbox() {
       worker = new Worker(url);
       worker.onmessage = event => {
         const data = event.data;
+        if (modules && typeof data?.moduleError === "string") {
+          let message = data.moduleError.slice(0, 1000);
+          let location;
+          const stack = String(data.stack).slice(0, 5000);
+          let nearest = Infinity;
+          for (const [name, address] of moduleUrls) {
+            message = message.replaceAll(address, name);
+            const at = stack.indexOf(address + ":");
+            if (at >= 0 && at < nearest) {
+              nearest = at;
+              const match = /^:(\d+)/.exec(stack.slice(at + address.length));
+              if (match) location = { file: name, line: Number(match[1]) };
+            }
+          }
+          if (message.includes("does not provide an export named"))
+            message = "読み込み先に、その名前の export がありません。import と export の名前を見比べましょう。 " + message;
+          finish({ ok: false, error: message, ...location });
+          return;
+        }
         if (typeof data?.title !== "string" || !Array.isArray(data.output) || data.output.length > 40 ||
           !data.output.every(row => Array.isArray(row) && row.length <= 8 && row.every(item =>
             typeof item?.text === "string" && item.text.length <= 500 && typeof item.type === "string"))) return;
@@ -67,7 +102,7 @@ function startScoreSandbox() {
 }
 
 // タイマーも停止ボタンも、学習者のコードが動くスレッドの外から実行を終了する。
-function runScoreCode(code, initialScore = 0, binding, pauseExample = false) {
+function runScoreCode(code, initialScore = 0, binding, pauseExample = false, modules = null) {
   const frame = document.createElement("iframe");
   frame.setAttribute("sandbox", "allow-scripts");
   frame.hidden = true;
@@ -95,10 +130,11 @@ function runScoreCode(code, initialScore = 0, binding, pauseExample = false) {
   channel.port1.onmessage = event => finish(event.data);
   frame.addEventListener("load", () => {
     if (!frame.isConnected) return;
-    frame.contentWindow.postMessage({ code, initialScore, binding, pauseExample }, "*", [channel.port2]);
+    frame.contentWindow.postMessage({ code, initialScore, binding, pauseExample, modules }, "*", [channel.port2]);
     started = true;
   }, { once: true });
-  frame.srcdoc = '<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;unsafe-inline&apos;; worker-src blob:; connect-src &apos;none&apos;">' +
+  frame.srcdoc = '<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;unsafe-inline&apos;' +
+    (modules ? ' blob:' : '') + '; worker-src blob:; connect-src &apos;none&apos;">' +
     "<script>(" + startScoreSandbox.toString() + ")()<" + "/script>";
   timer = setTimeout(() => cancel({ ok: false, error: "時間がかかったので停止しました。コードを直して、もう一度試せます。" }), 3000);
   document.body.append(frame);
