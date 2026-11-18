@@ -9,6 +9,42 @@ const twoCards =
 const frameCard = "article { border: 1px solid; padding: 8px; }";
 const stack = ".shelf { display: grid; gap: 8px; }";
 const wideGrid = "@media (min-width: 600px) {\n  .shelf { grid-template-columns: 1fr 1fr; }\n}";
+const studioManuscript = `夜の机の小さな作品展
+
+月の切手
+青い紙に、雲からのぞく月を刷りました。
+制作メモを読む
+
+紙のランプ
+細く折った紙を重ねると、明かりが縞に見えます。
+制作メモを読む
+
+制作メモ
+どちらも、机に残っていた紙の切れ端から作りました。`;
+
+const studioSteps = [
+  {
+    task: "まず1作品を紹介する",
+    brief: "展示の名前を一番上の見出しにします。その下に作品名と短い紹介文を書き、一つの作品として囲んでください。ここで一度「作品を確認する」を押せます。",
+    hint: "展示の名前に h1、作品名に h2、紹介文に p を使います。作品名と紹介文を一組の article で囲みます。",
+    review: "card/1",
+    reviewLabel: "作品をひとまとまりにする例",
+  },
+  {
+    task: "2作品から同じ制作メモへ案内する",
+    brief: "もう一つ作品を紹介し、二つの作品の下に制作メモを置きます。どちらの作品からも、リンクを押すとそのメモへ移動できるようにしてください。",
+    hint: "メモの見出しに id で名前を付けます。二つの article にそれぞれリンクを置き、href に # と同じ名前を書きます。",
+    review: "link/4",
+    reviewLabel: "リンクと移動先を結ぶ例",
+  },
+  {
+    task: "読む人の画面に合わせて並べる",
+    brief: "幅360pxでは2作品を縦に、720pxでは横に並べます。どちらも、左右にスクロールせず最後まで読めるか確かめてください。",
+    hint: "二つの作品を一緒に囲みます。まず縦に並べ、広い画面でだけ、囲みの中が2列になるようにCSSを書きます。",
+    review: "responsive/2",
+    reviewLabel: "画面幅で並びを変える例",
+  },
+];
 const notesHeading = '<h2 id="notes">作品メモ</h2>';
 const notesLink = '<a href="#notes">メモを読む</a>';
 

@@ -107,14 +107,18 @@ function checkProject(docs) {
   const doc = docs[0];
   if (!doc.querySelector("h1")?.textContent.trim()) return "ページの名前を h1 で付けましょう。";
   const cards = [...doc.querySelectorAll("article")];
-  if (cards.length < 2)
-    return "ページ名はできました。二つの作品をそれぞれ article で囲みましょう。";
+  if (cards.length === 0)
+    return "ページ名はできました。まず1作品目の作品名と紹介文を article で囲みましょう。";
   for (const [i, card] of cards.entries()) {
     if (
       !card.querySelector("h2")?.textContent.trim() ||
       !card.querySelector("p")?.textContent.trim()
     )
       return i + 1 + "件目の作品には、作品名の h2 と紹介文の p の両方を用意しましょう。";
+  }
+  if (cards.length === 1)
+    return "1作品目の紹介ができました。次は2作品目を加え、両方の作品から制作メモへ案内しましょう。";
+  for (const [i, card] of cards.entries()) {
     const link = [...card.querySelectorAll("a[href]")].some((a) => {
       const target = doc.getElementById(a.hash.slice(1));
       return (
