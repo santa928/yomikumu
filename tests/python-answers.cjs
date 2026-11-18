@@ -42,3 +42,10 @@ module.exports[58] = [
   ["import counts\ntry:\n    print(counts.as_count(input()))\nexcept ValueError:\n    print('もう一度')", "from counts import as_count\nprint(as_count(input()) + 1)", "import counts\ntry:\n    print(1 + counts.as_count(input()))\nexcept ValueError:\n    print('数を確認')"],
   ["import counts\ntry:\n    a = counts.as_count(input())\n    print(a)\n    print(a + counts.as_count(input()))\nexcept ValueError:\n    print('数字を入力')", "from counts import as_count\na = as_count(input())\nprint(a)\nprint(a + as_count(input()))", "from counts import as_count\ntry:\n    first = as_count(input())\n    print(first)\n    print(as_count(input()) + first)\nexcept ValueError:\n    print('数字を入力')"],
 ];
+
+module.exports[59] = [
+  ["print([m / 60 for m in minutes])", "print([m for m in minutes])", "print([m + 5 for m in minutes])"],
+  ["print([60 * m for m in minutes])", "print([m + 2 for m in minutes])", "x = []\nfor m in minutes:\n    x.append(m + m)\nprint(x)"],
+  ["x = []\nfor m in minutes:\n    if m >= 30:\n        x.append(m)\nprint(x)", "print([m for m in minutes if m <= 30])", "print(list(filter(lambda t: t < 30, minutes)))"],
+  ["print([x / 60 for x in minutes if x > 59])", "print([m + 10 for m in minutes if m >= 30])", "x = []\nfor m in minutes:\n    if m > 30:\n        x.append(10 + m)\nprint(x)"],
+];

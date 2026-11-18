@@ -61,6 +61,15 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
     if (process.env.SCREENSHOT_DIR) await phone.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "python-mobile.png") });
 
     if (!only || only === "58") await require("./python-modules.cjs").verifyModules(pc, entry);
+    if ((!only || Number(only) >= 59) && await pc.evaluate(() => pythonChapters.some(ch => ch.id === "59"))) {
+      await pc.goto(entry + "#59/1/guide");
+      assert.equal(await pc.locator("#course-name").textContent(), "Python実践");
+      assert.equal(await pc.locator("#contents a[href^='#54']").count(), 0);
+      await pc.locator("#source").fill("読書の下書き");
+      await pc.reload();
+      assert.equal(await pc.locator("#source").inputValue(), "読書の下書き");
+      assert.equal(await pc.evaluate(() => JSON.parse(localStorage.getItem("yomikumu-python-practice-v1")).route), "59/1/guide");
+    }
     const report = await pc.evaluate(async ({ requested, fixtures }) => {
       const errors = [];
       let count = 0;

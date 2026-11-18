@@ -1,17 +1,28 @@
 "use strict";
 
-const storageKey = "yomikumu-python-v1";
 const $ = id => document.getElementById(id);
-const state = { route: "", drafts: {}, completed: {}, quizzes: {} };
-try {
-  const stored = JSON.parse(localStorage.getItem(storageKey));
-  if (stored && typeof stored === "object") {
-    if (typeof stored.route === "string") state.route = stored.route;
-    for (const key of ["drafts", "completed", "quizzes"]) {
-      if (stored[key] && typeof stored[key] === "object" && !Array.isArray(stored[key])) state[key] = stored[key];
+const courseNames = { python: "Python基礎", "python-practice": "Python実践", "python-oop": "Python OOP" };
+let storageKey, courseId, state;
+function family(id) {
+  if (Number(id) >= 63) return "python-oop";
+  if (Number(id) >= 59) return "python-practice";
+  return "python";
+}
+function openCourse(id) {
+  if (courseId === id) return;
+  courseId = id;
+  storageKey = "yomikumu-" + id + "-v1";
+  state = { route: "", drafts: {}, completed: {}, quizzes: {} };
+  try {
+    const stored = JSON.parse(localStorage.getItem(storageKey));
+    if (stored && typeof stored === "object") {
+      if (typeof stored.route === "string") state.route = stored.route;
+      for (const key of ["drafts", "completed", "quizzes"]) {
+        if (stored[key] && typeof stored[key] === "object" && !Array.isArray(stored[key])) state[key] = stored[key];
+      }
     }
-  }
-} catch { $("storage").textContent = "この環境では保存した学習を読み込めませんでした。"; }
+  } catch { $("storage").textContent = "この環境では保存した学習を読み込めませんでした。"; }
+}
 function save() {
   try { localStorage.setItem(storageKey, JSON.stringify(state)); }
   catch { $("storage").textContent = "この環境では保存できません。必要なコードをコピーして保管してください。"; }
@@ -37,7 +48,7 @@ let chapter, lesson, number, view, task, route, draft, mode, execution, reviewRe
 function showToc() {
   const toc = $("contents");
   toc.replaceChildren();
-  for (const unit of pythonChapters) {
+  for (const unit of pythonChapters.filter(item => family(item.id) === courseId)) {
     toc.append(link(unit.title, unit.id + "/demo"));
     const list = document.createElement("ol");
     for (const [i, step] of unit.lessons.entries()) {
@@ -59,7 +70,10 @@ function stop() {
   $("grade").disabled = $("run").disabled = false;
 }
 function routeToCourse() {
-  const requested = location.hash.slice(1) || state.route || "54/demo";
+  const rawRoute = location.hash.slice(1);
+  const found = pythonChapters.find(unit => unit.id === rawRoute.split("/")[0]);
+  openCourse(found ? family(found.id) : "python");
+  const requested = rawRoute || state.route || "54/demo";
   const parts = requested.split("/");
   chapter = pythonChapters.find(item => item.id === parts[0]) || pythonChapters[0];
   number = Number(parts[1]);
@@ -68,7 +82,7 @@ function routeToCourse() {
   route = view === "demo" ? chapter.id + "/demo" : [chapter.id, number, view].join("/");
   if (location.hash.slice(1) !== route) history.replaceState(null, "", "#" + route);
   state.route = route;
-  window.YomikumuPaths?.remember("python", route);
+  window.YomikumuPaths?.remember(courseId, route);
   save();
   stop();
   $("contents").parentElement.open = $("hint").open = false;
@@ -78,9 +92,11 @@ function routeToCourse() {
   task = demo ? chapter.demo : lesson[view];
   draft = state.drafts[route] ||= {};
   mode = draft.mode || (matchMedia("(max-width: 640px)").matches ? "tap" : "code");
+  $("course-name").textContent = courseNames[courseId];
+  $("course-toc").textContent = courseNames[courseId] + "の目次";
   $("position").textContent = chapter.title + (demo ? "　完成例" : "　" + number + " / " + chapter.lessons.length);
   $("title").textContent = demo ? chapter.title : lesson.title;
-  document.title = $("title").textContent + " | Python基礎 | よみくむ";
+  document.title = $("title").textContent + " | " + courseNames[courseId] + " | よみくむ";
   $("description").textContent = demo ? chapter.goal + " " + task.prompt : slide ? lesson.text : task.prompt;
   $("example").hidden = !slide;
   $("exercise").hidden = slide;
@@ -172,7 +188,7 @@ function showSteps() {
     else if (number < chapter.lessons.length) next = link("次のスライドへ", chapter.id + "/" + (number + 1) + "/slide");
     else {
       const nextChapter = pythonChapters[pythonChapters.indexOf(chapter) + 1];
-      if (nextChapter) next = link("次の章「" + nextChapter.title + "」へ", nextChapter.id + "/demo");
+      if (nextChapter && family(nextChapter.id) === courseId) next = link("次の章「" + nextChapter.title + "」へ", nextChapter.id + "/demo");
       else { next = element("a", "学習パス一覧へ戻る"); next.href = "../index.html#paths"; }
     }
   }
