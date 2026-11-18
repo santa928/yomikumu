@@ -26,3 +26,11 @@ module.exports[56] = [
   ["trial = list(cards)\ntrial[0] = 7\nprint(cards[0])\nprint(trial[0])", "trial = cards\ntrial[1] = 0\nprint(cards)\nprint(trial)", "trial = list(cards)\ntrial[1] = 0\nprint(cards)\nprint(trial)"],
   ["works['月'] = 4\nkey = '雲'\nprint(works[key])", "print(works['月'])", "print(works[input()])"],
 ];
+
+module.exports[57] = [
+  ["def greet():\n    print('受付')\ngreet()", "def pay():\n    print('精算')\npay()", "def pay():\n    print('精算')\nfor i in range(2):\n    pay()"],
+  ["def show_price(n):\n    print(50 * n)\nfor i in [2,4]:\n    show_price(i)", "def bill(count):\n    print(80)\nbill(1)\nbill(3)", "def bill(n):\n    print(80 * n)\nfor i in [1,3]:\n    bill(i)"],
+  ["def price(n):\n    total = 100 * n\n    return total", "def total(n):\n    print(n * 60)\namount = total(3)\nprint(amount + 5)", "def total(n):\n    return 60 * n\namount = total(3)\nprint(5 + amount)"],
+  ["def minus(n):\n    result = n - 1\n    return result", "def sale(amount):\n    print(amount - 3)", "def sale(n):\n    n -= 3\n    return n"],
+  ["amount = 100\ndef discount(n):\n    return n - 5\nprint(discount(40))\nprint(amount)", "amount = 200\ndef member(amount):\n    return amount - 20\namount = member(amount)\nprint(amount)\nprint(amount)", "def member(price):\n    return price - 20\namount = 200\nreduced = member(amount)\nprint(reduced)\nprint(amount)"],
+];
