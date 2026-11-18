@@ -22,8 +22,8 @@ function validateReadingRecord(group, id, item) {
   return Object.entries(item).every(([key, value]) => {
     if (key === "choice") return Number.isInteger(value) && value >= 0 && value < 4;
     if (key === "tap" || key === "write") return validMap(value) && Object.entries(value).every(
-      ([part, code]) => ["card", "shelf", "action", "other", "theme"].includes(part) && typeof code === "string");
-    return ["quizDone", "tapDone", "writeDone"].includes(key) && typeof value === "boolean";
+      ([part, code]) => ["card", "shelf", "action", "first", "other", "theme"].includes(part) && typeof code === "string");
+    return ["quizDone", "tapDone", "writeDone", "localDone"].includes(key) && typeof value === "boolean";
   });
 }
 
