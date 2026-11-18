@@ -32,6 +32,7 @@ async function run() {
         slides: l.slides.length,
         correct: l.quiz.correct,
         answer: l.exercise.answer,
+        answerCss: l.exercise.answerCss,
       })),
     );
     const expectedIds = [
@@ -39,7 +40,8 @@ async function run() {
       "heading-levels", "material-list", "making-steps", "page-regions", "work-section", "word-emphasis",
       "museum-link", "sign-image", "field-name", "clear-form", "contact-card",
       "class", "linked-css", "rule-order", "specific-rule", "inherited-size", "root-size",
-      "card", "padding", "outer-space", "border-width", "link-area", "narrow-card", "layout", "responsive",
+      "card", "padding", "outer-space", "border-width", "link-area", "narrow-card",
+      "bio-lines", "name-colors", "picked-mark", "shared-ink", "author-pair", "layout", "responsive",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
@@ -68,7 +70,12 @@ async function run() {
         () => document.querySelector("main [role=status]").textContent.length > 0,
       );
       assert.ok(!(await feedback.textContent()).startsWith("できました"));
-      await page.locator("textarea").fill(unit.answer);
+      if (unit.answerCss) {
+        await page.getByRole("textbox", { name: "HTML", exact: true }).fill(unit.answer);
+        await page.getByRole("textbox", { name: "CSS", exact: true }).fill(unit.answerCss);
+      } else {
+        await page.getByRole("textbox").fill(unit.answer);
+      }
       await confirm.click();
       await says("できました");
       if (unit.id === "link") {
@@ -191,6 +198,37 @@ async function run() {
     await open("border-width/2");
     await page.getByText("札の外幅　140px", { exact: true }).waitFor();
     await page.getByText("札の外幅　120px", { exact: true }).waitFor();
+    const profiles = [
+      ["bio-lines", ".bio{font-size:16px; line-height:2}", "一行分の高さ", ".bio{font-size:16px;line-height:24px}"],
+      ["name-colors", "p{color:white;background:navy}", "下の説明文", ".badge{background:#000080;color:#fff}"],
+      ["picked-mark", ".badge{border-left:4px solid}", "もう一人", ".picked{border-inline-start:solid 4px green}"],
+      ["shared-ink", ":root{--ink:teal}.name{color:teal}", "一か所の変更", ":root{--ink:#008080} h2.name{color:var(--ink)}"],
+    ];
+    for (const [id, wrong, message, alternate] of profiles) {
+      await open(id + "/write");
+      await page.getByRole("textbox").fill(wrong);
+      await confirm.click();
+      await says(message);
+      await page.getByRole("textbox").fill(alternate);
+      await confirm.click();
+      await says("できました。条件を満たしています");
+    }
+    const pair = units.find((u) => u.id === "author-pair");
+    await open("author-pair/write");
+    const pairHtml = page.getByRole("textbox", { name: "HTML", exact: true });
+    const pairCss = page.getByRole("textbox", { name: "CSS", exact: true });
+    await pairHtml.fill(pair.answer.replace("profile picked", "profile"));
+    await pairCss.fill(pair.answerCss);
+    await confirm.click();
+    await says("浜ナオだけ");
+    await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
+    assert.equal(await pairHtml.inputValue(), pair.answer.replace("profile picked", "profile"));
+    assert.equal(await pairCss.inputValue(), pair.answerCss);
+    await pairHtml.fill(pair.answer.replace("profile picked", "picked profile"));
+    await pairCss.fill(pair.answerCss.replace("teal", "#008080"));
+    await confirm.click();
+    await says("できました。条件を満たしています");
     const exhibitionCases = [
       ["heading-levels", "<h1>小さな版画展</h1><h2>体験会</h2><h2>午前の部</h2>", "章はできました", "<main><h1>小さな版画展</h1><section><h2>体験会</h2><h3 style='font-size:26px'>午前の部</h3></section></main>"],
       ["material-list", "<p>受付で使います。</p><ul><li>入場券</li></ul><ul><li>手帳</li></ul>", "同じ ul", "<p>受付で使います。</p><ul><li>手帳</li><li>消しゴム</li><li>入場券</li></ul>"],
@@ -353,6 +391,9 @@ async function run() {
       "specific-rule": [".author", "navy"], "inherited-size": [".wall", "22px"], "root-size": ["1.5rem"],
       "outer-space": ["padding", "margin-right"], "border-width": ["100px", "border-box"],
       "link-area": ["block", "padding"], "narrow-card": ["border-box", "anywhere"],
+      "bio-lines": ["line-height", "1.5"], "name-colors": ["white", "navy"],
+      "picked-mark": [".picked", "border-left"], "shared-ink": [".name", "var(--ink)"],
+      "author-pair": ["profile", "profile picked"],
       "heading-levels": ["h2", "h3"], "material-list": ["li", "手帳"], "making-steps": ["ol", "li"],
       "page-regions": ["main", "footer"], "work-section": ["section", "article"], "word-emphasis": ["strong", "em"],
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
