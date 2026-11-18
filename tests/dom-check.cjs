@@ -34,7 +34,9 @@ async function verifyDom(id, answers, demo, course = "dom") {
         const [template, ...slots] = step.build || domBuilders[id][index];
         return template.replace(/《(\d+)》/g, (_, n) => slots[n-1][0]);
       }, [id, i]);
-      for (const answer of [primary ?? model, alternative]) {
+      const other = typeof alternative === "function" ? alternative(model) : alternative;
+      assert.notEqual(other, primary ?? model);
+      for (const answer of [primary ?? model, other]) {
         await fillCode(answer);
         await run.click();
         await feedback.filter({ hasText: "できました" }).waitFor();
@@ -44,10 +46,10 @@ async function verifyDom(id, answers, demo, course = "dom") {
       await pc.waitForFunction(() => document.activeElement.tagName === "TEXTAREA");
       await pc.reload();
       if (multi) {
-        const files = await pc.evaluate(text => splitReactFiles(text), alternative);
+        const files = await pc.evaluate(text => splitReactFiles(text), other);
         for (const [name, content] of Object.entries(files))
           assert.equal(await pc.getByRole("textbox",{name,exact:true}).inputValue(), content);
-      } else assert.equal(await editor.inputValue(), alternative);
+      } else assert.equal(await editor.inputValue(), other);
       const correct = await phone.evaluate(([id, i]) => domUnits.find(u => u.id === id).steps[i].correct, [id, i]);
       const options = phone.locator('input[name="prediction"]');
       assert.equal(await options.count(), 4);

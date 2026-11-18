@@ -1,0 +1,71 @@
+"use strict";
+
+{
+  const record = "from dataclasses import dataclass\n@dataclass\nclass Record:\n    minutes: int";
+  const valid = "def valid(n):\n    return isinstance(n, int) and n >= 0";
+  const archive = { "archive.py": [
+    record, valid, "class Notes:", "    def __init__(self, nums):", "        self.items = [Record(n) for n in nums]",
+    "        self.closed = 0", "    def __enter__(self):", "        return self.items", "    def __exit__(self, kind, value, trace):",
+    "        self.closed += 1", "        return False",
+  ].join("\n") };
+  function totals(threshold, expected) {
+    return [[], [0, 15, 30, 60], [-1], [threshold]].map((list, i) => check(
+      ["空の集計", "境界を含む複数件", "不正値でも閉じる", "境界ちょうど"][i], expected[i] + "\n",
+      { before: "from archive import Notes, valid\nnotes = Notes(" + JSON.stringify(list) + ")", observe: "notes.closed", value: 1 },
+    ));
+  }
+  function aggregate(limit) {
+    return "total = 0\ntry:\n    with notes as rows:\n        for row in rows:\n            if not valid(row.minutes):\n                raise ValueError('記録を確認')\n            if row.minutes >= " + limit + ":\n                total += row.minutes\n    print(total)\nexcept ValueError:\n    print('記録を確認')";
+  }
+  const yesNo = (expr, value, label) => check(label, "", { observe: expr, value });
+  pythonChapters.push({
+    id: "62", engine: "cpython", title: "型付きの読書記録を検証して集計する",
+    goal: "一件を作るところから始め、最後は読書時間を検査し、条件に合う記録だけを集計できるようにします。",
+    demo: { prompt: "最初の読書時間を入力します。30分以上を合計する例です。15、30、−1（半角で -1）を比べましょう。", input: "30", files: archive,
+      code: "from archive import Notes, valid\nnotes = Notes([int(input()), 60])\n" + aggregate(30) + "\nprint(notes.closed)" },
+    lessons: [
+      {
+        title: "型注釈は何を知らせる？", text: "minutes: int は「分には整数を入れる予定」と読み手に知らせる型注釈です。コロンの右が型です。注釈を書いても、実行時に別の種類の値を自動で拒むわけではありません。",
+        code: 'minutes: int = 12\nprint(minutes)\nminutes = "十二"\nprint(minutes)', output: "12\n十二",
+        quiz: ["minutes: int に「十二」を代入すると、注釈だけでどうなる？", ["自動で12になる", "必ず拒否される", "文字も代入できる", "変数が消える"], 2, "型を伝える注釈と、実行時のチェックは別です。"],
+        guide: exercise("読書時間の値を15にし、int の注釈と表示は残しましょう。", "minutes: int = 12\nprint(minutes)", "minutes: int = 15\nprint(minutes)", [check("値と注釈", "15\n", { observe: "__annotations__.get('minutes') is int", value: true })], "コロンの右の型は int のまま、値だけ15にします。"),
+        write: exercise("冊数 count に整数の注釈を付け、0を入れて表示しましょう。", "", "count: int = 0\nprint(count)", [check("空の棚と注釈", "0\n", { observe: "__annotations__.get('count') is int", value: true })], "count: int = 0 と書くと、初期値と型の両方が読めます。"),
+      },
+      {
+        title: "dataclass で一件を作る", text: "dataclass は、項目名と型を書けば、一件を作る手続きを用意してくれる標準の道具です。@dataclass を class の上に置きます。Record(15) が作った一件の分を .minutes で読めます。",
+        code: record + "\nentry = Record(15)\nprint(entry.minutes)", output: "15",
+        quiz: ["Record(20) の minutes を読むのは？", ["Record.minutes(20)", "entry.minutes", "entry[20]", "dataclass(20)"], 1, "entry に一件が入っていれば、ドットの後に項目名を書いて取り出せます。"],
+        guide: exercise("Record を作る引数を20に変え、entry の minutes を表示しましょう。", record + "\nentry = Record(15)\nprint(entry.minutes)", record + "\nentry = Record(20)\nprint(entry.minutes)", [check("読書20分", "20\n", { observe: "[entry.minutes, Record(0).minutes]", value: [20, 0] })], "作成する Record(…) の中身を変更します。"),
+        write: exercise("pages という整数項目を一つ持つ dataclass の BookLog を作りましょう。採点が0ページと18ページの記録を作ります。", "", "from dataclasses import dataclass\n@dataclass\nclass BookLog:\n    pages: int", [yesNo("[BookLog(0).pages, BookLog(18).pages, hasattr(BookLog, '__dataclass_fields__')]", [0, 18, true], "二つの記録を作成")], "class の前に @dataclass、内側に pages: int を置きます。"),
+      },
+      {
+        title: "注釈に加えて一件を調べる", text: "isinstance(n, int) は n が整数として扱えるかを調べます。and は二つの条件が両方 True のときだけ True。0分を許し、負の分と数字の文字を拒む検証を作ります。ここでは入力は整数または文字です。",
+        code: valid + '\nprint(valid(0))\nprint(valid(-1))\nprint(valid("2"))', output: "True\nFalse\nFalse",
+        quiz: ["0以上の整数を許す検査で、境界を確かめる入力は？", ["5と6だけ", "0と−1", "空リストだけ", "2と3だけ"], 1, "0を許し、すぐ隣の−1を拒むことを個別に見ます。"],
+        guide: exercise("0分を除いてしまう見本を直し、0以上の整数だけを許す valid を作りましょう。", valid.replace(">= 0", "> 0"), valid, [yesNo("valid(3)", true, "正の数"), yesNo("valid(0)", true, "0分を含む"), yesNo("[valid(-1), valid('2')]", [false, false], "不正な値")], "種類を調べる条件を残し、0に等しい場合を許します。"),
+        write: exercise("valid_page(n) は1以上の整数ページだけを許します。0ページと数字の文字は False を返してください。", "", "def valid_page(n):\n    return isinstance(n, int) and n >= 1", [yesNo("valid_page(1)", true, "最初のページ"), yesNo("[valid_page(0), valid_page('1')]", [false, false], "範囲外と種類違い")], "まず整数かを確かめ、1以上のときだけ True にします。"),
+      },
+      {
+        title: "期待する結果を小さなテストにする", text: "assert 条件 は、条件が True ならそのまま進み、False なら AssertionError で止まります。期待する値を先に決めておくと、後から検証を壊したときに気付けます。== は二つの値が等しいかを調べます。",
+        code: valid + '\nassert valid(0) == True\nprint("確認できた")', output: "確認できた",
+        quiz: ["assert valid(0) == True が止まるのは？", ["valid(0) が True", "valid(0) が False", "0を書くと必ず", "毎回"], 1, "期待は True なので、False に変わった場合に失敗します。"],
+        guide: exercise("境界の0分を許すか調べるテストに直しましょう。正しい実装なら通り、0分を拒む実装なら AssertionError で止まるのが成功です。", "assert valid(1) == True", "assert valid(0) == True", [check("正しい検証", "", { before: valid }), check("0を除く誤りを検出", "", { before: valid.replace(">= 0", "> 0"), error: "AssertionError" })], "assert に渡す例を、境界の0分にします。"),
+        write: exercise("負の読書時間を拒むことを assert で検査してください。負の値を許す誤実装で止まるテストにします。", "", "assert valid(-1) == False", [check("正しい検証", "", { before: valid }), check("負の値を許す誤りを検出", "", { before: "def valid(n):\n    return isinstance(n, int)", error: "AssertionError" })], "期待する False を、負の具体例で確かめます。"),
+      },
+      {
+        title: "一件ずつ検証し、出口で閉じる", text: "Notes はメモリにある記録の束です。with の as が返す rows を順に読みます。raise ValueError(...) は不正な値を見つけた場所で例外を起こす書き方です。正常でも例外でも束は一度閉じます。",
+        files: archive, code: "from archive import Notes, valid\nnotes = Notes([0, 15])\n" + aggregate(0) + "\nprint(notes.closed)", output: "15\n1",
+        quiz: ["不正な記録で raise した場合、with の後片付けは？", ["行われない", "二度行う", "出口で一度行う", "次の実行まで待つ"], 2, "with を抜ける途中で Notes の終了処理が動きます。"],
+        guide: exercise("合計の初期値を直し、0分以上の記録をすべて合計しましょう。数字以外・負の入力には「記録を確認」と表示します。", aggregate(0).replace("total = 0", "total = 1"), aggregate(0), totals(0, ["0", "105", "記録を確認", "0"]), "一件も読まないときの結果から、合計の初期値を決めます。", { files: archive }),
+        write: exercise("Notes を with で開き、件数を数えましょう。正しい記録の個数を表示し、不正が一つでもあれば「記録を確認」と表示します。", "", aggregate(0).replace("total += row.minutes", "total += 1"), totals(0, ["0", "4", "記録を確認", "1"]), "記録を検証後、分の値の代わりに1ずつ足します。", { files: archive }),
+      },
+      {
+        title: "別の条件で読書時間を集計する", text: "同じ記録でも調べたいことは変わります。すべての時間を検査し、条件に合う分だけ足します。空、境界ぴったり、不正値を別々のテスト入力にすると、直す場所を見つけやすくなります。",
+        files: archive, code: "from archive import Notes, valid\nnotes = Notes([15, 30, 60])\n" + aggregate(30), output: "90",
+        quiz: ["30分以上を合計するテストで、30分一件なら期待値は？", ["0", "1", "30", "60"], 2, "境界ちょうどの記録も合計に含みます。"],
+        guide: exercise("30分ぴったりが漏れる集計を直しましょう。全件を検査し、30分以上だけの合計を表示します。", aggregate(30).replace(">= 30", "> 30"), aggregate(30), totals(30, ["0", "90", "記録を確認", "30"]), "選ぶ境界を >= 30 にします。", { files: archive }),
+        write: exercise("別の読書会では60分以上の時間を合計します。全記録を検証し、不正なら「記録を確認」。空なら0を表示し、どの経路も Notes を一度閉じましょう。", "", aggregate(60), totals(60, ["0", "60", "記録を確認", "60"]), "空の合計、60分ぴったり、不正な値の三つの経路を順に確かめます。", { files: archive }),
+      },
+    ],
+  });
+}

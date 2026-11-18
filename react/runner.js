@@ -22,6 +22,7 @@ const trainingRoot = ReactDOM.createRoot(document.getElementById("root"), {
 const training = {
   uses: Object.create(null),
   elements: [],
+  providers: [],
   mount(component, props = {}) {
     ReactDOM.flushSync(() => trainingRoot.render(React.createElement(component, props)));
   },
@@ -39,6 +40,7 @@ const training = {
 };
 const originalCreateElement = React.createElement;
 React.createElement = (type, props, ...children) => {
+  if (type?.$$typeof === Symbol.for("react.context") && !training.providers.includes(type)) training.providers.push(type);
   if (typeof type === "function" && type !== training.app && training.elements.length < 200)
     training.elements.push({type, props});
   return originalCreateElement(type, props, ...children);
@@ -71,7 +73,8 @@ function readModule(path) {
   if (name !== "App" && typeof exports.default === "function") {
     const original = exports.default;
     exports.default = props => {
-      (training.uses[name] ||= []).push(props);
+      const uses = training.uses[name] ||= [];
+      if (uses.length < 200) uses.push(props);
       return React.createElement(original, props);
     };
   }

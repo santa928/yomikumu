@@ -21,6 +21,13 @@ const url = process.env.TS_URL || pathToFileURL(path.join(__dirname,"../typescri
     const commonJS = await page.evaluate(() => transpileTSX('import {name} from "./name"; export const el = <p>{name}</p>;', true));
     assert.match(commonJS.code,/require\("\.\/name"\)/);
     assert.deepEqual(commonJS.diagnostics,[]);
+    const project = await page.evaluate(async()=>{
+      const declarations = {"node_modules/@types/react/index.d.ts":'export namespace JSX { interface IntrinsicElements { p:{children?:unknown} } } export function createElement(...args:unknown[]):unknown;'};
+      const files = {"App.tsx":'import * as React from "react"; import {add} from "./math";\nconst label=<p>{add(3)}</p>;', "math.ts":"export function add(n:number){return n+1}"};
+      return [await inspectTSXFiles(files,declarations), await inspectTSXFiles({...files,"App.tsx":files["App.tsx"].replace("add(3)",'add("3")')},declarations)];
+    });
+    assert.deepEqual(project[0].diagnostics,[]);
+    assert.ok(project[1].diagnostics.some(d=>d.file==="App.tsx" && d.line===2 && d.code===2345));
     const sets = {
       infer: [["let points = 0; points = 4;", true],["let points = 2+2;",true],['let points = 0; points = "4";',false]],
       annotate: [["let score:number = 3;",true],["const score: number = 1+2;",true],["const score = 3;",false]],

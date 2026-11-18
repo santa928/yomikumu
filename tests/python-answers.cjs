@@ -64,3 +64,15 @@ module.exports[61] = [
   ["from memo import Memo, events\ntry:\n    with Memo(input()) as r:\n        n = r.read()\n    print(n)\nexcept ValueError:\n    print('数字を確認')\nprint(events)", "from memo import Memo, events\nr = Memo(input())\nprint(r.read())\nr.close()", "from memo import Memo, events\nwith Memo(input()) as r:\n    n = r.read()\nprint(n)"],
   ["class Session:\n    def __enter__(self):\n        return self\n    def __exit__(self, *details):\n        events.append('閉じる')", "class Session:\n    def __enter__(self):\n        events.append('開く')\n        return self\n    def __exit__(self, *args):\n        events.append('閉じる')\n        return True", "class Session:\n    def __enter__(self):\n        events.append('開く')\n        return self\n    def __exit__(self, *details):\n        events.append('閉じる')"],
 ];
+
+{
+  const collect = expr => "try:\n    with notes as rows:\n        kept = []\n        for item in rows:\n            if not valid(item.minutes):\n                raise ValueError()\n            kept.append(item.minutes)\n    print(" + expr + ")\nexcept ValueError:\n    print('記録を確認')";
+  module.exports[62] = [
+    ["minutes: int\nminutes = 15\nprint(minutes)", "count = 0\nprint(count)", "count: int\ncount = 0\nprint(count)"],
+    ["import dataclasses\n@dataclasses.dataclass\nclass Record:\n    minutes: int\nentry = Record(minutes=20)\nprint(entry.minutes)", "class BookLog:\n    pages = 0", "import dataclasses\n@dataclasses.dataclass\nclass BookLog:\n    pages: int"],
+    ["def valid(n):\n    return type(n) is int and not n < 0", "def valid_page(n):\n    return isinstance(n, int) and n >= 0", "def valid_page(n):\n    if type(n) is int:\n        return n > 0\n    return False"],
+    ["assert valid(0)", "assert valid(1)", "assert not valid(-1)"],
+    [collect("sum(kept)"), collect("sum(kept)"), collect("len(kept)")],
+    [collect("sum(n for n in kept if n >= 30)"), collect("sum(n for n in kept if n > 60)"), collect("sum(n for n in kept if n >= 60)")],
+  ];
+}

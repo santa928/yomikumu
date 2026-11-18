@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../lesson.css">
   <link rel="stylesheet" href="python.css">
   <script defer src="vendor/skulpt/runtime.js"></script>
+  <script defer src="cpython.js"></script>
   <script defer src="runtime.js"></script>
   <script defer src="model.js"></script>
   <script defer src="../path-location.js"></script>
@@ -18,6 +19,7 @@
   <script defer src="practice-lists.js"></script>
   <script defer src="practice-iterators.js"></script>
   <script defer src="practice-resources.js"></script>
+  <script defer src="practice-records.js"></script>
   <script defer src="workbook.js"></script>
 </head>
 <body>
@@ -45,13 +47,13 @@
     <section id="console" hidden>
       <h2>実行して確かめる</h2>
       <label for="input">事前入力（1行に1件）</label><textarea id="input" rows="2" spellcheck="false"></textarea>
-      <p class="note">足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。</p>
+      <p class="note" id="input-note">足りない行は実行中に入力できます。空の行を渡すときは、入力待ちで何も書かずに「一行を渡す」を押します。</p>
       <div class="actions"><button id="run" type="button">練習実行</button><button id="stop" type="button" disabled>停止</button><button id="grade" type="button">別の条件でも採点</button></div>
       <form id="waiting" hidden><label for="line">入力待ち・次の一行</label><input id="line" autocomplete="off"><button>一行を渡す</button></form>
       <p id="status" role="status"></p><h3>実際の出力</h3><pre id="output"></pre>
       <div id="checks"></div>
     </section>
     <nav id="steps" aria-label="この単元の移動"></nav>
-    <details class="environment"><summary>ブラウザとPCでの実行方法</summary><p>この画面は端末内の Skulpt で教材の Python 3 コードを実行します。名前・コードは端末内に保存します。回線やアカウントは不要です。追加パッケージの導入やPC上のファイルの操作は、PCに用意した CPython で試せます。</p><p>PCではコードを main.py に保存し、同じフォルダーをターミナルで開いて python3 main.py（Windowsでは py main.py）を実行します。入力は一行ずつ Enter で渡し、停止は Ctrl+C です。別ファイルがある例は同じフォルダーに保存します。</p></details>
+    <details class="environment"><summary>ブラウザとPCでの実行方法</summary><p>この画面は端末内で Python 3 のコードを実行します。基礎や反復の練習には Skulpt、標準ライブラリが必要な章には CPython を使います。名前・コードは端末内に保存します。回線やアカウントは不要です。追加パッケージの導入やPC上のファイルの操作は、PCに用意した CPython で試せます。</p><p>PCではコードを main.py に保存し、同じフォルダーをターミナルで開いて python3 main.py（Windowsでは py main.py）を実行します。入力は一行ずつ Enter で渡し、停止は Ctrl+C です。別ファイルがある例は同じフォルダーに保存します。</p></details>
   </main>
 </body></html>
