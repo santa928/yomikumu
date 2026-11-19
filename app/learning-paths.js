@@ -19,7 +19,7 @@ const pathCourses = {
     review: ["見出しを試す", "#first-edit/1"],
   },
   python: {
-    title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo", start: "python/index.html#54/1/slide",
+    title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo/toc", start: "python/index.html#54/1/slide",
     project: "文字や数を入力する練習から、条件分岐・繰り返し・リスト・辞書・関数を学びます。名簿を整え、名前ごとの件数を集計します。",
     first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
     question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
@@ -45,7 +45,7 @@ const pathCourses = {
     review: ["JavaScriptで数と文字を比べる", "#js-console/1"],
   },
   "python-oop": {
-    title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo", start: "python/index.html#63/1/slide",
+    title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo/toc", start: "python/index.html#63/1/slide",
     project: "本ごとの状態と操作をクラスにまとめ、継承で料金の計算方法を変えます。関数を呼ぶたびに成功や失敗を記録するデコレーターも作ります。",
     first: "実践と共通のクラス入門では、Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
@@ -55,7 +55,7 @@ const pathCourses = {
     afterIntro: ["クラスを学習済みなら OOP の続きへ", "python/index.html#63/4/slide"],
   },
   "python-practice": {
-    title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo", start: "python/index.html#63/1/slide",
+    title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo/toc", start: "python/index.html#63/1/slide/practice",
     project: "読書記録を1件ずつ調べ、条件に合う読書時間を合計します。最後は CSV ファイルの記録を検査して集計します。",
     first: "共通のクラス入門で本ごとの記録と操作を作ります。実践では、リストの集計や with でファイルを閉じる書き方を学びます。",
     question: "30分と60分をどちらも時間に変えると、記録は何件になりますか。",

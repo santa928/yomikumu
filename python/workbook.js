@@ -3,19 +3,27 @@
 const $ = id => document.getElementById(id);
 const courseNames = { python: "Python基礎", "python-practice": "Python実践", "python-oop": "Python OOP" };
 const classIntro = "63/1/slide";
-let storageKey, courseId, state;
+const classEntryCourses = { basics: "python", practice: "python-practice" };
+let courseId, state, classEntry;
 function family(id) {
   if (Number(id) >= 63) return "python-oop";
   if (id === "csv" || Number(id) >= 59) return "python-practice";
   return "python";
 }
+function storageKey(id) { return "yomikumu-" + id + "-v1"; }
+function storedCourse(id) { return JSON.parse(localStorage.getItem(storageKey(id))); }
+function coursePosition(id) {
+  try {
+    const position = storedCourse(id)?.route;
+    return typeof position === "string" ? position : "";
+  } catch { return ""; }
+}
 function openCourse(id) {
   if (courseId === id) return;
   courseId = id;
-  storageKey = "yomikumu-" + id + "-v1";
   state = { route: "", drafts: {}, completed: {}, quizzes: {} };
   try {
-    const stored = JSON.parse(localStorage.getItem(storageKey));
+    const stored = storedCourse(id);
     if (stored && typeof stored === "object") {
       if (typeof stored.route === "string") state.route = stored.route;
       for (const key of ["drafts", "completed", "quizzes"]) {
@@ -25,7 +33,7 @@ function openCourse(id) {
   } catch { $("storage").textContent = "このブラウザに保存した進捗と下書きを読み込めませんでした。"; }
 }
 function save() {
-  try { localStorage.setItem(storageKey, JSON.stringify(state)); }
+  try { localStorage.setItem(storageKey(courseId), JSON.stringify(state)); }
   catch { $("storage").textContent = "この環境では保存できません。必要なコードをコピーして保管してください。"; }
 }
 function element(tag, text) {
@@ -33,9 +41,9 @@ function element(tag, text) {
   node.textContent = text;
   return node;
 }
-function link(text, path) {
+function link(text, path, entry = classEntry) {
   const node = element("a", text);
-  node.href = "#" + path;
+  node.href = "#" + (entry && /^63\/[1-3]\/(?:slide|guide|write)$/.test(path) ? path + "/" + entry : path);
   return node;
 }
 function button(text, action) {
@@ -49,7 +57,7 @@ let chapter, lesson, number, view, task, route, draft, mode, execution, reviewRe
 function showToc() {
   const toc = $("contents");
   toc.replaceChildren();
-  if (courseId === "python-practice") toc.append(link("クラス入門（実践・OOP共通）", classIntro));
+  if (courseId === "python-practice") toc.append(link("クラス入門（実践・OOP共通）", classIntro, "practice"));
   for (const unit of pythonChapters.filter(item => family(item.id) === courseId)) {
     toc.append(link(unit.title, unit.id + "/demo"));
     const list = document.createElement("ol");
@@ -62,7 +70,7 @@ function showToc() {
     }
     toc.append(list);
   }
-  if (courseId === "python") toc.append(link("クラス入門（実践・OOP共通）", classIntro));
+  if (courseId === "python") toc.append(link("クラス入門（実践・OOP共通）", classIntro, "basics"));
 }
 function stop() {
   generation++;
@@ -72,7 +80,7 @@ function stop() {
   $("stop").disabled = true;
   $("grade").disabled = $("run").disabled = false;
 }
-function routeToCourse() {
+function routeToCourse(focusTitle = false) {
   const rawRoute = location.hash.slice(1);
   const found = pythonChapters.find(unit => unit.id === rawRoute.split("/")[0]);
   openCourse(found ? family(found.id) : "python");
@@ -82,17 +90,23 @@ function routeToCourse() {
   number = Number(parts[1]);
   lesson = chapter.lessons[number - 1];
   view = lesson && ["slide", "guide", "write"].includes(parts[2]) ? parts[2] : "demo";
-  route = view === "demo" ? chapter.id + "/demo" : [chapter.id, number, view].join("/");
-  if (location.hash.slice(1) !== route) history.replaceState(null, "", "#" + route);
-  state.route = route;
-  window.YomikumuPaths?.remember(courseId, route);
-  save();
-  stop();
-  $("contents").parentElement.open = $("hint").open = false;
-  $("status").textContent = $("output").textContent = "";
-  $("checks").replaceChildren();
   const demo = view === "demo", slide = view === "slide";
   const inClassIntro = !demo && chapter.id === "63" && number <= 3;
+  classEntry = inClassIntro && Object.hasOwn(classEntryCourses, parts[3]) ? parts[3] : "";
+  const openToc = demo && parts[1] === "demo" && parts[2] === "toc";
+  route = demo ? chapter.id + "/demo" : [chapter.id, number, view].join("/");
+  const address = classEntry ? route + "/" + classEntry : openToc ? route + "/toc" : route;
+  if (rawRoute !== address) history.replaceState(null, "", "#" + address);
+  if (!openToc) {
+    if (!classEntry) state.route = route;
+    window.YomikumuPaths?.remember(classEntryCourses[classEntry] || courseId, address);
+    save();
+  }
+  stop();
+  $("contents").parentElement.open = openToc;
+  $("hint").open = false;
+  $("status").textContent = $("output").textContent = "";
+  $("checks").replaceChildren();
   const courseName = inClassIntro ? "Python クラス入門" : courseNames[courseId];
   task = demo ? chapter.demo : lesson[view];
   draft = state.drafts[route] ||= {};
@@ -114,6 +128,8 @@ function routeToCourse() {
   else showExercise(demo);
   showSteps(inClassIntro);
   showToc();
+  if (openToc) $("course-toc").focus();
+  else if (focusTitle) $("title").focus();
 }
 function showSlide() {
   $("example-code").textContent = lesson.code;
@@ -205,8 +221,9 @@ function showSteps(inClassIntro) {
   const nav = $("steps");
   nav.replaceChildren();
   const path = chapter.id + "/" + number + "/";
-  const practice = inClassIntro && window.YomikumuPaths?.read().positions["python-practice"];
   const nextClass = inClassIntro && number === 3 && view === "write";
+  const practice = (nextClass || classEntry === "practice") && coursePosition("python-practice");
+  const basics = classEntry === "basics" && coursePosition("python");
   const beforeWith = chapter.id === "61" && number === 3 && view === "write";
   const introDone = beforeWith && window.YomikumuPaths?.completedPythonClassIntro();
   let next;
@@ -229,12 +246,12 @@ function showSteps(inClassIntro) {
       if (practice === "61/3/write") next = link("Python実践の with の練習へ戻る", "61/4/slide");
       else if (practice) next = link("Python実践の続きへ", practice);
       else next = link("Python実践へ", "59/1/slide");
-    } else if (beforeWith && !introDone) next = link("クラス入門へ（with の処理を書く前に）", classIntro);
+    } else if (beforeWith && !introDone) next = link("クラス入門へ（with の処理を書く前に）", classIntro, "practice");
     else if (number < chapter.lessons.length) next = link("次のスライドへ", chapter.id + "/" + (number + 1) + "/slide");
     else {
       const nextChapter = pythonChapters[pythonChapters.indexOf(chapter) + 1];
       if (nextChapter && family(nextChapter.id) === courseId) next = link("次の章「" + nextChapter.title + "」へ", nextChapter.id + "/demo");
-      else if (courseId === "python") next = link("クラス入門へ（実践・OOP共通）", classIntro);
+      else if (courseId === "python") next = link("クラス入門へ（実践・OOP共通）", classIntro, "basics");
       else { next = element("a", "学習パス一覧へ戻る"); next.href = "../index.html#paths"; }
     }
   }
@@ -242,9 +259,10 @@ function showSteps(inClassIntro) {
   nav.append(next);
   if (nextClass) nav.append(link("Python OOPの続きへ", "63/4/slide"));
   else if (practice) nav.append(link("Python実践の続きへ戻る", practice));
+  if (basics) nav.append(link("Python基礎の続きへ戻る", basics));
   if (beforeWith && !introDone) nav.append(link("クラスを学習済みなら with の練習へ", "61/4/slide"));
-  if (introDone || (chapter.id === "61" && number === 4)) nav.append(link("クラス入門を読み直す", classIntro));
-  if (view !== "demo") nav.append(link("完成例を試す", chapter.id + "/demo"));
+  if (introDone || (chapter.id === "61" && number === 4)) nav.append(link("クラス入門を読み直す", classIntro, "practice"));
+  if (view !== "demo") nav.append(link(classEntry ? "OOPの完成例へ" : "完成例を試す", chapter.id + "/demo"));
 }
 function stopForEdit() {
   if (!execution) return;
@@ -343,5 +361,5 @@ async function execute(grade) {
 }
 $("run").onclick = () => execute(false);
 $("grade").onclick = () => execute(true);
-addEventListener("hashchange", () => { routeToCourse(); $("title").focus(); });
+addEventListener("hashchange", () => routeToCourse(true));
 routeToCourse();

@@ -19,7 +19,7 @@ async function fromCoursePicker(browser) {
     const practice = page.locator(".path-course").filter({
       has: page.getByRole("heading", { name: "Python実践", exact: true }),
     });
-    await follow(page, practice.getByRole("link", { name: "最初の一課題を開く" }), workbook + "#63/1/slide", true);
+    await follow(page, practice.getByRole("link", { name: "最初の一課題を開く" }), workbook + "#63/1/slide/practice", true);
     await page.getByRole("heading", { name: "Book クラスで1冊分の記録を作る" }).waitFor();
     assert.equal(await page.locator("#course-name").textContent(), "Python クラス入門");
     await page.goto(home + "#paths/python");
@@ -32,8 +32,8 @@ async function fromBasics(browser) {
   try {
     await page.goto(workbook + "#58/5/write");
     const steps = page.getByRole("navigation", { name: "この単元の移動" });
-    await follow(page, steps.locator(".next"), workbook + "#63/1/slide");
-    await page.goto(workbook + "#63/3/write");
+    await follow(page, steps.locator(".next"), workbook + "#63/1/slide/basics");
+    await page.goto(workbook + "#63/3/write/basics");
     await follow(page, steps.getByRole("link", { name: "Python実践へ" }), workbook + "#59/1/slide");
     await page.goto(workbook + "#63/3/write");
     await follow(page, steps.getByRole("link", { name: "Python OOPの続きへ" }), workbook + "#63/4/slide");
@@ -50,7 +50,7 @@ async function fromPractice(browser) {
     await phone.locator("#source").fill(saved);
     await phone.goto(workbook + "#61/3/write");
     const steps = phone.getByRole("navigation", { name: "この単元の移動" });
-    await follow(phone, steps.locator(".next"), workbook + "#63/1/slide", true);
+    await follow(phone, steps.locator(".next"), workbook + "#63/1/slide/practice", true);
     await phone.getByText("Python OOPの目次", { exact: true }).tap();
     await phone.locator("#contents").getByRole("link", { name: "self で呼ばれた本だけ更新する" }).tap();
     await phone.getByRole("link", { name: "見本を変えてみる" }).tap();
@@ -79,7 +79,75 @@ async function afterCompletedIntro(browser) {
     await page.reload();
     const steps = page.getByRole("navigation", { name: "この単元の移動" });
     await follow(page, steps.locator(".next"), workbook + "#61/4/slide");
-    await follow(page, steps.getByRole("link", { name: "クラス入門を読み直す" }), workbook + "#63/1/slide");
+    await follow(page, steps.getByRole("link", { name: "クラス入門を読み直す" }), workbook + "#63/1/slide/practice");
+  } finally { await page.close(); }
+}
+
+async function independentResume(browser) {
+  const pc = await browser.newPage();
+  const phone = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });
+  const oopDraft = "history = []";
+  const practiceDraft = "first = Book(4)";
+  try {
+    await pc.goto(workbook + "#67/5/write");
+    await pc.locator("#source").fill(oopDraft);
+    await pc.goto(home + "#paths/python");
+    await pc.locator(".path-course").filter({ has: pc.getByRole("heading", { name: "Python実践", exact: true }) })
+      .getByRole("link", { name: "最初の一課題を開く" }).click();
+    await pc.getByRole("link", { name: "見本を変えてみる" }).click();
+    await pc.getByRole("link", { name: "自分で解く課題へ" }).click();
+    await pc.getByRole("link", { name: "次のスライドへ" }).click();
+    await pc.getByRole("link", { name: "見本を変えてみる" }).click();
+    await pc.getByRole("heading", { name: "見本のコードを直す", exact: true }).waitFor();
+    await pc.locator("#source").fill(practiceDraft);
+    await pc.getByRole("link", { name: "関連スライドを読み直す" }).click();
+    await pc.getByRole("link", { name: "書き途中の課題に戻る" }).waitFor();
+    await pc.reload();
+    await pc.getByRole("link", { name: "書き途中の課題に戻る" }).click();
+    await pc.getByRole("heading", { name: "見本のコードを直す", exact: true }).waitFor();
+    await pc.goto(home + "#paths");
+    const latest = pc.getByRole("link", { name: /^前回の続きへ/ });
+    assert.match(await latest.textContent(), /Python実践/);
+    assert.equal(await latest.evaluate(element => element.href), workbook + "#63/2/guide/practice");
+
+    await pc.goto(workbook + "#58/5/write");
+    await follow(pc, pc.locator("#steps .next"), workbook + "#63/1/slide/basics");
+    await pc.getByRole("heading", { name: "Book クラスで1冊分の記録を作る" }).waitFor();
+    await pc.goto(home + "#paths/python");
+    await pc.getByText("進捗と下書きの引き継ぎ", { exact: true }).click();
+    const download = pc.waitForEvent("download");
+    await pc.getByRole("button", { name: "進捗を書き出す" }).click();
+    const saved = await (await download).path();
+    await phone.goto(home + "#paths/python");
+    await phone.getByText("進捗と下書きの引き継ぎ", { exact: true }).tap();
+    await phone.locator("input[type=file]").setInputFiles(saved);
+    await phone.getByRole("button", { name: "この記録を読み込む" }).tap();
+    const resumes = ["Python基礎", "Python実践", "Python OOP"].map(name => phone.getByRole("link", { name: name + "の続きを開く" }));
+    assert.equal(await resumes[0].evaluate(element => element.href), workbook + "#63/1/slide/basics");
+    await follow(phone, resumes[1], workbook + "#63/2/guide/practice", true);
+    await phone.getByRole("button", { name: "キーボードで書く" }).tap();
+    assert.equal(await phone.locator("#source").inputValue(), practiceDraft);
+    assert.equal(await phone.evaluate(() => JSON.parse(localStorage.getItem("yomikumu-python-oop-v1")).route), "67/5/write");
+    await phone.goto(home + "#paths/python");
+    await follow(phone, resumes[2], workbook + "#67/5/write", true);
+    await phone.getByRole("button", { name: "キーボードで書く" }).tap();
+    assert.equal(await phone.locator("#source").inputValue(), oopDraft);
+  } finally { await pc.close(); await phone.close(); }
+}
+
+async function openCourseToc(browser) {
+  const page = await browser.newPage();
+  try {
+    for (const [name, id] of [["Python基礎", 54], ["Python実践", 59], ["Python OOP", 63]]) {
+      await page.goto(home + "#paths/python");
+      await page.getByRole("link", { name: name + "の単元を選ぶ" }).click();
+      const toc = page.getByText(name + "の目次", { exact: true });
+      await toc.waitFor();
+      assert.equal(await toc.evaluate(element => element.parentElement.open), true);
+      assert.equal(await toc.evaluate(element => element === document.activeElement), true);
+      await page.goto(workbook + "#" + id + "/demo");
+      await page.locator("details:not([open]) > #course-toc").waitFor();
+    }
   } finally { await page.close(); }
 }
 
@@ -134,7 +202,7 @@ async function transferNewChapters(browser) {
   try {
     const results = await Promise.allSettled([
       fromCoursePicker(browser), fromBasics(browser), fromPractice(browser), afterCompletedIntro(browser),
-      transferNewChapters(browser),
+      transferNewChapters(browser), independentResume(browser), openCourseToc(browser),
     ]);
     const errors = results.filter(result => result.status === "rejected").map(result => result.reason);
     if (errors.length) throw new AggregateError(errors, "Pythonの共通入門または引き継ぎに失敗しました");
