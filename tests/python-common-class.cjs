@@ -122,14 +122,15 @@ async function independentResume(browser) {
     await phone.getByText("進捗と下書きの引き継ぎ", { exact: true }).tap();
     await phone.locator("input[type=file]").setInputFiles(saved);
     await phone.getByRole("button", { name: "この記録を読み込む" }).tap();
-    const resumes = ["Python基礎", "Python実践", "Python OOP"].map(name => phone.getByRole("link", { name: name + "の続きを開く" }));
-    assert.equal(await resumes[0].evaluate(element => element.href), workbook + "#63/1/slide/basics");
-    await follow(phone, resumes[1], workbook + "#63/2/guide/practice", true);
+    const [basics, practice, oop] = ["Python基礎", "Python実践", "Python OOP"]
+      .map(name => phone.getByRole("link", { name: name + "の続きを開く" }));
+    assert.equal(await basics.evaluate(element => element.href), workbook + "#63/1/slide/basics");
+    await follow(phone, practice, workbook + "#63/2/guide/practice", true);
     await phone.getByRole("button", { name: "キーボードで書く" }).tap();
     assert.equal(await phone.locator("#source").inputValue(), practiceDraft);
     assert.equal(await phone.evaluate(() => JSON.parse(localStorage.getItem("yomikumu-python-oop-v1")).route), "67/5/write");
     await phone.goto(home + "#paths/python");
-    await follow(phone, resumes[2], workbook + "#67/5/write", true);
+    await follow(phone, oop, workbook + "#67/5/write", true);
     await phone.getByRole("button", { name: "キーボードで書く" }).tap();
     assert.equal(await phone.locator("#source").inputValue(), oopDraft);
   } finally { await pc.close(); await phone.close(); }

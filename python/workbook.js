@@ -98,6 +98,7 @@ function routeToCourse(focusTitle = false) {
   const address = classEntry ? route + "/" + classEntry : openToc ? route + "/toc" : route;
   if (rawRoute !== address) history.replaceState(null, "", "#" + address);
   if (!openToc) {
+    // 共通入門の下書きは OOP で共有し、再開位置は入門を開いたコースに置く。
     if (!classEntry) state.route = route;
     window.YomikumuPaths?.remember(classEntryCourses[classEntry] || courseId, address);
     save();
