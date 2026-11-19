@@ -22,3 +22,5 @@ docker run --rm --network none -v "${PWD}:/build" -w /build node:24-bookworm npm
 `shelf/index.html` は同じフォルダーの `shelf.css` を読む独立した完成例です。入力の HTML とテーマ定義から `npm run build:shelf` で再生成できます。
 
 最終課題の「今の読書棚をZIPで保存」は学習者の記述を HTML と CSS の材料、固定した CLI の依存と Compose ファイルにまとめます。展開先で `docker compose run --rm build` を実行し、`index.html` を開きます。ZIP作成には同梱の fflate を使います。ライセンスは `fflate-LICENSE.txt` にあります。
+
+「生成されない状態の色を直す」のZIPにも同じ Compose と依存の設定が入ります。最初は `status.js` がクラス名を実行時に組み立てるため、CLIで生成したCSSに状態の文字色が含まれません。利用可と貸出中それぞれに完成したクラス名を書いてから同じコマンドを実行し、色、639pxと640pxでの並び、Tabキーで移動したときの輪郭を確かめます。

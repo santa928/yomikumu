@@ -78,13 +78,16 @@ async function downloadKit() {
   anchor.href = url; anchor.download = "yomikumu-reading-room.zip"; anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 15000);
 }
-function pcSetup(step, message) {
+function pcSetup(lesson, message) {
   const instructions = el("ol");
   const steps = [
     ["ZIPをPCに保存して展開します。compose.yaml と同じ場所でターミナルを開きます。"],
+    ...(lesson.pcCreate ? [["展開先に " + lesson.file + " がなければ、[id] フォルダーとその中の page.jsx を作り、記述欄のコードをコピーします。"]] : []),
     ["Dockerが起動しているPCで次を実行します。初回は依存の取得に通信を使います。", "docker compose up --build -d web"],
-    ["ブラウザで http://localhost:3090 を開き、図書室の一覧か「実習の入口」から、この章の見本を開きます。ソースの変更は自動で反映されます。"],
-    ["手元のサーバーの実際の応答を採点するには次を実行します。", "docker compose run --build --rm check " + step],
+    [lesson.pcPath
+      ? "ブラウザで http://localhost:3090" + lesson.pcPath + " を開きます。ソースの変更は自動で反映されます。"
+      : "ブラウザで http://localhost:3090 を開き、図書室の一覧か「実習の入口」から、この章の見本を開きます。ソースの変更は自動で反映されます。"],
+    ["手元のサーバーの実際の応答を採点するには次を実行します。", "docker compose run --build --rm check " + lesson.id],
     ["終えたらサーバーを停止します。", "docker compose stop web"],
   ];
   for (const [body, code] of steps) {
@@ -195,7 +198,7 @@ function write(lesson, rec) {
   const feedback = note();
   const result = note();
   area.oninput = () => { rec.code = area.value; save(); feedback.textContent = ""; };
-  const setup = pcSetup(lesson.id, feedback);
+  const setup = pcSetup(lesson, feedback);
   setup.open = true;
   const upload = el("label", "手元の採点結果を読み込む ");
   const file = el("input"); file.type = "file"; file.accept = ".json,application/json"; upload.append(file);

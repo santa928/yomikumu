@@ -56,6 +56,7 @@ async function run() {
       "device-width", "responsive", "content-break", "reading-width", "photo-fit", "four-widths",
       "tab-route", "visible-focus", "control-names", "ticket-state", "quiet-cue", "keyboard-exhibit",
       "reader-outline", "profile-entry", "profile-stories", "profile-visit",
+      "repair-image", "repair-color", "form-entry", "form-email",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
     // 採点関数の登録漏れを見落とすと、その演習は誤答でも「正解」になり得る。
@@ -656,6 +657,8 @@ async function run() {
       structure: ["h1", "p"], link: ["href", "#artist"], class: [".title", "font-size"],
       card: [".card", "border"], padding: ["8px", "16px"], layout: ["1fr 1fr", "gap"],
       responsive: ["min-width", "1fr 1fr"],
+      "repair-image": ["assets/port.png"], "repair-color": [".current"],
+      "form-entry": ["name"], "form-email": ["email", "required"],
     };
     for (const [id, answers] of Object.entries(buildSolutions)) {
       await touch.goto(base + "#" + id + "/write");
@@ -698,6 +701,10 @@ async function run() {
       }
     }
     assert.deepEqual(errors, []);
+    if (process.argv.includes("--html-only")) {
+      console.log(expectedIds.length + "単元のHTML/CSS、卒業制作、書き出しと引き継ぎを確認");
+      return;
+    }
     await verifyJavaScript(browser, base);
     await verifyChoices(browser, base);
     await verifyFunctions(browser, base);

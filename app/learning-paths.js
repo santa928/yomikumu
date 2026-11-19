@@ -2,6 +2,7 @@
 
 const pathCourses = {
   html: {
+    practical: ["画像とフォームを直す", "#repair-image/1"],
     title: "HTML / CSS", catalog: "#home", start: "#first-edit/1",
     project: "作品を二つ並べた紹介ページを作ります。完成したページはHTMLファイルに保存できます。",
     first: "見出しにある「朝の港」を自分の作品名に書き換えます。",
@@ -10,6 +11,7 @@ const pathCourses = {
     feedback: ["そうです。最初のスライドでは文字を一か所だけ変えます。", "横幅を変えると写真の大きさが変わります。作品の名前は文字で書きます。"],
   },
   javascript: {
+    practical: ["JSONを使う画面操作へ", "dom/index.html#fetch-json"],
     title: "JavaScript", catalog: "#javascript", start: "#js-sign/1",
     project: "クイズの答えを判定し、正解すると得点が増えるプログラムを作ります。",
     first: "最初はボタンを押して、見出しが「開館中」から「本日は閉館」に変わる様子を見ます。",
@@ -27,6 +29,7 @@ const pathCourses = {
     feedback: ["そうです。「ゆき」と表示されます。「はる」と入力すれば、表示も「はる」に変わります。", "表示されるのは入力した文字です。今回は「ゆき」と入力しました。"],
   },
   tailwind: {
+    practical: ["生成されない色を調べる", "tailwind/index.html#status-colors/slide"],
     title: "Tailwind CSS", page: "tailwind/index.html", catalog: "tailwind/index.html", start: "tailwind/index.html#padding/slide",
     project: "本の紹介カードを並べ、余白や文字の大きさをそろえます。貸出中の本はボタンを押せないことが見た目でも分かるようにします。",
     first: "CSSで余白を指定した経験があれば始められます。最初はカードの class を変え、端と文字の間を広げます。",
@@ -36,6 +39,7 @@ const pathCourses = {
     review: ["CSSの余白を試す", "#padding/1"],
   },
   typescript: {
+    practical: ["共有する型を変える", "typescript/index.html#practical"],
     title: "TypeScript", page: "typescript/index.html", catalog: "typescript/index.html", start: "typescript/index.html#infer/slide",
     project: "クイズの得点に数値を使うと決めておくと、文字を代入した行にエラーが表示されます。その行を直してから実行します。",
     first: "JavaScriptの変数を使ったことがあれば、まず得点に代入する値を、文字列から数値に変えてみましょう。",
@@ -65,6 +69,7 @@ const pathCourses = {
     afterIntro: ["クラスを学習済みなら実践へ", "python/index.html#59/1/slide"],
   },
   react: {
+    practical: ["並べ替えで移るメモを直す", "react/index.html#book-memos"],
     title: "React", page: "react/index.html", catalog: "react/index.html", start: "react/index.html#components",
     project: "作品名と紹介文を変えるだけで、同じレイアウトのカードを何枚も表示できるようにします。",
     first: "関数を呼んで値を渡せるようになったら、最初のカードの作品名を一か所だけ変えます。",
@@ -74,6 +79,7 @@ const pathCourses = {
     review: ["関数に値を渡す練習", "#javascript"],
   },
   next: {
+    practical: ["詳細ページと検索を作る", "next/index.html#catalog-practice"],
     title: "Next.js", page: "next/index.html", catalog: "next/index.html", start: "next/index.html#routes",
     project: "本の一覧から1冊を選ぶと、その本の詳細ページが開くサイトを作ります。PCではDockerでサーバーを起動して試せます。",
     first: "Reactで画面を作ったことがあれば、まず /notice を開いたときの見出しを変えてみましょう。スマホでは見本を読んでコードを組み立てられます。",
@@ -83,6 +89,7 @@ const pathCourses = {
     review: ["Reactの作品カードを試す", "react/index.html#components"],
   },
   dom: {
+    practical: ["JSONの読み込みを直す", "dom/index.html#fetch-json"],
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
     project: "クイズに回答すると得点が変わり、間違えた問題にもう一度答えられる画面を作ります。",
     first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
@@ -150,6 +157,7 @@ function courseEntry(course, positions) {
   if (introDone && !resumingIntro) section.append(pathLink("クラス入門を読み直す", entry.start, "review"));
   else if (entry.afterIntro) section.append(pathLink(entry.afterIntro[0], entry.afterIntro[1], "review"));
   section.append(pathLink(entry.title + "の単元を選ぶ", entry.catalog, "review"));
+  if (entry.practical) section.append(pathLink(...entry.practical, "review"));
   return section;
 }
 

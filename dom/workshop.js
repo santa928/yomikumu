@@ -1,7 +1,7 @@
 "use strict";
 const workshop = window.courseWorkshop || {
   id: "dom", heading: "ブラウザで動かすJavaScript", language: "JavaScript",
-  units: [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit],
+  units: [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit, readingUnit],
   frame: domFrame, prepare: limitDomLoops,
 };
 const domUnits = workshop.units;
@@ -62,6 +62,7 @@ function renderDom() {
     domMain.append(list);
     return;
   }
+  const frameFor = unit.frame || workshop.frame;
   const index = Number(part) - 1;
   const step = unit.steps[index];
   const key = step ? id + "/" + (index + 1) : id;
@@ -75,7 +76,7 @@ function renderDom() {
   if (!step) {
     domMain.append(node("p", unit.intro));
     const demo = section("完成例を試す");
-    demo.append(node("p", unit.demo.tip), workshop.frame("操作できる完成例", unit.demo.html, unit.demo.code, [], unit.setup));
+    demo.append(node("p", unit.demo.tip), frameFor("操作できる完成例", unit.demo.html, unit.demo.code, [], unit.setup));
     const list = node("ol");
     list.className = "catalog";
     for (const [i, s] of unit.steps.entries()) {
@@ -85,18 +86,25 @@ function renderDom() {
       if (progress.tap || progress.built || progress.passed) li.append(node("small", [progress.tap && "予測正解", progress.built && "組み立て達成", progress.passed && "コード達成"].filter(Boolean).join("・")));
       list.append(li);
     }
-    domMain.append(demo, node("h2", "小課題"), list);
+    domMain.append(demo);
+    if (unit.guide) domMain.append(unit.guide());
+    domMain.append(node("h2", "小課題"), list);
     return;
   }
   const state = domState.tasks[key] ||= {};
   const model = section("見本を読む");
   model.id = "example";
   model.tabIndex = -1;
-  model.append(node("p", step.explain), node("pre", step.example));
+  model.append(node("p", step.explain), node("pre", step.excerpt || step.example));
+  if (step.excerpt) {
+    const full = node("details");
+    full.append(node("summary", "見本のコードをすべて読む"), node("pre", step.example));
+    model.append(full);
+  }
   if (step.referenceHtml) {
     model.append(node("pre", step.referenceHtml), domFrame("HTMLでの表示", step.referenceHtml, ""));
   }
-  const sample = workshop.frame("見本の実行結果", step.exampleHtml || step.html, step.example, [], unit.setup);
+  const sample = frameFor("見本の実行結果", step.exampleHtml || step.html, step.example, [], unit.setup);
   model.append(sample);
   if (id === "elements" && index > 0) {
     const css = node("details");
@@ -106,7 +114,7 @@ function renderDom() {
   if (step.compare) {
     const stage = node("div");
     model.append(button(step.compare.label, () => {
-      stage.replaceChildren(node("pre", step.compare.code), workshop.frame("変更後の実行結果", step.html, step.compare.code, [], unit.setup));
+      stage.replaceChildren(node("pre", step.compare.code), frameFor("変更後の実行結果", step.html, step.compare.code, [], unit.setup));
     }), stage);
   }
   const phone = section("タップで確かめる");
@@ -149,10 +157,17 @@ function renderDom() {
   const pieces = Array.isArray(state.pieces) ? state.pieces : [];
   const assemble = () => template.replace(/《(\d+)》/g, (mark, n) => pieces[n - 1] || mark);
   assembled.textContent = assemble();
-  build.append(node("p", "《番号》に入れるコードを選んでください。"), assembled);
+  build.append(node("p", "《番号》に入れるコードを選んでください。"));
+  if (step.showPieceLines) {
+    const full = node("details");
+    full.append(node("summary", "組み立てるコードをすべて読む"), assembled);
+    build.append(full);
+  } else build.append(assembled);
   for (const [j, choices] of slots.entries()) {
     const group = node("fieldset");
-    group.append(node("legend", "《" + (j + 1) + "》に入れるコード"));
+    const mark = "《" + (j + 1) + "》";
+    group.append(node("legend", mark + "に入れるコード"));
+    if (step.showPieceLines) group.append(node("pre", template.split("\n").find(line => line.includes(mark)).trim()));
     const order = (index + j) % 2 === 0 ? [...choices].reverse() : choices;
     for (const choice of order) {
       const radio = node("input");
@@ -222,8 +237,8 @@ function renderDom() {
     try { code = workshop.prepare(source); }
     catch (error) { result.textContent = "コードの実行で止まりました。 " + error.message; return; }
     result.textContent = "実行しています。";
-    const frame = workshop.frame("自分の実行結果", step.html, code, [], unit.setup);
-    const test = workshop.frame("操作の確認", step.html, code, step.tests, unit.setup);
+    const frame = frameFor("自分の実行結果", step.html, code, [], unit.setup);
+    const test = frameFor("操作の確認", step.html, code, step.tests, unit.setup);
     const beforeTest = document.activeElement;
     if (unit.focusTests) {
       test.className = "dom-focus-check";

@@ -514,4 +514,5 @@ const lessons = [
   ...responsiveLessons,
   ...keyboardLessons,
   ...profileProjectLessons,
+  ...repairLessons,
 ];

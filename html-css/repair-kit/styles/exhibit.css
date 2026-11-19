@@ -1,0 +1,5 @@
+body { font-family: system-ui, sans-serif; line-height: 1.6; margin: 1.5rem; }
+main { max-width: 38rem; margin: auto; }
+input, button { font: inherit; }
+h2 { color: navy; }
+.current { color: gray; }

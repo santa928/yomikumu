@@ -11,6 +11,7 @@ const htmlCssExerciseGraders = {
   ...responsiveExerciseGraders,
   ...keyboardExerciseGraders,
   ...profileExerciseGraders,
+  ...repairExerciseGraders,
 };
 
 /**
