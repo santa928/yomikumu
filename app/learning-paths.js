@@ -20,7 +20,7 @@ const pathCourses = {
   },
   python: {
     title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo", start: "python/index.html#54/1/slide",
-    project: "入力した名前を表示したり、入力した数に1を足したりしながら、Pythonの書き方を学びます。",
+    project: "文字や数を入力する練習から、条件分岐・繰り返し・リスト・辞書・関数を学びます。名簿を整え、名前ごとの件数を集計します。",
     first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
     question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
     choices: ["ゆき", "名前"], correct: 0,
@@ -46,7 +46,7 @@ const pathCourses = {
   },
   "python-oop": {
     title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo", start: "python/index.html#63/1/slide",
-    project: "本ごとの状態と操作をクラスにまとめます。関数を呼ぶたびに成功や失敗を記録するデコレーターも作ります。",
+    project: "本ごとの状態と操作をクラスにまとめ、継承で料金の計算方法を変えます。関数を呼ぶたびに成功や失敗を記録するデコレーターも作ります。",
     first: "実践と共通のクラス入門では、Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
     choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
