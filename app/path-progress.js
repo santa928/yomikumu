@@ -79,7 +79,13 @@ function validatedStores(data) {
   for (const [course, record] of Object.entries(data)) {
     if (!Object.hasOwn(courseStores, course) || !validMap(record)) throw Error("コース");
     const { position, groups, validate, version } = courseStores[course];
-    if (Object.keys(record).some(key => ![position, ...groups, ...(version ? ["version"] : [])].includes(key))) throw Error("記録の項目");
+    const keys = [position, ...groups];
+    if (version) keys.push("version");
+    if (course === "typescript") {
+      keys.push("practical");
+      if (Object.hasOwn(record, "practical") && !validPracticalDraftTS(record.practical)) throw Error("実習の下書き");
+    }
+    if (Object.keys(record).some(key => !keys.includes(key))) throw Error("記録の項目");
     if (version && record.version !== version) throw Error("記録の版");
     if (typeof record[position] !== "string" || !/^[a-z0-9/-]{0,96}$/.test(record[position])) throw Error("教材の位置");
     for (const group of groups) {
@@ -110,7 +116,7 @@ function restoreStores(data) {
     const { key, groups, position } = courseStores[course];
     const raw = localStorage.getItem(key);
     const current = raw ? validatedStores({ [course]: JSON.parse(raw) })[course] : {};
-    const merged = { ...incoming, [position]: incoming[position] || current[position] || "" };
+    const merged = { ...current, ...incoming, [position]: incoming[position] || current[position] || "" };
     for (const field of groups) merged[field] = { ...current[field], ...incoming[field] };
     writes.push({ key, raw, value: JSON.stringify(merged) });
   }

@@ -6,9 +6,10 @@ import { clientChecks } from "./client.mjs";
 import { refreshChecks } from "./refresh.mjs";
 import { signupChecks } from "./signup.mjs";
 import { guideChecks } from "./guide.mjs";
+import { catalogChecks } from "./catalog.mjs";
 
 const step = process.argv[2];
-const suites = { ...routeChecks, ...clientChecks, ...refreshChecks, ...signupChecks, ...guideChecks };
+const suites = { ...routeChecks, ...clientChecks, ...refreshChecks, ...signupChecks, ...guideChecks, ...catalogChecks };
 if (!Object.hasOwn(suites, step)) {
   console.error("確かめる単元を選びます。 " + Object.keys(suites).join(" / "));
   process.exit(2);
@@ -17,7 +18,10 @@ const exercise = suites[step];
 const base = process.env.BOOK_URL || "http://localhost:3000";
 const sourceDir = process.env.SOURCE_DIR || "/source";
 const reportDir = process.env.REPORT_DIR || "/reports";
-const source = await readFile(join(sourceDir, exercise.file), "utf8");
+const source = await readFile(join(sourceDir, exercise.file), "utf8").catch(error => {
+  if (exercise.createFile && error.code === "ENOENT") return "";
+  throw error;
+});
 const companionSources = {};
 for (const file of exercise.companionFiles || []) {
   companionSources[file] = await readFile(join(sourceDir, file), "utf8");

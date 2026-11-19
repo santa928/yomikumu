@@ -32,7 +32,10 @@ function safeMarkup(source) {
     if (node.localName === "img") {
       const filename = (node.getAttribute("src") || "").replace(/^\.\//, "");
       if (filename === "arrow.png") element.src = contactArrow;
-      else if (pictureFiles.has(filename)) element.src = pictureFiles.get(filename);
+      else if (filename === "assets/port.png") {
+        element.src = pictureFiles.get("harbor.png");
+        element.dataset.courseFile = filename;
+      } else if (pictureFiles.has(filename)) element.src = pictureFiles.get(filename);
       if (node.hasAttribute("alt")) element.alt = node.getAttribute("alt");
     }
     if (node.localName === "label" && node.hasAttribute("for")) element.htmlFor = node.htmlFor;
@@ -41,6 +44,8 @@ function safeMarkup(source) {
       element.type = node.type;
       element.disabled = node.disabled;
       element.readOnly = node.readOnly;
+      element.required = node.required;
+      if (node.hasAttribute("name")) element.name = node.name;
       if (node.hasAttribute("value")) element.defaultValue = node.defaultValue;
     }
     if (node.localName === "button") {
@@ -93,6 +98,24 @@ function pageSource(html, css, fallbackTitle = "作品紹介", preview = false, 
     page.body +
     "\n</body>\n</html>"
   );
+}
+
+/** 見本の入力値をブラウザ標準の検証とFormDataで読み、送信せずに結果を示す。 */
+function bindFormExample(host, doc) {
+  if (!host.isConnected) return;
+  const form = doc.querySelector("form");
+  const field = form.querySelector("input");
+  const result = statusMessage();
+  const show = button("この入力で送る内容を見る", () => {
+    if (field.validity.valueMissing) result.textContent = "連絡先を入力してください。";
+    else if (field.validity.typeMismatch) result.textContent = "メールアドレスの形を確かめてください。";
+    else {
+      const value = new FormData(form).get("email");
+      result.textContent = value === null ? "送る項目がありません。" : "email = " + value;
+    }
+  });
+  field.addEventListener("input", () => { result.textContent = ""; });
+  host.append(show, result);
 }
 
 function makePreview(host, html, css, label, width, maxHeight = 310, showTitle = false, measure, usesViewportInput = false) {

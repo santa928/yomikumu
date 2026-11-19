@@ -15,7 +15,7 @@ async function verifyNext() {
     await pc.goto(base + "#contents");
     const chapters = await pc.evaluate(() => nextChapters.map(({ id, title, examples }) =>
       ({ id, title, examples })));
-    assert.deepEqual(chapters.map(chapter => chapter.id), ["routes", "client", "refresh", "signup", "guide-project"]);
+    assert.deepEqual(chapters.map(chapter => chapter.id), ["routes", "client", "refresh", "signup", "guide-project", "catalog-practice"]);
     for (const chapter of chapters) {
       await pc.getByRole("link", { name: chapter.title, exact: true }).click();
       const [action, result] = chapter.examples.at(-1);

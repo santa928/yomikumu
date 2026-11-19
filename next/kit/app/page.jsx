@@ -20,6 +20,7 @@ export default async function Library({ searchParams }) {
           <li><Link href="/signup-lab">読書会に申し込む</Link></li>
           <li><Link href="/travel">旅の案内を見る</Link></li>
           <li><Link href="/meetings">読書会の日程を見る</Link></li>
+          <li><Link href="/recommendations">おすすめの本を探す</Link></li>
         </ul>
       </nav>
     </>

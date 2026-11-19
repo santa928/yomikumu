@@ -10,7 +10,9 @@ let requestTS = 0;
 function validateTS(data) {
   if (!data || data.version !== 1 || typeof data.last !== "string" || !data.units || typeof data.units !== "object" || Array.isArray(data.units)) return false;
   const [unit, view] = data.last.split("/");
-  if (data.last && (!tsLessons.some(s => s.id === unit) || !Object.hasOwn(viewLabels, view) || data.last !== unit + "/" + view)) return false;
+  if (data.last && data.last !== "practical" &&
+    (!tsLessons.some(s => s.id === unit) || !Object.hasOwn(viewLabels, view) || data.last !== unit + "/" + view)) return false;
+  if (data.practical !== undefined && !validPracticalDraftTS(data.practical)) return false;
   return Object.entries(data.units).every(([id, state]) => {
     const lesson = tsLessons.find(s => s.id === id);
     return lesson && state && typeof state === "object" && Object.entries(state).every(([k,v]) => {
@@ -118,11 +120,13 @@ async function performTS(lesson, source, section, { execute = true, practice = f
 }
 function tsCatalogue() {
   const prev = tsLessons.find(s => s.id === stateTS.last.split("/")[0]);
+  const resume = stateTS.last === "practical" ? "複数ファイルで採点を改修する" : prev?.title;
   main.innerHTML = `<p class="kind">Web制作 · JavaScriptの次へ</p><h1>クイズから始めるTypeScript</h1>
     <p>クイズの得点や回答に型を付けます。数値と文字列を取り違えたとき、型検査でどの行にエラーが出るかを確かめましょう。</p>
-    ${prev ? `<a class="next" href="#${stateTS.last}">前回の続きへ · ${prev.title}</a>` : ""}
-    ${tsChapters.map((ch,i) => `<section><h2>${ch.title}</h2><p>${ch.intro}</p><div class="ts-tools">
-    ${ch.demo.map((text,n) => `<button type="button" data-ch="${i}" data-n="${n}">${text}</button>`).join("")}</div><div data-show></div>
+    ${resume ? `<a class="next" href="#${stateTS.last}">前回の続きへ · ${resume}</a>` : ""}
+    ${tsChapters.map((ch,i) => `<section><h2>${ch.title}</h2><p>${ch.intro}</p>
+    ${ch.practical ? '<a class="next" href="#practical">採点を改修する実習へ</a>' : `<div class="ts-tools">
+    ${ch.demo.map((text,n) => `<button type="button" data-ch="${i}" data-n="${n}">${text}</button>`).join("")}</div><div data-show></div>`}
     <ol class="catalog">${tsLessons.filter(u=>u.chapter===i).map(u=>{
       const st = stateTS.units[u.id] || {};
       const done = ["quiz","tap","write"].filter(v => st[v+"Done"]).map(v => viewLabels[v]);
@@ -182,6 +186,8 @@ function tsPractice(lesson, view, record) {
   const write = view === "write";
   const picks = record.tap ||= lesson.slots.map(() => null);
   const next = tsLessons[tsLessons.indexOf(lesson)+1];
+  const nextPath = lesson.nextPractical ? "practical" : next ? next.id + "/slide" : "contents";
+  const nextLabel = lesson.nextPractical ? "複数ファイルの実習へ" : next ? "次へ · " + next.title : "コースの目次へ";
   main.insertAdjacentHTML("beforeend", `<p>${escTS(lesson.prompt)}</p>
     ${write ? `<label>自分のTypeScript<textarea spellcheck="false" autocapitalize="off">${escTS(record.write ?? lesson.starter)}</textarea></label>` :
       `${lesson.slots.map(([label,...options],i) => `<fieldset><legend>${escTS(label)}</legend>${options.map((option,n) =>
@@ -189,7 +195,7 @@ function tsPractice(lesson, view, record) {
     <div class="ts-tools"><button type="button" id="check-type">型を検査</button><button type="button" id="run-type">実行して確かめる</button>
     <button type="button" id="halt-type" disabled>停止する</button></div>
     ${panelTS()}<a class="review" href="#${lesson.id}/slide">この課題の見本を読み返す</a>
-    <a class="next" href="#${next ? next.id+"/slide" : "contents"}">${next ? "次へ · "+next.title : "コースの目次へ"}</a>`);
+    <a class="next" href="#${nextPath}">${nextLabel}</a>`);
   const code = () => write ? main.querySelector("textarea").value : buildTS(lesson, picks);
   if (write) main.querySelector("textarea").oninput = e => { record.write = e.target.value; persistTS(); };
   else {
@@ -213,6 +219,13 @@ function tsPractice(lesson, view, record) {
 }
 function routeTS() {
   ++requestTS; execution?.stop(); execution=undefined;
+  if (location.hash === "#practical") {
+    stateTS.last = "practical";
+    persistTS();
+    window.YomikumuPaths?.remember("typescript", stateTS.last);
+    renderPracticalTS();
+    return;
+  }
   const [id,name] = location.hash.slice(1).split("/");
   const u = tsLessons.find(s=>s.id===id);
   if (!u) { tsCatalogue(); return; }

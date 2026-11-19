@@ -12,6 +12,7 @@ const workbookScripts = [
   "html-css/lessons/responsive-works.js",
   "html-css/lessons/keyboard.js",
   "html-css/lessons/profile-project.js",
+  "html-css/lessons/repairs.js",
   "html-css/lessons/index.js",
 
   "javascript/lessons/choices.js",
@@ -40,9 +41,11 @@ const workbookScripts = [
   "html-css/grading/keyboard.js",
   "html-css/grading/profile.js",
   "html-css/grading/project.js",
+  "html-css/grading/repairs.js",
   "html-css/grading/index.js",
 
   "app/path-location.js",
+  "typescript/practical-draft.js",
   "app/path-progress.js",
   "app/learning-paths.js",
   "app/workbook.js",

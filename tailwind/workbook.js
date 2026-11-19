@@ -114,7 +114,7 @@ async function showSample(unit, values, name, settings, container, width) {
 function slide(unit) {
   const ex = unit.example;
   const state = unit.checks.find(check => check.state)?.state;
-  main.insertAdjacentHTML("beforeend", `<p>${unit.why}</p><p><strong>${partLabels[ex.part]}</strong>の変更する箇所</p>
+  main.insertAdjacentHTML("beforeend", `<p>${unit.why}</p><p><strong>${ex.source ? "status.js" : partLabels[ex.part]}</strong>の変更する箇所</p>
     <pre class="reading-code" id="snippet"></pre>${windowHtml()}${unit.widths ? widthTools() : ""}
     <div class="tools"><button id="switch" type="button" aria-pressed="false">${ex.after ? "見本を一か所変える" : "指定を外して比べる"}</button>
     ${state && state !== "disabled" ? '<button type="button" id="state" aria-pressed="false">状態見本に切り替える</button>' : ""}</div>
@@ -124,9 +124,11 @@ function slide(unit) {
   let statePreview = false;
   const draw = () => {
     const value = changed ? ex.after : ex.before;
-    document.getElementById("snippet").textContent = ex.part === "theme" ? value : `class="${value}"`;
+    document.getElementById("snippet").textContent = ex.source ? ex.source[Number(changed)] :
+      ex.part === "theme" ? value : `class="${value}"`;
     document.getElementById("switch").setAttribute("aria-pressed", String(changed));
-    const settings = { state: statePreview ? state : "" };
+    const settings = { state: statePreview ? state : "", titles: unit.titles,
+      omitClassParts: ex.source && !changed ? ["card", "other"] : [] };
     showSample(unit, { ...ex.base, [ex.part]: value }, "見本の読書カード", settings, main.querySelector(".sample-window"), width);
     document.getElementById("result").textContent = changed ? unit.result : "変更前の見本です。";
   };
@@ -164,13 +166,13 @@ function practice(unit, mode, state) {
   main.insertAdjacentHTML("beforeend", `<p class="prompt">${unit.prompt}</p>
     ${unit.plain ? `<details open><summary>素のCSSで作った見本</summary><pre>${plainCard}</pre><div id="plain">${windowHtml()}</div></details>` : ""}
     <form>${unit.fields.map(field => mode === "write" ?
-    `<label class="code-field">${partLabels[field.part]}の${field.part === "theme" ? "CSS" : " class"}<textarea data-field="${field.part}" spellcheck="false" autocapitalize="off">${escapeText(draft[field.part] || "")}</textarea></label>` :
-    `<fieldset data-field="${field.part}"><legend>${partLabels[field.part]}の指定を選ぶ</legend><div class="tokens">
+    `<label class="code-field">${field.label || partLabels[field.part]}の${field.part === "theme" ? "CSS" : " class"}<textarea data-field="${field.part}" spellcheck="false" autocapitalize="off">${escapeText(draft[field.part] || "")}</textarea></label>` :
+    `<fieldset data-field="${field.part}"><legend>${field.label || partLabels[field.part]}の指定を選ぶ</legend><div class="tokens">
       ${field.options.map(option => `<button type="button" data-token="${escapeText(option)}">${escapeText(option)}</button>`).join("")}
       </div><output class="reading-code"></output></fieldset>`).join("")}<button type="submit">表示と答えを確かめる</button></form>
     <p id="feedback" role="status"></p>${windowHtml()}${unit.widths ? widthTools() : ""}
     <a class="review" href="#${addr(unit, "slide")}">この課題の見本を読み返す</a>
-    ${unit.local ? localInstructions(mode) : ""}
+    ${unit.local === "status" ? statusLocalInstructions(mode) : unit.local ? localInstructions(mode) : ""}
     <a class="next" href="#${next ? addr(next, "slide") : "contents"}">${next ? "次へ · "+next.title : "コース目次に戻る"}</a>`);
   const windowBox = main.querySelector(":scope > .sample-window");
   if (unit.plain) showSample(unit, {}, "素のCSSの読書カード", { plain: true, titles: nightBookNames }, main.querySelector("#plain .sample-window"));
@@ -200,10 +202,11 @@ function practice(unit, mode, state) {
   const validTheme = () => !unit.fields.some(f => f.part === "theme") || !draft.theme ||
     /^\s*@theme\s*\{\s*--color-[\w-]+\s*:\s*(?:#[\da-f]{3,8}|[a-z]+|(?:rgb|hsl|oklch)\([\d\s.,%/-]+\))\s*;?\s*\}\s*$/i.test(draft.theme);
   let width = 300;
-  const display = () => showSample(unit, validTheme() ? draft : { ...draft, theme: "" }, "入力した読書カード", { titles: nightBookNames }, windowBox, width);
+  const display = () => showSample(unit, validTheme() ? draft : { ...draft, theme: "" }, "入力した読書カード", { titles: unit.titles || nightBookNames }, windowBox, width);
   if (unit.widths) bindWidths(main.querySelector("[data-widths]"), width, value => { width = value; display(); });
   else display();
-  if (unit.local) bindLocal(unit, draft, state, validTheme);
+  if (unit.local === "status") bindStatusLocal(unit, state);
+  else if (unit.local) bindLocal(unit, draft, state, validTheme);
   const form = main.querySelector("form");
   form.onsubmit = async e => {
     e.preventDefault();

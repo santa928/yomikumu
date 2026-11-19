@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; form-action 'none'">
+  <title>港の写真展</title>
+  <link rel="stylesheet" href="styles/exhibit.css">
+  <script defer src="form.js"></script>
+</head>
+<body>
+  <main>
+    <h1>港の写真展</h1>
+    <img alt="港に浮かぶ舟" src="port.png" width="96" height="64">
+    <h2>次の展示</h2><p>灯台の夜</p>
+    <h2 class="current">開催中の展示</h2><p>朝の港</p>
+    <form>
+      <label for="address">連絡先</label>
+      <input id="address" type="text" placeholder="a@example.com">
+      <button>送る内容を見る</button>
+    </form>
+    <p>練習には架空のアドレスを使います。入力した内容はこの画面だけに表示します。</p>
+    <output aria-live="polite"></output>
+  </main>
+</body>
+</html>

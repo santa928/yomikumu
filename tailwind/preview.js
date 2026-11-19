@@ -27,8 +27,9 @@ const sampleBase = `@layer reset, scenery; @layer scenery {
   button { padding: 3px; background: white; border: 1px solid #596e62; }
 }`;
 
-async function renderSample(frame, values, { titles = sampleBookNames, plain = false, probe = false, state = "", compiledCss } = {}) {
-  const classes = Object.entries(values).filter(([key]) => key !== "theme").flatMap(([, v]) => classTokens(v));
+async function renderSample(frame, values, { titles = sampleBookNames, plain = false, probe = false, state = "", compiledCss, omitClassParts = [] } = {}) {
+  const classes = Object.entries(values).filter(([key]) => key !== "theme" && !omitClassParts.includes(key))
+    .flatMap(([, value]) => classTokens(value));
   let css = compiledCss ?? await window.readingStyles(classes, values.theme || "");
   if (probe || state) {
     // タッチの状態見本と採点用コピーでも、生成された宣言そのものを使う。

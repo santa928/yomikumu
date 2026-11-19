@@ -295,6 +295,18 @@ function slidePage(lesson, position) {
     return;
   }
   const examples = node("div", undefined, "slide-examples");
+  if (slide.repairKit) {
+    const sample = node("a", "修正前のページを開く（新しいタブ）");
+    sample.href = "html-css/repair-kit/index.html";
+    sample.target = "_blank";
+    sample.rel = "noopener";
+    const kit = node("a", "PCで直すファイルを保存（ZIP）");
+    kit.href = "html-css/repair-site.zip";
+    kit.download = "repair-site.zip";
+    const links = node("p");
+    links.append(sample, document.createElement("br"), kit);
+    content.append(links);
+  }
   if (slide.viewportSamples) {
     for (const [suffix, label] of [["", "幅の指定なし"], ["?device", "端末の幅を指定"]]) {
       const sample = node("a", label + "（新しいタブで開く）");
@@ -319,6 +331,7 @@ function slidePage(lesson, position) {
       slide.showTitle,
       slide.measure,
     );
+    if (slide.tryForm) ready.then(doc => bindFormExample(examples, doc));
     if (slide.focusWalk || slide.motionDemo) {
       ready.then((doc) => {
         if (examples.isConnected) keyboardExample(examples, doc, slide.motionDemo);
