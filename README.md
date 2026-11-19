@@ -28,3 +28,16 @@ docker compose up web
 [作品紹介とJavaScript入門の到達点・教材の基準](docs/course.md)
 
 開発時の操作確認は `docker compose run --build --rm test` で実行できます。テスト用イメージの初回取得後、ブラウザ検証は外部通信なしで動きます。
+
+## 教材を編集する
+
+| 変更したいもの | 編集する場所 |
+| --- | --- |
+| HTML/CSSのスライド・問題文・解答例 | [html-css/lessons](html-css/lessons)。目次の順番は同じディレクトリの `index.js` で決まります。 |
+| HTML/CSSの採点・ヒント | [html-css/grading](html-css/grading)。たとえば画面幅で列数を変える `content-break` は、教材が `html-css/lessons/responsive-works.js`、採点が `html-css/grading/responsive.js` にあります。両方を同じ単元IDで探せます。 |
+| JavaScriptの教材と実行画面 | [javascript/lessons](javascript/lessons) に教材、[javascript](javascript) に実行と画面表示があります。DOM操作の教材は [dom](dom) にあります。 |
+| コース選択・学習位置と下書き | [app](app)。コースの入口は `learning-paths.js`、端末間で記録を引き継ぐ処理は `path-progress.js` です。 |
+
+Python・Tailwind CSS・TypeScript・React・Next.jsの教材はそれぞれのコース名のディレクトリにあります。ルートの `ink.css` や画像は、練習中のHTMLから同じ名前で参照する教材素材です。
+
+HTML/CSSとJavaScriptの入口は [app/start.js](app/start.js) の順にスクリプトを読み込みます。新しい教材ファイルを増やすときは、対応するコースの `lessons/index.js` より前に登録します。HTML/CSSの採点を変えたら `docker compose run --build --rm test node tests/course.cjs`、旧ブックマークからの再開を確かめるには `docker compose run --build --rm test node tests/legacy-entry.cjs` を使います。

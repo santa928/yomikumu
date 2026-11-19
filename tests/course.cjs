@@ -58,6 +58,9 @@ async function run() {
       "reader-outline", "profile-entry", "profile-stories", "profile-visit",
     ];
     assert.deepEqual(units.map((unit) => unit.id), expectedIds);
+    // 採点関数の登録漏れを見落とすと、その演習は誤答でも「正解」になり得る。
+    const gradedIds = await page.evaluate(() => Object.keys(htmlCssExerciseGraders));
+    assert.deepEqual(gradedIds.sort(), [...expectedIds].sort());
     await page.getByRole("link", { name: "最初のスライドへ →" }).click();
     await page.getByRole("button", { name: "次の作品を表示" }).click();
     await page.frameLocator("main iframe").getByRole("heading", { name: "夕方の港" }).waitFor();
