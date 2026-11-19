@@ -41,7 +41,7 @@ function cpythonWorker() {
       const py = await loadPyodide({ indexURL: "https://python.invalid/", jsglobals: {} });
       files.clear();
       for (const [name, source] of Object.entries(options.files || {})) {
-        if (/^[a-z][a-z_0-9]*\.py$/.test(name)) py.FS.writeFile(name, source);
+        if (/^[a-z][a-z_0-9]*\.(?:py|csv)$/.test(name)) py.FS.writeFile(name, source);
       }
       py.globals.set("course_request", JSON.stringify(options));
       const json = py.runPython(`

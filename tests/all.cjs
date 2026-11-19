@@ -2,7 +2,8 @@
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
-for (const suite of ["legacy-entry", "course", "dom-elements", "dom-events", "dom-state", "dom-loading", "dom-keyboard",
+for (const suite of ["legacy-entry", "course", "python-record-basics", "python-common-class", "python-csv-practice",
+  "dom-elements", "dom-events", "dom-state", "dom-loading", "dom-keyboard",
   "dom-quiz", "dom-guard", "tailwind-cards", "tailwind-shelf", "typescript-basics", "typescript-states",
   "typescript-functions", "typescript-boundaries", "typescript-final", "react-cards", "react-works",
   "react-roles", "react-effects", "react-quiz", "react-reading", "next-workshop", "path-workshops", "path-projects", "catalog"]) {

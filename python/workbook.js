@@ -2,10 +2,11 @@
 
 const $ = id => document.getElementById(id);
 const courseNames = { python: "Python基礎", "python-practice": "Python実践", "python-oop": "Python OOP" };
+const classIntro = "63/1/slide";
 let storageKey, courseId, state;
 function family(id) {
   if (Number(id) >= 63) return "python-oop";
-  if (Number(id) >= 59) return "python-practice";
+  if (id === "csv" || Number(id) >= 59) return "python-practice";
   return "python";
 }
 function openCourse(id) {
@@ -48,6 +49,7 @@ let chapter, lesson, number, view, task, route, draft, mode, execution, reviewRe
 function showToc() {
   const toc = $("contents");
   toc.replaceChildren();
+  if (courseId === "python-practice") toc.append(link("クラス入門（実践・OOP共通）", classIntro));
   for (const unit of pythonChapters.filter(item => family(item.id) === courseId)) {
     toc.append(link(unit.title, unit.id + "/demo"));
     const list = document.createElement("ol");
@@ -60,6 +62,7 @@ function showToc() {
     }
     toc.append(list);
   }
+  if (courseId === "python") toc.append(link("クラス入門（実践・OOP共通）", classIntro));
 }
 function stop() {
   generation++;
@@ -89,22 +92,27 @@ function routeToCourse() {
   $("status").textContent = $("output").textContent = "";
   $("checks").replaceChildren();
   const demo = view === "demo", slide = view === "slide";
+  const inClassIntro = !demo && chapter.id === "63" && number <= 3;
+  const courseName = inClassIntro ? "Python クラス入門" : courseNames[courseId];
   task = demo ? chapter.demo : lesson[view];
   draft = state.drafts[route] ||= {};
   mode = draft.mode || (matchMedia("(max-width: 640px)").matches ? "tap" : "code");
-  $("course-name").textContent = courseNames[courseId];
+  $("course-name").textContent = courseName;
   $("course-toc").textContent = courseNames[courseId] + "の目次";
-  $("position").textContent = chapter.title + (demo ? "　完成例" : "　" + number + " / " + chapter.lessons.length);
+  $("position").textContent = inClassIntro
+    ? "実践・OOP共通　" + number + " / 3"
+    : chapter.title + (demo ? "　完成例" : "　" + number + " / " + chapter.lessons.length);
   $("title").textContent = demo ? chapter.title : lesson.title;
-  document.title = $("title").textContent + " | " + courseNames[courseId] + " | よみくむ";
+  document.title = $("title").textContent + " | " + courseName + " | よみくむ";
   $("description").textContent = demo ? chapter.goal + " " + task.prompt : slide ? lesson.text : task.prompt;
   $("example").hidden = !slide;
   $("exercise").hidden = slide;
   $("console").hidden = slide;
   $("method").hidden = $("grade").hidden = $("hint").hidden = demo;
+  $("csv-kit")?.toggleAttribute("hidden", chapter.id !== "csv");
   if (slide) showSlide();
   else showExercise(demo);
-  showSteps();
+  showSteps(inClassIntro);
   showToc();
 }
 function showSlide() {
@@ -127,10 +135,11 @@ function showSlide() {
 function renderFiles(place, files = {}, editable) {
   place.replaceChildren();
   for (const [name, content] of Object.entries(files)) {
-    if (!editable) {
+    const data = name.endsWith(".csv");
+    if (!editable || data) {
       const details = document.createElement("details");
       details.open = content.split("\n").length <= 10;
-      details.append(element("summary", name + " のコード"), element("pre", content));
+      details.append(element("summary", name + (data ? " のデータ" : " のコード")), element("pre", content));
       place.append(details);
       continue;
     }
@@ -192,10 +201,14 @@ function showExercise(demo) {
     })));
   }
 }
-function showSteps() {
+function showSteps(inClassIntro) {
   const nav = $("steps");
   nav.replaceChildren();
   const path = chapter.id + "/" + number + "/";
+  const practice = inClassIntro && window.YomikumuPaths?.read().positions["python-practice"];
+  const nextClass = inClassIntro && number === 3 && view === "write";
+  const beforeWith = chapter.id === "61" && number === 3 && view === "write";
+  const introDone = beforeWith && window.YomikumuPaths?.completedPythonClassIntro();
   let next;
   if (view === "demo") next = link("最初のスライドを読む", chapter.id + "/1/slide");
   else if (view === "slide") {
@@ -212,15 +225,25 @@ function showSteps() {
     review.onclick = () => { reviewReturn = route; };
     nav.append(review);
     if (view === "guide") next = link("自分で解く課題へ", path + "write");
+    else if (nextClass) {
+      if (practice === "61/3/write") next = link("Python実践の with の練習へ戻る", "61/4/slide");
+      else if (practice) next = link("Python実践の続きへ", practice);
+      else next = link("Python実践へ", "59/1/slide");
+    } else if (beforeWith && !introDone) next = link("クラス入門へ（with の処理を書く前に）", classIntro);
     else if (number < chapter.lessons.length) next = link("次のスライドへ", chapter.id + "/" + (number + 1) + "/slide");
     else {
       const nextChapter = pythonChapters[pythonChapters.indexOf(chapter) + 1];
       if (nextChapter && family(nextChapter.id) === courseId) next = link("次の章「" + nextChapter.title + "」へ", nextChapter.id + "/demo");
+      else if (courseId === "python") next = link("クラス入門へ（実践・OOP共通）", classIntro);
       else { next = element("a", "学習パス一覧へ戻る"); next.href = "../index.html#paths"; }
     }
   }
   next.className = "next";
   nav.append(next);
+  if (nextClass) nav.append(link("Python OOPの続きへ", "63/4/slide"));
+  else if (practice) nav.append(link("Python実践の続きへ戻る", practice));
+  if (beforeWith && !introDone) nav.append(link("クラスを学習済みなら with の練習へ", "61/4/slide"));
+  if (introDone || (chapter.id === "61" && number === 4)) nav.append(link("クラス入門を読み直す", classIntro));
   if (view !== "demo") nav.append(link("完成例を試す", chapter.id + "/demo"));
 }
 function stopForEdit() {
@@ -268,7 +291,12 @@ async function execute(grade) {
   let source = task.targetFile ? task.main : edit;
   if (grade && task.after) source += "\n" + task.after;
   const demo = view === "demo";
-  const files = { ...task.files, ...(!demo && mode === "code" ? draft.files : {}), ...(!demo && mode === "tap" ? task.tapFiles : {}) };
+  const files = { ...task.files, ...(!demo && mode === "tap" ? task.tapFiles : {}) };
+  if (!demo && mode === "code" && task.editFiles) {
+    for (const [name, code] of Object.entries(draft.files || {})) {
+      if (name.endsWith(".py") && Object.hasOwn(files, name)) files[name] = code;
+    }
+  }
   if (task.targetFile) files[task.targetFile] = (task.filePrefix || "") + edit;
   const cases = grade ? task.cases : [{ before: !demo && task.cases[0].before, input: $("input").value }];
   $("checks").replaceChildren();
