@@ -93,6 +93,14 @@ async function verifyBuild(page, standalone, download, modules) {
       return rows.length === 2 && getComputedStyle(rows[0]).color !== getComputedStyle(rows[1]).color;
     });
     await pc.getByRole("link", { name: "自分で書く" }).click();
+    const grade = pc.getByRole("button", { name: "表示と答えを確かめる" });
+    const feedback = pc.locator("#feedback");
+    await pc.locator('textarea[data-field="card"]').fill("emerald");
+    await pc.locator('textarea[data-field="other"]').fill("rose");
+    await grade.click();
+    await feedback.filter({ hasText: "利用可の文字色" }).waitFor();
+    assert.match(await feedback.textContent(), /貸出中の文字色/);
+    assert.doesNotMatch(await feedback.textContent(), /項目は合っています/);
     for (const [part, value] of [["card", "text-emerald-700"], ["other", "text-rose-700"]])
       await pc.locator('textarea[data-field="' + part + '"]').fill(value);
     await pc.getByRole("button", { name: "表示と答えを確かめる" }).click();

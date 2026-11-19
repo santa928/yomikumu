@@ -61,7 +61,7 @@ const repairLessons = [
     slides: [
       {
         title: "同じ見出しに二つの色が書かれている",
-        body: "h2 は両方の見出しを選びます。.current は「開催中の展示」だけを選ぶので、そちらの灰色が採用されます。",
+        body: "h2 は両方の見出しを選びます。「開催中の展示」には .current も当てはまります。この例では、クラス名で指定した色がタグ名で指定した色より優先されるため、その見出しは灰色になります。",
         html: exhibitTitles,
         css: competingColors,
       },

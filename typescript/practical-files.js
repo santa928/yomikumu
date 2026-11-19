@@ -57,18 +57,32 @@ const practicalChecksTS = [
   ["小数の配点", '{"answer":"苔","points":1.5}', "苔", "invalid 0点"]
 ];
 
+const practicalRoundExpectedTS = { label: "2つの問題を続けて採点", expected: "correct 4点 / correct 7点" };
+const practicalExpectedTS = [
+  ...practicalChecksTS.map(([label, , , expected]) => ({ label, expected })),
+  practicalRoundExpectedTS
+];
+
 const practicalCheckCodeTS = `import { describe } from "./display.js";
-import { scoreAnswer } from "./score.js";
+import { QuizRound, scoreAnswer } from "./score.js";
 
 const cases = [
 ${practicalChecksTS.map(row => "  " + JSON.stringify(row)).join(",\n")}
 ];
 
 export function runChecks() {
-  return cases.map(([label, json, text, expected]) => {
+  const results = cases.map(([label, json, text, expected]) => {
     const raw: unknown = JSON.parse(json);
     return { label, actual: describe(scoreAnswer(raw, text)), expected };
   });
+  const moss = new QuizRound({ answer: "苔", points: 4 });
+  const stone = new QuizRound({ answer: "石", points: 7 });
+  results.push({
+    label: ${JSON.stringify(practicalRoundExpectedTS.label)},
+    expected: ${JSON.stringify(practicalRoundExpectedTS.expected)},
+    actual: describe(moss.answer("苔")) + " / " + describe(stone.answer("石"))
+  });
+  return results;
 }
 `;
 
@@ -90,7 +104,7 @@ const practicalReadmeTS = `# 観察クイズの採点を改修する
 
 1. 展開したフォルダーをPCのエディターで開きます。
 2. Dockerを起動します。ターミナルで展開したフォルダーへ移動し、次の3つのコマンドを一つずつ実行します。macOS のターミナルや Linux のシェルを想定しています。
-3. 一つ目はこのフォルダーに TypeScript 6.0.3 を入れます。初回の取得にはネット接続が必要です。二つ目は型だけを検査します。三つ目は型検査を通ったファイルを dist に出力して、10通りの結果まで確かめます。
+3. 一つ目はこのフォルダーに TypeScript 6.0.3 を入れます。初回の取得にはネット接続が必要です。二つ目は型だけを検査します。三つ目は型検査を通ったファイルを dist に出力して、10通りのJSON入力と、QuizRound を二つ作ってから採点した結果を確かめます。
 
 \`\`\`sh
 docker run --rm -v "\${PWD}:/practice" -w /practice node:24-bookworm npm ci --no-audit --no-fund

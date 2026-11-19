@@ -52,8 +52,10 @@ function statusLocalInstructions(mode) {
       <li>Docker と Compose が使えるPCでZIPを展開し、compose.yaml のあるフォルダーでターミナルを開きます。</li>
       <li>次の一行を実行します。初回はNodeのイメージとTailwind CLIを取得するため、ネット接続が必要です。<pre>docker compose run --rm build</pre></li>
       <li>同じフォルダーの index.html を開きます。「貸出中にする」を押すと文字は変わりますが、2状態の色は同じです。開発者ツールで状態の文字を選ぶと、要素の class には text-emerald-700 または text-rose-700 が入っています。</li>
-      <li>status.js の statusClass の中を直します。利用可の available と貸出中の borrowed をキーにし、上で選んだ完成したクラス名を文字列で書きます。見本の「見本を一か所変える」で書き方を読み返せます。</li>
-      <li>同じコマンドで shelf.css を生成し直し、index.html を再読み込みします。状態を切り替えて2色を比べます。幅を狭めると縦、640px以上では横に並びます。Tabキーでボタンに移ったときに輪郭が見えることも確かめます。</li>
+      <li>生成された shelf.css をエディターで開き、<code>.text-emerald-700</code> と <code>.text-rose-700</code> を検索します。最初はどちらの色の指定も見つかりません。</li>
+      <li>status.js の statusClass を直します。利用可の available と貸出中の borrowed に、それぞれ上で選んだクラス名を文字列で書きます。書き方は「見本を一か所変える」で読み返せます。</li>
+      <li>同じコマンドをもう一度実行します。新しい shelf.css を開いて同じ二つの名前を検索し、今度は両方に文字色の指定があることを確かめます。</li>
+      <li>index.html を再読み込みして状態を切り替え、文字色を比べます。幅を狭めると縦、640px以上では横に並びます。Tabキーでボタンに移ると輪郭が見えます。</li>
     </ol>
     <label>生成した shelf.css を選ぶ <input id="status-built-css" type="file" accept=".css,text/css"></label>
     <p id="status-local-result" role="status"></p></section>`;

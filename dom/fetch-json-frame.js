@@ -37,9 +37,11 @@ addEventListener("message", async event => {
     event.source.postMessage({ type: "yomikumu-reading-response", id: request.id, reply }, "*");
 });
 
+// 関数を文字列にして iframe で実行するため、親ページの変数を参照せず関数内で完結させる。
 function readingExerciseFetch(paths) {
   const files = new Set(paths);
   const waiting = new Map();
+  const replies = new Map();
   let ready;
   const connected = new Promise(resolve => { ready = resolve; });
   let id = 0;
@@ -55,7 +57,7 @@ function readingExerciseFetch(paths) {
     }
   });
 
-  return async function fetch(path) {
+  async function fetch(path) {
     if (!files.has(path)) throw TypeError("この教材にあるデータのファイル名を選んでください。");
     await connected;
     const requestId = ++id;
@@ -64,13 +66,16 @@ function readingExerciseFetch(paths) {
       parent.postMessage({ type: "yomikumu-reading-request", id: requestId, path }, "*");
     });
     if (reply.error) throw TypeError(reply.error);
+    replies.set(path, reply);
     const headers = reply.contentType ? { "Content-Type": reply.contentType } : {};
     return new Response(reply.body, { status: reply.status, headers });
-  };
+  }
+
+  return { fetch, readingReply: path => replies.get(path) };
 }
 
 function readingFrame(title, html, source, tests, setup) {
-  const fetchSetup = "const fetch = (" + readingExerciseFetch.toString() + ")(" +
+  const fetchSetup = "const { fetch, readingReply } = (" + readingExerciseFetch.toString() + ")(" +
     JSON.stringify([...readingFiles]) + ");\n";
   const frame = domFrame(title, html, source, tests, fetchSetup + setup);
   frame.addEventListener("load", () => {

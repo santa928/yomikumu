@@ -32,6 +32,8 @@ class QuizRound {
 }`;
 const roundTest = (question, text, want, hint) =>
   trial(`new QuizRound(${question}).answer(${JSON.stringify(text)})`, want, hint);
+const twoRoundsExample = `const moss = new QuizRound({ answer: "苔", points: 4 });
+const stone = new QuizRound({ answer: "石", points: 7 });`;
 
 tsChapters.push({
   title: "複数ファイルで採点を改修する",
@@ -88,14 +90,14 @@ tsLessons.push({
   id: "round-class", chapter: practicalChapter, title: "問題と採点のクラスを作る",
   why: "class で、問題と回答を採点する処理を一つにまとめます。new QuizRound(question) で一問分のオブジェクト（インスタンス）を作ると、constructor が受け取った問題を this.question に保存します。answer はその回の問題を使うメソッドです。",
   before: classExample + '\nconst round = new QuizRound({ answer: "苔", points: 4 });\nconsole.log(round.answer("苔"));',
-  after: classExample + '\nconst round = new QuizRound({ answer: "石", points: 7 });\nconsole.log(round.answer("石"));',
-  change: "別の問題を渡して点数を比べる",
+  after: classExample + "\n\n" + twoRoundsExample + '\nconsole.log(moss.answer("苔"));\nconsole.log(stone.answer("石"));',
+  change: "二つの問題を作ってから採点する",
   question: [
     "答えと配点の違う問題を new QuizRound で二つ作ったとき、answer が参照するのはどれですか。",
     ["いちばん最後に作った問題", "各インスタンスの問題", "始めに作った問題だけ", "常に同じ配点の問題"],
     1, "this.question は、そのメソッドを呼び出したインスタンスが持つ問題です。"
   ],
-  prompt: "クラス QuizRound を作ります。constructor で Question 型の問題を受け、this.question に保存します。answer(text) は一致したらこの回の配点を、不一致なら0を返します。問題を二つ作り、それぞれの答えと配点を使えるか確かめます。",
+  prompt: "クラス QuizRound を作ります。constructor で Question 型の問題を受け、this.question に保存します。answer(text) は一致したらこの回の配点を、不一致なら0を返します。QuizRound を二つ作ってから、別々の答えと配点で採点できるか確かめます。",
   template: classExample.replace("this.question.answer", "§").replace("this.question.points", "§"),
   slots: [["比べる答え", 'this.question.answer', '"苔"'], ["今回の配点", "4", "this.question.points"]],
   starter: `type Question = { answer: string; points: number };
@@ -108,7 +110,11 @@ tsLessons.push({
   probes: [
     roundTest('{ answer: "苔", points: 4 }', "苔", 4, "一致したら、この問題の配点を返します。"),
     roundTest('{ answer: "石", points: 7 }', "石", 7, "作るときに渡した問題から配点を読みます。"),
-    roundTest('{ answer: "石", points: 7 }', "苔", 0, "別の問題の正解は加点しません。")
+    roundTest('{ answer: "石", points: 7 }', "苔", 0, "別の問題の正解は加点しません。"),
+    trial(`(() => {
+      ${twoRoundsExample}
+      return [moss.answer("苔"), stone.answer("石")];
+    })()`, [4, 7], "二つを作ってから採点しても4点と7点になります。各回の問題を this.question に保存しましょう。")
   ],
   nextPractical: true
 });

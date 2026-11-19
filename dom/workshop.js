@@ -86,7 +86,9 @@ function renderDom() {
       if (progress.tap || progress.built || progress.passed) li.append(node("small", [progress.tap && "予測正解", progress.built && "組み立て達成", progress.passed && "コード達成"].filter(Boolean).join("・")));
       list.append(li);
     }
-    domMain.append(demo, node("h2", "小課題"), list);
+    domMain.append(demo);
+    if (unit.guide) domMain.append(unit.guide());
+    domMain.append(node("h2", "小課題"), list);
     return;
   }
   const state = domState.tasks[key] ||= {};

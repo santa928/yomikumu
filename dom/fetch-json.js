@@ -29,19 +29,29 @@ function waitForReading(check) {
   return new Promise(resolve => {
     const result = document.querySelector("#result");
     const button = document.querySelector("#load");
-    const observer = new MutationObserver(update);
+    const interval = setInterval(update, 25);
     const timer = setTimeout(() => finish(false), 2500);
     function finish(ok) {
       clearTimeout(timer);
-      observer.disconnect();
+      clearInterval(interval);
       resolve(ok);
     }
     function update() {
       if (check(result.textContent, button.disabled)) finish(true);
     }
-    observer.observe(result, { childList: true });
-    observer.observe(button, { attributes: true, attributeFilter: ["disabled"] });
     update();
+  });
+}
+
+function waitForReadingTitles(path, emptyText = "", requireReady = false) {
+  return waitForReading((text, disabled) => {
+    const reply = readingReply(path);
+    if (!reply || reply.status < 200 || reply.status >= 300 || (requireReady && disabled)) return false;
+    try {
+      const titles = JSON.parse(reply.body);
+      return Array.isArray(titles) && titles.every(title => typeof title === "string")
+        && text === (titles.length ? titles.join(" / ") : emptyText);
+    } catch { return false; }
   });
 }`;
 
@@ -87,10 +97,33 @@ button.onclick = async () => {
   }
 };`;
 
+function readingLocalGuide() {
+  const guide = node("details");
+  guide.append(node("summary", "PCでJSONを書き換える"));
+  const download = node("a", "教材ソースのZIPをダウンロード");
+  download.href = "https://github.com/santa928/yomikumu/archive/refs/heads/main.zip";
+  const prepare = node("li");
+  prepare.append(download, "して展開します。DockerとComposeが使えるPCで、compose.yaml があるフォルダーをターミナルで開きます。");
+  const serve = node("li", "次のコマンドで教材を配信します。初回はDockerのイメージの取得に通信が必要です。");
+  serve.append(node("pre", "docker compose up web"));
+  const open = node("a", "手元のJSON実習を開く");
+  open.href = "http://localhost:8080/dom/index.html#fetch-json";
+  const before = node("li");
+  before.append(open, "を選びます。完成例で「本がある棚」を選び、「棚を読み込む」を押して、今の2冊を確認します。");
+  const edit = node("li", "展開したフォルダーの dom/data/reading.json をテキストエディターで開き、2冊のタイトルを書き換えて保存します。角括弧 []、タイトルを囲む半角の二重引用符、間のコンマを残します。");
+  edit.append(node("pre", '["朝の時計", "帰り道の雲"]'));
+  const after = node("li", "同じページで「棚を読み込む」をもう一度押します。この例なら「朝の時計 / 帰り道の雲」と表示されます。終わったらターミナルで Ctrl+C を押します。");
+  const steps = node("ol");
+  steps.append(prepare, serve, before, edit, after);
+  guide.append(steps);
+  return guide;
+}
+
 const readingUnit = {
   id: "fetch-json",
   title: "JSONで読書棚を更新する",
-  intro: "サーバーに置いたJSONを読み、届いた本で読書棚を更新します。この単元はHTTPで配信されたページで開いてください。Dockerで手元から開くときは、教材フォルダーで docker compose up web を実行して http://localhost:8080/dom/index.html#fetch-json を開きます。",
+  intro: "サーバーに置いたJSONを読み、届いた本で読書棚を更新します。この単元はHTTPで配信されたページで開いてください。手元でデータを変える手順は「PCでJSONを書き換える」にあります。",
+  guide: readingLocalGuide,
   setup: readingSetup,
   frame: readingFrame,
   demo: {
@@ -140,18 +173,18 @@ const readingUnit = {
     {
       title: "response.json()で本の配列を読む",
       html: readingHtml,
-      explain: 'JSONはデータを文字で書き表す形式です。data/reading.json の本文は ["雲の地図", "星の台所"] です。await response.json() で本文をJavaScriptの配列に変え、books[0] で最初の本を読めます。別の棚を選ぶと別のJSONが届きます。',
+      explain: 'JSONはデータを文字で書き表す形式です。配布時の data/reading.json の本文は ["雲の地図", "星の台所"] です。await response.json() で本文をJavaScriptの配列に変え、books[0] で最初の本を読めます。別の棚を選ぶと別のJSONが届きます。',
       example: dataModel.replace('books.join(" / ")', "books[0]"),
-      question: "見本で「別の本がある棚」を選ぶと、books[0]はどれになりますか。",
+      question: 'books が ["風の標本", "星の台所"] のとき、books[0] はどれですか。',
       options: ["200", "雲の地図", "風の標本", "空の配列"],
       correct: 2,
-      feedback: "別の棚の本文は [\"風の標本\"] です。先頭の要素は風の標本です。",
+      feedback: "添字0は、配列の最初の要素を指します。",
       task: '成功のときだけ response.json() で配列を読み、本を「 / 」でつないで表示します。例は「雲の地図 / 星の台所」です。',
       starter: dataModel.replace("await response.json()", "response"),
       build: [dataModel.replace("await response.json()", "《1》"), ["await response.json()", "response"]],
       tests: [
-        [async t => { t.click("#load"); return waitForReading(text => text === "雲の地図 / 星の台所"); }, "応答は本文を入れた箱です。await response.json()で箱の中から配列を取り出しましょう。"],
-        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReading(text => text === "風の標本"); }, "本の名前はコードに固定せず、届いた配列から読みましょう。"],
+        [async t => { t.click("#load"); return waitForReadingTitles("data/reading.json"); }, "await response.json()で本文を配列に変え、届いたタイトルを「 / 」でつなぎましょう。"],
+        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReadingTitles("data/other.json"); }, "別の棚を選んだら、その応答の配列からタイトルを読みましょう。"],
       ],
     },
     {
@@ -167,9 +200,9 @@ const readingUnit = {
       starter: emptyModel.replace('books.length ? books.join(" / ") : "本はまだありません"', 'books.join(" / ")'),
       build: [emptyModel.replace("books.length ?", "《1》 ?"), ["books.length", "!books.length"]],
       tests: [
-        [async t => { t.q("#reading-mode").value = "empty"; t.click("#load"); return waitForReading(text => text === "本はまだありません"); }, "200の空の配列では、件数が0の場合の案内を表示しましょう。"],
+        [async t => { t.q("#reading-mode").value = "empty"; t.click("#load"); return waitForReadingTitles("data/empty.json", "本はまだありません"); }, "応答が成功したら、配列の件数に応じてタイトルか0件の案内を表示しましょう。"],
         [async t => { t.q("#reading-mode").value = "retry"; t.click("#load"); return waitForReading(text => text === "HTTP 404"); }, "失敗時には番号を表示し、JSONを読まずに処理を終えましょう。"],
-        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReading(text => text === "風の標本"); }, "配列の件数が1以上なら、その本の名前を表示しましょう。"],
+        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReadingTitles("data/other.json", "本はまだありません"); }, "配列の件数が1以上なら、その本の名前を表示しましょう。"],
       ],
     },
     {
@@ -191,9 +224,9 @@ const readingUnit = {
         [t => { t.q("#reading-mode").value = "retry"; t.click("#load"); return t.q("#load").disabled && t.q("#result").textContent === "読み込み中"; }, "待っている間は「読み込み中」と表示し、ボタンを止めましょう。"],
         [async () => waitForReading(text => text === "HTTP 404。もう一度押してください"), "ファイルがないときに「HTTP 404。もう一度押してください」と表示しましょう。"],
         [t => !t.q("#load").disabled, "404の案内は表示できました。finally でボタンをもう一度押せる状態に戻しましょう。"],
-        [async t => { t.click("#load"); return waitForReading((text, disabled) => text === "雲の地図 / 星の台所" && !disabled); }, "同じボタンをもう一度押したら、新しく届いた本を表示しましょう。"],
-        [async t => { t.q("#reading-mode").value = "empty"; t.click("#load"); return waitForReading((text, disabled) => text === "本はまだありません" && !disabled); }, "空の成功では本がないことを案内しましょう。"],
-        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReading((text, disabled) => text === "風の標本" && !disabled); }, "応答の本文が変わっても、届いた本のタイトルを表示しましょう。"],
+        [async t => { t.click("#load"); return waitForReadingTitles("data/reading.json", "本はまだありません", true); }, "同じボタンをもう一度押したら、新しく届いた本を表示しましょう。"],
+        [async t => { t.q("#reading-mode").value = "empty"; t.click("#load"); return waitForReadingTitles("data/empty.json", "本はまだありません", true); }, "応答が成功したら、配列の件数に応じてタイトルか0件の案内を表示しましょう。"],
+        [async t => { t.q("#reading-mode").value = "other"; t.click("#load"); return waitForReadingTitles("data/other.json", "本はまだありません", true); }, "応答の本文が変わっても、届いた本のタイトルを表示しましょう。"],
       ],
     },
   ],

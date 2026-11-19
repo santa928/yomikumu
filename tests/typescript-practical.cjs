@@ -43,6 +43,23 @@ const displayCode = `import type { Result } from "./types.js";
 export function describe(result: Result): string {
   return result.status + " " + result.score + "点";
 }`;
+const roundClassCode = `type Question = { answer: string; points: number };
+class QuizRound {
+  question: Question;
+
+  constructor(question: Question) {
+    this.question = question;
+  }
+
+  answer(text: string): number {
+    return text === this.question.answer ? this.question.points : 0;
+  }
+}`;
+
+function shareQuestionAmongRounds(source) {
+  return source.replace("  question: Question;", "  static question: Question;")
+    .replaceAll("this.question", "QuizRound.question");
+}
 
 async function verifyDesktop(browser) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
@@ -90,12 +107,33 @@ async function verifyDesktop(browser) {
     assert.ok((await output.textContent()).includes(label + " · invalid 0点"), label);
   }
 
+  await files.selectOption("score.ts");
+  await editor.fill(shareQuestionAmongRounds(scoreCode));
+  await run.click();
+  await grade.waitFor();
+  assert.match(await grade.textContent(), /結果を見比べましょう。「2つの問題を続けて採点」/);
+  assert.match(await output.textContent(), /2つの問題を続けて採点 · incorrect 0点 \/ correct 7点/);
+  await editor.fill(scoreCode);
+  await run.click();
+  await grade.getByText(/すべての確認を通りました/).waitFor();
+  assert.match(await output.textContent(), /2つの問題を続けて採点 · correct 4点 \/ correct 7点/);
+
+  await files.selectOption("display.ts");
+  await editor.fill(displayCode.replace("result.score", "result.points"));
+  await check.click();
+  const displayDiagnostic = page.getByRole("button", { name: /^display\.ts:\d+:\d+ · TS2339/ });
+  await displayDiagnostic.waitFor();
+  await editor.fill(displayCode);
+  await displayDiagnostic.waitFor({ state: "detached" });
+  assert.match(await typeStatus.textContent(), /もう一度「型を検査」/);
+
   await page.reload();
   await files.selectOption("input.ts");
   assert.equal(await editor.inputValue(), inputCode);
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "現在のプロジェクトをZIPで保存" }).click();
-  const archive = unzipSync(await fs.readFile(await (await download).path()));
+  const zip = await download;
+  const archive = unzipSync(await fs.readFile(await zip.path()));
   assert.equal(strFromU8(archive["input.ts"]).trimEnd(), inputCode);
   assert.equal(strFromU8(archive["score.ts"]).trimEnd(), scoreCode);
   assert.equal(JSON.parse(strFromU8(archive["package.json"])).devDependencies.typescript, "6.0.3");
@@ -103,23 +141,18 @@ async function verifyDesktop(browser) {
   if (process.env.TS_PRACTICAL_DOWNLOAD) {
     const destination = process.env.TS_PRACTICAL_DOWNLOAD;
     await fs.mkdir(destination, { recursive: true });
+    await zip.saveAs(path.join(destination, zip.suggestedFilename()));
     for (const [name, content] of Object.entries(archive)) await fs.writeFile(path.join(destination, name), content);
   }
   await page.goto(url + "#round-class/write");
   const classEditor = page.getByRole("textbox", { name: "自分のTypeScript" });
   assert.doesNotMatch(await classEditor.inputValue(), /^\s*class QuizRound\s*\{/m);
-  await classEditor.fill(`type Question = { answer: string; points: number };
-class QuizRound {
-  question: Question;
-
-  constructor(question: Question) {
-    this.question = question;
-  }
-
-  answer(text: string): number {
-    return text === this.question.answer ? this.question.points : 0;
-  }
-}`);
+  await classEditor.fill(shareQuestionAmongRounds(roundClassCode));
+  await run.click();
+  const classGrade = page.locator("[data-grade]");
+  await classGrade.waitFor();
+  assert.match(await classGrade.textContent(), /二つを作ってから/);
+  await classEditor.fill(roundClassCode);
   await run.click();
   await page.getByText(/^できました。/).waitFor();
   await page.close();

@@ -49,7 +49,7 @@ function renderPracticalTS() {
         <li><strong>診断が出たファイルを開く</strong>
           <p>もう一度「型を検査」を押します。ファイル名・行・列が表示されます。診断を選び、<code>score.ts</code> が返す得点の項目と、<code>display.ts</code> が読む項目をそろえます。表示は <code>correct 4点</code> の形です。</p></li>
         <li><strong>クラスの <code>answer</code> を仕上げる</strong>
-          <p><code>score.ts</code> の <code>QuizRound</code> では、<code>constructor</code> が問題を <code>this.question</code> に保存します。<code>answer(text)</code> を直し、一致なら <code>correct</code> と問題の配点を、不一致なら <code>incorrect</code> と0点を返します。</p></li>
+          <p><code>score.ts</code> の <code>QuizRound</code> では、<code>constructor</code> が問題を <code>this.question</code> に保存します。<code>answer(text)</code> を直し、一致なら <code>correct</code> と問題の配点を、不一致なら <code>incorrect</code> と0点を返します。二つの <code>QuizRound</code> を先に作っても、それぞれの問題で採点できるようにします。</p></li>
         <li><strong><code>input.ts</code> で届いた値を実行時に確認する</strong>
           <p><code>questionFrom</code> は <code>unknown</code> を受け取ります。<code>null</code> 以外のオブジェクトで、<code>answer</code> が文字列、<code>points</code> が0以上の整数のときだけ問題を返します。ほかは <code>null</code> を返し、<code>score.ts</code> から <code>invalid</code> と0点を返します。</p></li>
       </ol>
@@ -128,7 +128,7 @@ function renderPracticalTS() {
     sources[file.value] = editor.value;
     stateTS.practical = sources;
     persistTS();
-    clearRun("編集内容を型検査できます。");
+    clearRun("編集しました。もう一度「型を検査」を押してください。");
   };
 
   function showDiagnostic(diagnostic) {
@@ -178,14 +178,14 @@ function renderPracticalTS() {
         grade.textContent = "実行エラーがあります。";
         return;
       }
-      const observed = result.output.slice(-practicalChecksTS.length);
+      const observed = result.output.slice(-practicalExpectedTS.length);
       output.textContent = observed.map(row => row.map(value => value.text).join(" · ")).join("\n");
-      const mismatch = practicalChecksTS.findIndex(([label, , , want], index) =>
-        !matchTS(observed[index]?.[0], label) || !matchTS(observed[index]?.[1], want));
+      const mismatch = practicalExpectedTS.findIndex(({ label, expected }, index) =>
+        !matchTS(observed[index]?.[0], label) || !matchTS(observed[index]?.[1], expected));
       if (mismatch < 0) grade.textContent = "すべての確認を通りました。";
       else {
-        const [label, , , want] = practicalChecksTS[mismatch];
-        grade.textContent = "結果を見比べましょう。「" + label + "」では " + want + " を表示します。";
+        const { label, expected } = practicalExpectedTS[mismatch];
+        grade.textContent = "結果を見比べましょう。「" + label + "」では " + expected + " を表示します。";
       }
     } catch (error) {
       if (current === requestTS) {

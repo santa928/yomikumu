@@ -108,12 +108,14 @@ function transfer() {
       const incoming = validatedProgress(data);
       const paths = data.paths === undefined ? null : YomikumuPaths.validate(data.paths);
       const stores = validatedStores(data.courses ?? {});
-      const count = Object.keys(incoming.units).length +
+      const hasPracticalDraft = Boolean(stores.typescript?.practical);
+      const count = Object.keys(incoming.units).length + (hasPracticalDraft ? 1 : 0) +
         Object.entries(stores).reduce((total, [course, record]) =>
           total + Object.keys(record[courseStores[course].groups[0]]).length, 0);
       status.textContent =
         count +
-        "件の記録があります。読み込むと、この端末の同じ単元はファイルの記録に置き換わります。";
+        "件の記録があります。読み込むと、この端末の同じ単元はファイルの記録に置き換わります。" +
+        (hasPracticalDraft ? "TypeScript実習の4ファイルの下書きも置き換わります。" : "");
       confirm.append(
         button("この記録を読み込む", () => {
           const local = readProgress();

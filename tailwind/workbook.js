@@ -218,10 +218,16 @@ function practice(unit, mode, state) {
       await display();
       const results = await evaluateReading(unit, { ...draft });
       const missing = results.find(item => !item.ok);
-      const count = results.filter(item => item.ok).length;
-      if (!missing) { state[mode+"Done"] = true; save(); }
-      feedback.textContent = missing ? `${count ? count+"項目は合っています。" : ""}${missing.check.hint}` :
-        "できました。書いた指定で、読書カードが要望どおりに表示されています。";
+      if (!missing) {
+        state[mode+"Done"] = true;
+        save();
+        feedback.textContent = "できました。書いた指定で、読書カードが要望どおりに表示されています。";
+      } else if (unit.local === "status") {
+        feedback.textContent = results.filter(item => !item.ok).map(item => item.check.hint).join(" ");
+      } else {
+        const count = results.filter(item => item.ok).length;
+        feedback.textContent = (count ? count + "項目は合っています。" : "") + missing.check.hint;
+      }
     } catch {
       feedback.textContent = "表示を作れませんでした。見本の書き方を確認して、もう一度試してください。";
     } finally { submit.disabled = false; }
