@@ -81,7 +81,8 @@ async function verifyBuild(page, standalone, download, modules) {
     const entry = pc.getByRole("link", { name: "生成されない状態の色を直す" });
     assert.equal(await entry.count(), 1, "コース目次からクラス名の実践教材へ入れる");
     await entry.click();
-    const preview = pc.frameLocator(".sample-window iframe");
+    await pc.getByRole("heading", { level: 1, name: "生成されない状態の色を直す" }).waitFor();
+    const preview = pc.frameLocator('iframe[title="見本の読書カード"]');
     const colors = () => preview.locator("article").evaluateAll(elements => elements.map(el => getComputedStyle(el).color));
     await preview.locator(".sample-book").first().waitFor();
     await pc.waitForFunction(() => document.querySelector(".sample-window iframe").contentDocument.querySelector("style"));
