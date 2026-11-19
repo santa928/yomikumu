@@ -7,41 +7,15 @@ services:
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./padding.html:/usr/share/nginx/html/padding.html:ro
-      - ./lesson.css:/usr/share/nginx/html/lesson.css:ro
-      - ./exhibition.js:/usr/share/nginx/html/exhibition.js:ro
-      - ./contact.js:/usr/share/nginx/html/contact.js:ro
       - ./arrow.png:/usr/share/nginx/html/arrow.png:ro
-      - ./typography.js:/usr/share/nginx/html/typography.js:ro
       - ./ink.css:/usr/share/nginx/html/ink.css:ro
-      - ./boxes.js:/usr/share/nginx/html/boxes.js:ro
-      - ./profiles.js:/usr/share/nginx/html/profiles.js:ro
-      - ./flex.js:/usr/share/nginx/html/flex.js:ro
-      - ./grid.js:/usr/share/nginx/html/grid.js:ro
-      - ./responsive-works.js:/usr/share/nginx/html/responsive-works.js:ro
       - ./viewport-sample.html:/usr/share/nginx/html/viewport-sample.html:ro
       - ./harbor.png:/usr/share/nginx/html/harbor.png:ro
       - ./moon.png:/usr/share/nginx/html/moon.png:ro
-      - ./keyboard.js:/usr/share/nginx/html/keyboard.js:ro
-      - ./profile-project.js:/usr/share/nginx/html/profile-project.js:ro
-      - ./course.js:/usr/share/nginx/html/course.js:ro
-      - ./javascript-lessons.js:/usr/share/nginx/html/javascript-lessons.js:ro
-      - ./javascript-choices.js:/usr/share/nginx/html/javascript-choices.js:ro
-      - ./javascript-functions.js:/usr/share/nginx/html/javascript-functions.js:ro
-      - ./javascript-counters.js:/usr/share/nginx/html/javascript-counters.js:ro
-      - ./javascript-cards.js:/usr/share/nginx/html/javascript-cards.js:ro
-      - ./javascript-transforms.js:/usr/share/nginx/html/javascript-transforms.js:ro
-      - ./javascript-module-lessons.js:/usr/share/nginx/html/javascript-module-lessons.js:ro
-      - ./javascript-runner.js:/usr/share/nginx/html/javascript-runner.js:ro
-      - ./module-files.js:/usr/share/nginx/html/module-files.js:ro
       - ./vendor:/usr/share/nginx/html/vendor:ro
-      - ./javascript-workbook.js:/usr/share/nginx/html/javascript-workbook.js:ro
-      - ./preview.js:/usr/share/nginx/html/preview.js:ro
-      - ./progress.js:/usr/share/nginx/html/progress.js:ro
-      - ./grading.js:/usr/share/nginx/html/grading.js:ro
-      - ./workbook.js:/usr/share/nginx/html/workbook.js:ro
-      - ./path-location.js:/usr/share/nginx/html/path-location.js:ro
-      - ./path-progress.js:/usr/share/nginx/html/path-progress.js:ro
-      - ./learning-paths.js:/usr/share/nginx/html/learning-paths.js:ro
+      - ./app:/usr/share/nginx/html/app:ro
+      - ./html-css:/usr/share/nginx/html/html-css:ro
+      - ./javascript:/usr/share/nginx/html/javascript:ro
       - ./python:/usr/share/nginx/html/python:ro
       - ./dom:/usr/share/nginx/html/dom:ro
       - ./tailwind:/usr/share/nginx/html/tailwind:ro
