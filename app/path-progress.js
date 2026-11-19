@@ -57,11 +57,14 @@ function validMap(value) {
 }
 
 function validatePythonRecord(group, route, item) {
+  const slash = route.indexOf("/");
+  if (slash < 0 || !/^(?:\d+|names|csv)$/.test(route.slice(0, slash))) return false;
+  const step = route.slice(slash + 1);
   if (group === "completed")
-    return /^\d+\/\d+\/(?:write|guide)\/(?:tap|code)$/.test(route) && typeof item === "boolean";
+    return /^\d+\/(?:write|guide)\/(?:tap|code)$/.test(step) && typeof item === "boolean";
   if (group === "quizzes")
-    return /^\d+\/\d+\/slide$/.test(route) && Number.isInteger(item) && item >= 0 && item < 4;
-  if (!/^\d+\/(?:demo|\d+\/(?:slide|guide|write))$/.test(route) || !validMap(item)) return false;
+    return /^\d+\/slide$/.test(step) && Number.isInteger(item) && item >= 0 && item < 4;
+  if (!/^(?:demo|\d+\/(?:slide|guide|write))$/.test(step) || !validMap(item)) return false;
   return Object.entries(item).every(([field, value]) => {
     if (field === "files") return validMap(value) && Object.entries(value).every(([name, source]) =>
       /^[a-zA-Z][\w-]*\.py$/.test(name) && typeof source === "string");

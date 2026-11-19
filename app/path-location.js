@@ -39,5 +39,13 @@ window.YomikumuPaths = (() => {
     if (courses.has(course) && validRoute(route)) restore({ last: course, positions: { [course]: route } });
   }
 
-  return { read, restore, validate, remember };
+  function completedPythonClassIntro() {
+    try {
+      const completed = JSON.parse(localStorage.getItem("yomikumu-python-oop-v1"))?.completed;
+      return [1, 2, 3].every(step =>
+        ["tap", "code"].some(mode => completed?.["63/" + step + "/write/" + mode] === true));
+    } catch { return false; }
+  }
+
+  return { read, restore, validate, remember, completedPythonClassIntro };
 })();

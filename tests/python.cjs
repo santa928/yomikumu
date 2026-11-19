@@ -98,9 +98,11 @@ async function verifyPython(browser, entry = pathToFileURL(path.resolve("python/
                 return base.replace(original, change);
               });
             }
+            // 別解を用意していない課題では、同じ解答でWorkerを二度起動しない。
+            const answers = new Set([assignment.solution, fixture?.[step === "guide" ? 0 : 2] ?? assignment.solution]);
             for (const test of assignment.cases) {
               const files = { ...assignment.files, ...assignment.tapFiles };
-              for (const source of [assignment.solution, fixture?.[step === "guide" ? 0 : 2] || assignment.solution]) {
+              for (const source of answers) {
                 const result = assignment.targetFile
                   ? await run(assignment.main, test, { ...files, [assignment.targetFile]: (assignment.filePrefix || "") + source })
                   : await run(source + (assignment.after ? "\n" + assignment.after : ""), test, files);

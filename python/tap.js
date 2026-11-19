@@ -38,7 +38,7 @@ function tapTemplate(task, view, stepId, saved) {
   if (view === "guide") {
     slots = lines.map((line, i) => initial.includes(line) ? -1 : i).filter(i => i >= 0);
   } else {
-    for (const target of pythonTapFocus[stepId] || []) {
+    for (const target of task.tapFocus || pythonTapFocus[stepId] || []) {
       const index = lines.findIndex((line, i) => !slots.includes(i) && line.includes(target));
       if (index >= 0) slots.push(index);
     }

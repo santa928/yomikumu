@@ -19,8 +19,8 @@ const pathCourses = {
     review: ["見出しを試す", "#first-edit/1"],
   },
   python: {
-    title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo", start: "python/index.html#54/1/slide",
-    project: "入力した名前を表示したり、入力した数に1を足したりしながら、Pythonの書き方を学びます。",
+    title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo/toc", start: "python/index.html#54/1/slide",
+    project: "文字や数を入力する練習から、条件分岐・繰り返し・リスト・辞書・関数を学びます。名簿を整え、名前ごとの件数を集計します。",
     first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
     question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
     choices: ["ゆき", "名前"], correct: 0,
@@ -45,22 +45,24 @@ const pathCourses = {
     review: ["JavaScriptで数と文字を比べる", "#js-console/1"],
   },
   "python-oop": {
-    title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo", start: "python/index.html#63/1/slide",
-    project: "本ごとに読んだページ数を記録します。最後は、関数を呼ぶたびに成功か失敗かを記録する処理を作ります。",
-    first: "最初は Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
+    title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo/toc", start: "python/index.html#63/1/slide",
+    project: "本ごとの状態と操作をクラスにまとめ、継承で料金の計算方法を変えます。関数を呼ぶたびに成功や失敗を記録するデコレーターも作ります。",
+    first: "実践と共通のクラス入門では、Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
     choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
     feedback: ["そうです。一冊ごとに別の値を持たせる方法を試します。", "表示の手順は共通です。今どこまで読んだかは本ごとに違います。"],
     review: ["Pythonで関数を作る", "python/index.html#57/1/slide"],
+    afterIntro: ["クラスを学習済みなら OOP の続きへ", "python/index.html#63/4/slide"],
   },
   "python-practice": {
-    title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo", start: "python/index.html#59/1/slide",
-    project: "読書時間の記録を1件ずつ調べ、60分以上の分だけを合計するプログラムを作ります。",
-    first: "リストの値を順に取り出せたら、まずは30分を0.5時間に、60分を1時間に変換してみましょう。",
+    title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo/toc", start: "python/index.html#63/1/slide/practice",
+    project: "読書記録を1件ずつ調べ、条件に合う読書時間を合計します。最後は CSV ファイルの記録を検査して集計します。",
+    first: "共通のクラス入門で本ごとの記録と操作を作ります。実践では、リストの集計や with でファイルを閉じる書き方を学びます。",
     question: "30分と60分をどちらも時間に変えると、記録は何件になりますか。",
     choices: ["1件", "2件"], correct: 1,
-    feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。最初の練習でそれぞれを変換してみましょう。"],
+    feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。実践の最初の練習でそれぞれを変換してみましょう。"],
     review: ["Pythonのリストを読み直す", "python/index.html#56/1/slide"],
+    afterIntro: ["クラスを学習済みなら実践へ", "python/index.html#59/1/slide"],
   },
   react: {
     title: "React", page: "react/index.html", catalog: "react/index.html", start: "react/index.html#components",
@@ -141,7 +143,12 @@ function courseEntry(course, positions) {
   const section = node("section", undefined, "path-course");
   section.append(node("h2", entry.title), node("p", entry.project), node("p", entry.first), readiness(course, entry));
   const dest = pathHref(course, positions[course]);
-  section.append(pathLink(dest ? entry.title + "の続きを開く" : "最初の一課題を開く", dest || entry.start, "next"));
+  const introDone = entry.afterIntro && YomikumuPaths.completedPythonClassIntro();
+  const start = introDone ? entry.afterIntro[1] : entry.start;
+  section.append(pathLink(dest ? entry.title + "の続きを開く" : "最初の一課題を開く", dest || start, "next"));
+  const resumingIntro = /^63\/[1-3]\//.test(positions[course] || "");
+  if (introDone && !resumingIntro) section.append(pathLink("クラス入門を読み直す", entry.start, "review"));
+  else if (entry.afterIntro) section.append(pathLink(entry.afterIntro[0], entry.afterIntro[1], "review"));
   section.append(pathLink(entry.title + "の単元を選ぶ", entry.catalog, "review"));
   return section;
 }
@@ -174,11 +181,10 @@ function learningPaths(part) {
     }
     content.append(details("この先で作るもの", node("p", "JavaScriptの次はTypeScriptで問題の型を決め、Reactでクイズ画面を作り、Next.jsで複数ページのサイトにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
   } else if (python) {
-    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から始められます。リストや関数を使える人は「Python実践」や「Python OOP」も選べます。");
+    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から。リストや関数を使える人は、実践と OOP に共通のクラス入門から始められます。");
     content.append(courseEntry("python", saved.positions));
     content.append(courseEntry("python-practice", saved.positions));
     content.append(courseEntry("python-oop", saved.positions));
-    content.append(details("基礎の後に選べること", node("p", "読書時間の集計を練習したければ「実践」、複数の本の情報と操作をクラスにまとめたければ「OOP」へ進めます。")));
   } else {
     heading("学習パス", "作りたいものから始めよう", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");
     const href = pathHref(saved.last, saved.positions[saved.last]);
