@@ -80,6 +80,16 @@ async function afterCompletedIntro(browser) {
     const steps = page.getByRole("navigation", { name: "この単元の移動" });
     await follow(page, steps.locator(".next"), workbook + "#61/4/slide");
     await follow(page, steps.getByRole("link", { name: "クラス入門を読み直す" }), workbook + "#63/1/slide/practice");
+    await page.goto(workbook + "#63/3/write/practice");
+    await page.goto(home + "#paths/python");
+    const practice = page.locator(".path-course").filter({
+      has: page.getByRole("heading", { name: "Python実践", exact: true }),
+    });
+    assert.equal(await practice.getByRole("link", { name: "Python実践の続きを開く" }).getAttribute("href"),
+      "python/index.html#63/3/write/practice");
+    const next = practice.getByRole("link", { name: "クラスを学習済みなら実践へ" });
+    assert.equal(await next.count(), 1);
+    await follow(page, next, workbook + "#59/1/slide");
   } finally { await page.close(); }
 }
 

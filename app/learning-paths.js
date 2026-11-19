@@ -146,7 +146,8 @@ function courseEntry(course, positions) {
   const introDone = entry.afterIntro && YomikumuPaths.completedPythonClassIntro();
   const start = introDone ? entry.afterIntro[1] : entry.start;
   section.append(pathLink(dest ? entry.title + "の続きを開く" : "最初の一課題を開く", dest || start, "next"));
-  if (introDone) section.append(pathLink("クラス入門を読み直す", entry.start, "review"));
+  const resumingIntro = /^63\/[1-3]\//.test(positions[course] || "");
+  if (introDone && !resumingIntro) section.append(pathLink("クラス入門を読み直す", entry.start, "review"));
   else if (entry.afterIntro) section.append(pathLink(entry.afterIntro[0], entry.afterIntro[1], "review"));
   section.append(pathLink(entry.title + "の単元を選ぶ", entry.catalog, "review"));
   return section;
