@@ -10,6 +10,8 @@ ZIPを展開して、4個のCSVと `reading_summary.py`、`test_reading_summary.
 
 `python3 --version` で、手元のPython 3を確認してください。Windowsでは `python3` の代わりに `py -3` を使えます。以下のコマンドも同じように置き換えます。使うライブラリはPythonに付属しています。
 
+コマンドが見つからない場合は、教材ページでCSVと集計の練習を続けられます。PCの実習にはPython 3が必要です。コードを編集するときは、テキストエディターで展開先の `.py` ファイルを開きます。同じ名前のまま保存してから、ターミナルでコマンドを再実行してください。
+
 ## 2. 最初の失敗を確かめる
 
 ```sh
@@ -18,6 +20,8 @@ python3 -B -m unittest -v
 ```
 
 最初は `2` が表示され、テストには `2 != 35` と出ます。練習用コードの `total += 1` が記録を2件数えています。CSVの1件目は15分、2件目は20分なので、期待する合計は35分です。
+
+もう一つの失敗 `ValueError not raised` は、「不正な分を知らせるはずが、そのまま数えてしまった」という意味です。どちらもこれから直します。
 
 題名にカンマがある場合も確かめましょう。`reading_with_comma.csv` を開いて分を手で合計してから、`test_reading_summary.py` のクラスの中に `def test_title_with_comma(self):` を1つ足します。既存のテストと同じ字下げで、`self.assertEqual(..., ...)` の左に `total_minutes("reading_with_comma.csv")`、右に手で求めた合計を書きます。もう一度テストを実行すると、追加したテストも実行されます。
 

@@ -7,25 +7,26 @@
     "reading_empty.csv": "title,minutes\n",
     "reading_invalid.csv": "title,minutes\n図書室の地図,15\n夜の観察,未記入\n",
   };
-  const reordered = "minutes,title\n9,夕暮れの地図\n";
+  const reordered = "minutes,title\n9,夕暮れの地図\n6,木陰の本棚\n";
   const numberFiles = {
     ...files,
+    "reading_reordered.csv": reordered,
     "reading_zero_minutes.csv": "title,minutes\n夕暮れの地図,0\n",
     "reading_negative.csv": "title,minutes\n夕暮れの地図,-1\n",
     "reading_blank_minutes.csv": "title,minutes\n夕暮れの地図,\n",
   };
-  const books = ["reading.csv", "reading_with_comma.csv"];
-  const bookCases = (normal, quoted) => [
-    check("通常の記録", normal + "\n", { input: books[0] }),
-    check("題名にカンマがある記録", quoted + "\n", { input: books[1] }),
+  const bookCases = (normal, quoted, reversed) => [
+    check("通常の記録", normal + "\n", { input: "reading.csv" }),
+    check("題名にカンマがある記録", quoted + "\n", { input: "reading_with_comma.csv" }),
+    check("列順が逆の記録", reversed + "\n", { input: "reading_reordered.csv" }),
   ];
   const headerCases = (normal, reversed) => [
     check("title が先の見出し", normal + "\n", { input: "reading.csv" }),
     check("minutes が先の見出し", reversed + "\n", { input: "reading_reordered.csv" }),
   ];
   const headerFiles = { "reading.csv": files["reading.csv"], "reading_reordered.csv": reordered };
-  const twoBooks = { "reading.csv": files["reading.csv"], "reading_with_comma.csv": files["reading_with_comma.csv"] };
-  const validFiles = { ...twoBooks, "reading_empty.csv": files["reading_empty.csv"] };
+  const readingFiles = { ...headerFiles, "reading_with_comma.csv": files["reading_with_comma.csv"] };
+  const validFiles = { ...readingFiles, "reading_empty.csv": files["reading_empty.csv"] };
 
   const readLine = (body, path = "input()") => `with open(${path}, encoding="utf-8") as file:
 ${body}`;
@@ -57,6 +58,7 @@ def total_minutes(path):
     check("15分と20分を合計", "", { observe: 'total_minutes("reading.csv")', value: 35 }),
     check("題名にカンマがあっても分を合計", "", { observe: 'total_minutes("reading_with_comma.csv")', value: 20 }),
     check("見出しだけなら0", "", { observe: 'total_minutes("reading_empty.csv")', value: 0 }),
+    check("分が先頭列でも合計", "", { observe: 'total_minutes("reading_reordered.csv")', value: 15 }),
   ];
   const zeroCase = check("0分は正しい記録", "", {
     observe: 'total_minutes("reading_zero_minutes.csv")', value: 0,
@@ -164,9 +166,9 @@ except ValueError as error:
           "入力欄のCSVから最初の1件を読みます。辞書全体の表示を、その記録の題名だけの表示に変えましょう。",
           read("    row = next(reader)\n    print(row)"),
           read('    row = next(reader)\n    print(row["title"])'),
-          bookCases("図書室の地図", "月のしおり"),
+          bookCases("図書室の地図", "月のしおり", "夕暮れの地図"),
           'print に row["title"] を渡します。',
-          { files: twoBooks },
+          { files: readingFiles },
         ),
         write: exercise(
           "入力欄のCSVには2件あります。input() でファイル名を受け取り、2件目の題名だけを表示しましょう。",
@@ -174,10 +176,10 @@ except ValueError as error:
           read(`    next(reader)
     row = next(reader)
     print(row["title"])`),
-          bookCases("夜の観察", "山,海の図鑑"),
+          bookCases("夜の観察", "山,海の図鑑", "木陰の本棚"),
           "1回目の next は読み進めるだけです。2回目が返す辞書から title の値を取り出します。",
           {
-            files: twoBooks,
+            files: readingFiles,
             tapFocus: ["next(reader)", "row = next(reader)", 'row["title"]'],
             distractors: [
               "    next(file)",
@@ -205,9 +207,9 @@ except ValueError as error:
           read(`    row = next(reader)
     minutes = int(row["minutes"])
     print(minutes * 2)`),
-          bookCases("30", "16"),
+          bookCases("30", "16", "18"),
           'minutes に入れる前に、int(row["minutes"]) で変換します。',
-          { files: twoBooks },
+          { files: readingFiles },
         ),
         write: exercise(
           "入力欄のCSVから最初の1件を読み、読書時間に5分を足して表示しましょう。",
@@ -215,10 +217,10 @@ except ValueError as error:
           read(`    row = next(reader)
     minutes = int(row["minutes"])
     print(minutes + 5)`),
-          bookCases("20", "13"),
+          bookCases("20", "13", "14"),
           "文字を整数にしてから5を足します。",
           {
-            files: twoBooks,
+            files: readingFiles,
             tapFocus: ['int(row["minutes"])', "print(minutes + 5)"],
             distractors: [
               '    minutes = row["minutes"]',

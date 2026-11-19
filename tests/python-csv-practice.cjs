@@ -101,6 +101,18 @@ try {
     }
   }
 
+  // 列の位置を決め打ちした解答は、見出しの順序が変われば採点で落ちる。
+  const titleTask = chapter.lessons[2].write;
+  const positionalTitle = titleTask.solution.replace('row["title"]', "list(row.values())[0]");
+  assert.ok(titleTask.cases.some(test =>
+    attempt(positionalTitle, titleTask.files, test).output !== test.want), "題名を先頭列に固定した解答");
+  const totalTask = chapter.lessons[4].write;
+  const positionalTotal = totalTask.solution.replace('row["minutes"]', "list(row.values())[1]");
+  assert.ok(totalTask.cases.some(test => {
+    const result = attempt(positionalTotal, totalTask.files, test);
+    return result.error || result.value !== test.value;
+  }), "分を2列目に固定した解答");
+
   const directory = fs.mkdtempSync(path.join(root, "kit-"));
   const unpack = run(directory, ["-c", `
 from pathlib import Path
