@@ -76,7 +76,7 @@ form.addEventListener("submit", () => {
     {
       title: "ページ移動を抑えて回答を残す",
       html: answerForm,
-      explain: "ブラウザにはフォーム送信でページを移動する既定の動作があります。受け取ったeventのpreventDefault()を呼ぶと、今のページで処理を続けられます。",
+      explain: "フォームを送信すると、通常はブラウザが送信先へ移動します。見本では、送信が起きたときの情報を event で受け取ります。コメントの行を event.preventDefault() に変えると、ブラウザ任せの送信だけが止まります。そのあとの notice.textContent は動くので、入力した文字を今のページに表示できます。",
       example: formReader + `
 form.addEventListener("submit", event => {
   // event.preventDefault(); でページ移動を止める

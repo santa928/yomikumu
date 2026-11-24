@@ -21,7 +21,7 @@
         write: exercise("10席より少ないときだけ True を表示しましょう。「より小さい」は < です。", "", "print(seats < 10)", seats(["True\n", "False\n", "False\n"]), "9席は対象、10席ちょうどは対象外です。"),
       },
       {
-        title: "条件に合うときだけ表示する", text: "if の後に条件を書き、末尾に : を付けます。次の行を半角空白4個分下げると、条件が True のときだけその行が動きます。",
+        title: "条件に合うときだけ表示する", text: "if の後に条件を書き、末尾に : を付けます。次の行の先頭に半角スペースを4つ入れて右にずらします（字下げ）。この行は、条件が True（当てはまる）のときだけ動きます。",
         code: 'seats = 10\nif seats >= 10:\n    print("団体受付")\nprint("開場")', output: "団体受付\n開場",
         quiz: ["seats を 9 に変えると残る表示は？", ["団体受付だけ", "開場だけ", "両方", "何も出ない"], 1, "開場の行は左端から始まるため、席数にかかわらず動きます。"],
         guide: exercise("「団体受付」を10席以上の時だけ出すため、表示の行を字下げしましょう。", 'if seats >= 10:\nprint("団体受付")', 'if seats >= 10:\n    print("団体受付")', seats(["", "団体受付\n", "団体受付\n"]), "if の次の print の前に半角空白を4個入れます。"),
@@ -42,7 +42,7 @@
         write: exercise("整理券を20番から始めます。position が 0 の札では20、1の札では21を表示しましょう。", "", "print(20 + position)", [check("先頭", "20\n", { before: "position = 0" }), check("次の札", "21\n", { before: "position = 1" })], "位置が0のときに20になる足し算を作ります。"),
       },
       {
-        title: "range の終わりと回数", text: "for は値を一つずつ取り出して、字下げした行を繰り返します。range(3) が渡す位置は 0、1、2 の3個。終わりの3は含めません。range(0) なら一度も動きません。",
+        title: "range の終わりと回数", text: "range(3) は 0、1、2 の順に値を渡します。3回分ですが、3そのものは含めません。for は値を一つ受け取るたびに、字下げした行を1回実行します。range(0) では一度も実行しません。",
         code: "for position in range(3):\n    print(position + 1)", output: "1\n2\n3",
         quiz: ["range(3) の位置をそのまま出すと？", ["1、2、3", "0、1、2", "0、1、2、3", "3だけ"], 1, "0から始まり、3の直前で止まります。"],
         guide: exercise("1から count までの番号を1行ずつ表示しましょう。見本は回数が3に固定されています。", "for position in range(3):\n    print(position + 1)", "for position in range(count):\n    print(position + 1)", tickets(["", "1\n", "1\n2\n3\n"]), "range の丸かっこに枚数を入れます。"),

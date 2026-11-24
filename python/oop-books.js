@@ -15,7 +15,7 @@
     demo: { code: demo, input: "6", prompt: "6ページ、1ページ2円なら、三つの計算結果はいずれも12です。入力欄のページ数を変えてみましょう。" },
     lessons: [
       {
-        title: "Book クラスで1冊分の記録を作る", text: "first = Book(4) で、4ページ読んだ本の記録を一つ作ります。Book は記録の項目や操作を決めるクラス、first はそのクラスから作ったインスタンスです。作成時に呼ばれる __init__ では、self.pages にこの本のページ数を保存します。",
+        title: "Book クラスで1冊分の記録を作る", text: "first = Book(4) で、4ページ読んだ本の記録を一つ作ります。Book は記録の項目や操作を決めるクラスです。そこから作った1冊分の記録をインスタンスと呼び、first はその記録に付けた名前です。作成時に __init__ が呼ばれ、self（作ったばかりの記録）の pages に 4 を保存します。",
         code: book + "\nfirst = Book(4)\nprint(first.pages)", output: "4",
         quiz: ["Book(4) の結果を入れた first は？", ["クラスの定義そのもの", "4ページの一冊", "全冊のリスト", "ページ番号だけ"], 1, "Book はクラス、first はそこから作った一冊です。"],
         guide: exercise("初期値を4から9に変え、first のページを表示しましょう。", book + "\nfirst = Book(4)\nprint(first.pages)", book + "\nfirst = Book(9)\nprint(first.pages)", [check("一冊の状態", "9\n", { observe: "isinstance(first, Book)", value: true })], "一冊を作る Book(…) に渡す値を変えます。"),
@@ -43,7 +43,7 @@
         write: exercise("Book に from_text(cls, text) を作りましょう。数字の文字を整数にして、そのページ数の一冊を呼ばれたクラスで作って返します。", "", book + "\n    @classmethod\n    def from_text(cls, text):\n        return cls(int(text))", [inspect("二つの種類で生成", "[Book.from_text('07').pages, isinstance(Extra.from_text('3'), Extra)]", [7, true])], "文字列を int で整数にし、その数を cls に渡します。", { after: "class Extra(Book):\n    pass" }),
       },
       {
-        title: "staticmethod で引数だけを使って計算する", text: "@staticmethod を付けると、一冊やクラスを受け取らず、明示して渡した数だけで計算できます。ここではページ数に2を掛けて印刷代に変換します。",
+        title: "staticmethod で引数だけを使って計算する", text: "@staticmethod を付けると、self や cls は自動では渡されません。この例では、呼ぶ側が渡したページ数だけを使います。ここではページ数に2を掛けて印刷代に変換します。",
         code: staticFee + "\nprint(Book.cost(3))\nprint(Book().cost(3))", output: "6\n6",
         quiz: ["Book.cost(3) が受け取るものは？", ["self と3", "cls と3", "3だけ", "本の全ページ"], 2, "staticmethod は引数を自動で付け足しません。"],
         guide: exercise("単価を2円から3円に変え、Book.cost で計算できるようにしましょう。", staticFee, staticFee.replace("* 2", "* 3"), [inspect("クラス・一冊からの呼び出し", "[Book.cost(4), Book().cost(2)]", [12, 6])], "渡されたページに3を掛けます。"),

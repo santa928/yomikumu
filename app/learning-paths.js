@@ -22,7 +22,7 @@ const pathCourses = {
   },
   python: {
     title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo/toc", start: "python/index.html#54/1/slide",
-    project: "文字や数を入力する練習から、条件分岐・繰り返し・リスト・辞書・関数を学びます。名簿を整え、名前ごとの件数を集計します。",
+    project: "名簿に「ゆき」「はる」「ゆき」とあったら、それぞれ何回出てくるでしょう？ 名前を一つずつ読み、「ゆき」は2回、「はる」は1回と数えるプログラムを作ります。",
     first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
     question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
     choices: ["ゆき", "名前"], correct: 0,
@@ -50,7 +50,7 @@ const pathCourses = {
   },
   "python-oop": {
     title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo/toc", start: "python/index.html#63/1/slide",
-    project: "本ごとの状態と操作をクラスにまとめ、継承で料金の計算方法を変えます。関数を呼ぶたびに成功や失敗を記録するデコレーターも作ります。",
+    project: "「どこまで読んだか」と「読んだページ数を増やす操作」を、1冊分の記録としてまとめます。こうしてデータと操作をひと組にして考える方法が、オブジェクト指向プログラミング（OOP）です。",
     first: "実践と共通のクラス入門では、Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
     choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
@@ -60,9 +60,9 @@ const pathCourses = {
   },
   "python-practice": {
     title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo/toc", start: "python/index.html#63/1/slide/practice",
-    project: "読書記録を1件ずつ調べ、条件に合う読書時間を合計します。最後は CSV ファイルの記録を検査して集計します。",
+    project: "読書記録を1件ずつ調べ、条件に合う読書時間を合計します。最後は、本の題名と読書時間をカンマで区切って保存したファイル（CSV）を読み、記録を集計します。",
     first: "共通のクラス入門で本ごとの記録と操作を作ります。実践では、リストの集計や with でファイルを閉じる書き方を学びます。",
-    question: "30分と60分をどちらも時間に変えると、記録は何件になりますか。",
+    question: "読書記録が2件あります。「30分」を「0.5時間」に、「60分」を「1時間」に書き換えました。書き換えた後、記録は何件ありますか。",
     choices: ["1件", "2件"], correct: 1,
     feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。実践の最初の練習でそれぞれを変換してみましょう。"],
     review: ["Pythonのリストを読み直す", "python/index.html#56/1/slide"],
@@ -93,9 +93,9 @@ const pathCourses = {
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
     project: "クイズに回答すると得点が変わり、間違えた問題にもう一度答えられる画面を作ります。",
     first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
-    question: "二つの一覧に同じ li があります。作品クイズの行だけを探すとき、先に選ぶのは？",
+    question: "「作品クイズ」と「参考作品」の一覧には、どちらにも項目（li）があります。クイズの項目だけを探したいとき、探す範囲はどちら？",
     choices: ["ページ全体", "作品クイズの一覧"], correct: 1,
-    feedback: ["ページ全体には参考作品の行もあります。", "そうです。探す場所を決めると、ほかの一覧を保てます。"],
+    feedback: ["ページ全体には参考作品の行もあります。", "そうです。「作品クイズ」の中だけで探せば、「参考作品」の項目は選ばれません。"],
     review: ["問題の一覧を試す", "#js-file-audit/1"],
   },
 };
@@ -187,9 +187,9 @@ function learningPaths(part) {
     for (const course of ["html", "javascript", "dom", "typescript", "react", "next", "tailwind"]) {
       if (pathCourses[course]) content.append(courseEntry(course, saved.positions));
     }
-    content.append(details("この先で作るもの", node("p", "JavaScriptの次はTypeScriptで問題の型を決め、Reactでクイズ画面を作り、Next.jsで複数ページのサイトにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
+    content.append(details("この先で作るもの", node("p", "クイズの得点にうっかり文字を入れたら？ TypeScriptでは実行する前にその間違いを見つけます。Reactでは同じ形のカードに違う本を表示し、Next.jsでは本の一覧から詳細ページを開けるようにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
   } else if (python) {
-    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から。リストや関数を使える人は、実践と OOP に共通のクラス入門から始められます。");
+    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から。リストや関数を使える人は、読書記録を集計したければ「Python実践」、本ごとにページ数と操作をまとめたければ「Python OOP」へ。どちらも同じクラス入門から始まります。");
     content.append(courseEntry("python", saved.positions));
     content.append(courseEntry("python-practice", saved.positions));
     content.append(courseEntry("python-oop", saved.positions));

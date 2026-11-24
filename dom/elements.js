@@ -26,7 +26,7 @@ list.onclick = event => {
   steps: [
     {
       title: "一つの見出しを探す",
-      explain: "DOMは、ブラウザがHTMLを見出しや一覧などの要素として扱ったものです。querySelectorで最初に合う要素を探します。見つからないとnullが返ります。ifの内側に書くと、見つかった時だけ文字を変えられます。",
+      explain: "DOMは、ブラウザがHTMLを読み取って作るページの構造です。見本では document.querySelector(\"#heading\") で id が heading の要素を探します。見つかれば textContent で表示する文字を変えます。なければ null が返り、if (title) の後の処理は行いません。",
       html: quizLists,
       example: `const title = document.querySelector("#heading");
 if (title) title.textContent = "雨の問題";`,

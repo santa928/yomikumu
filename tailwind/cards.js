@@ -19,7 +19,7 @@ function cardUnit(id, title, why, part, before, after, result, prompt, solution,
 }
 
 cardUnit("padding", "CSSの余白を短い名前で書く",
-  "カードの端と文字の間を空けるには、内側の余白（padding）を指定します。Tailwind CSSでは、HTMLの class に p-2 と書くと四辺の余白が 0.5rem、p-4 なら 1rem になります。",
+  "カードの端と文字の間を空けるには、内側の余白（padding）を指定します。Tailwind CSS では、用意された名前を HTML の class に書くと対応する CSS が適用されます。この見本では p-2 が上下左右 0.5rem（8px）、p-4 が 1rem（16px）です。",
   "card", "p-2", "p-4", "カードの端と文字の間の余白が広がります。",
   "「夜の庭」のカードの内側に、上下左右とも 0.5rem の余白を付けてください。1rem はこの見本では16pxです。", "p-2",
   ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"], "カードの四辺の内側を 0.5rem にしましょう。",
@@ -75,9 +75,9 @@ cardUnit("hover", "ポインタが乗ったときだけ線を引く",
 readingUnits.at(-1).checks[0].state = "hover";
 
 cardUnit("focus", "Tabで選んだ場所に枠を出す",
-  "キーボードで次のボタンに移るには Tab を押します。focus-visible: はキーボードで選んだ場所に目印を出すための条件です。outline-2 は外側の輪郭を 2px にします。",
+  "キーボードで次のボタンに移るには Tab を押します。focus-visible: は、Tab での移動など、ブラウザが今の操作位置を目印で示す必要があると判断したときに使う条件です。outline-2 は外側の輪郭を 2px にします。",
   "action", "focus-visible:outline-1", "focus-visible:outline-2", "Tabでボタンに進むと、文字の下でなくボタンの周囲に 2px の輪郭が見えます。",
-  "夜の庭の操作場所に、キーボードで選んだときだけ 2px の輪郭を付けます。", "focus-visible:outline-2", ["outlineWidth", "outlineStyle"], "キーボードで選んだ状態の輪郭を 2px にします。",
+  "夜の庭の操作場所に、Tab で選んだ場所が分かるように 2px の輪郭を付けます。", "focus-visible:outline-2", ["outlineWidth", "outlineStyle"], "キーボードで選んだ状態の輪郭を 2px にします。",
   ["outline-2", "hover:underline", "focus-visible:outline-1", "focus-visible:outline-2"],
   ["Tabで移動中の人に、今の操作場所を伝えるのは？", ["hover:", "gap-2", "focus-visible:", "bg-white"], 2, "focus-visible: でキーボード操作時の目印を付けます。"]);
 readingUnits.at(-1).checks[0].state = "focus-visible";

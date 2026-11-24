@@ -45,23 +45,23 @@ const boxLessons = [
     slides: [
       {
         title: "120pxと書いても外側は140px",
-        body: "width は初め、中身の幅を決めます。この札は中身120pxに左右の余白8pxずつ、枠2pxずつが足されます。外側まで測ると 120＋16＋4 で140pxです。",
+        body: "この札では width: 120px が文字を置く中身の幅です。そこに内側の余白 (padding) が左右に8pxずつ、枠 (border) が左右に2pxずつ加わります。枠の端から端までは 120＋16＋4 で140pxです。",
         html: ticketMarkup, css: ticketStyles, measure: { selector: ".ticket", label: "札", width: true },
       },
       {
         title: "同じ120pxに枠まで収める",
-        body: "box-sizing は幅の数え方を選ぶ指定です。border-box にすると、余白も枠も width の内側に数えます。左右の余白と枠の太さを保ったまま、札全体が120pxになります。",
+        body: "box-sizing は width に何を含めるかを決めます。border-box なら120pxの中に内側の余白 (padding) と枠 (border) も入ります。余白と枠の太さは同じなので、中身の幅が100pxに縮みます。枠の外の余白 (margin) は含めません。",
         html: ticketMarkup, before: ticketStyles, css: ticketStyles + "\n.ticket { box-sizing: border-box; }", measure: { selector: ".ticket", label: "札", width: true },
       },
     ],
     quiz: {
-      prompt: "width が120pxの札で、padding と枠を増やしても札全体を120pxのままにするには？",
+      prompt: "width が120pxの札で、padding と枠を幅の内側に数えるには？",
       options: ["margin を増やす", "box-sizing: border-box", "文字を太くする", "線だけを消す"], correct: 1,
       reasons: ["margin は幅のさらに外側にあります。", "指定した幅の内側に padding と border を含めます。", "文字の太さは幅の数え方を変えません。", "枠を残したまま収めることができます。"],
     },
     exercise: {
       field: "css", html: ticketMarkup, css: ticketStyles, measure: { selector: ".ticket", label: "札", width: true },
-      task: "札の外側までの幅を100pxにしてください。左右の余白8pxと枠2pxを残し、あとで余白を増やしても全体が100pxに収まる数え方にします。",
+      task: "札の外側までの幅を100pxにしてください。左右の余白8pxと枠2pxを残し、余白と枠を含めて100pxと数える指定にします。",
       hint: ".ticket の width を100pxに変え、box-sizing で枠までを数えるようにしましょう。",
       answer: ".ticket { width: 100px; padding: 8px; border: 2px solid; box-sizing: border-box; }",
       build: { code: ".ticket { width: ①; padding: 8px; border: 2px solid; box-sizing: ②; }", slots: [["希望する全幅", "100px", "120px"], ["幅の数え方", "content-box", "border-box"]] }, review: 1,

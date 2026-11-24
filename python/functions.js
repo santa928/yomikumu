@@ -19,14 +19,14 @@
         write: exercise("「精算」と表示する関数 pay を作り、二度呼んで二行表示しましょう。", "", 'def pay():\n    print("精算")\npay()\npay()', [check("pay を2回呼ぶ", "精算\n精算\n", { observe: "callable(pay)", value: true })], "定義の外で pay() を二度呼びます。"),
       },
       {
-        title: "呼ぶたびに別の値を渡す", text: "関数の丸かっこに受け取る値の名前を書きます。これを引数といいます。呼ぶ側で数を渡すと、一つの関数を違う枚数に使えます。* は掛け算です。",
+        title: "呼ぶたびに別の値を渡す", text: "def show_price(count): の count は、受け取る値に付けた名前（仮引数）です。show_price(2) と呼ぶと、渡した 2（引数）を count として使います。次に show_price(4) と呼ぶと count は 4 です。* は掛け算です。",
         code: "def show_price(count):\n    print(count * 100)\nshow_price(2)\nshow_price(4)", output: "200\n400",
         quiz: ["show_price(3) の表示は？", ["100", "200", "300", "count"], 2, "今は count が3なので、3 × 100 を表示します。"],
         guide: exercise("単価を50円に変え、show_price に2枚と4枚を渡すと各金額が出るようにしましょう。", "def show_price(count):\n    print(count * 100)\nshow_price(2)\nshow_price(4)", "def show_price(count):\n    print(count * 50)\nshow_price(2)\nshow_price(4)", [check("2枚と4枚、その後に1枚", "100\n200\n50\n", { observe: "show_price(1)", value: null })], "関数の中で、受け取った count に単価50を掛けます。"),
         write: exercise("券の枚数 count を受け取り、1枚80円で計算した合計金額を表示する関数 bill を作りましょう。1枚、3枚の順に呼んでください。採点では5枚でも試します。", "", "def bill(count):\n    print(count * 80)\nbill(1)\nbill(3)", [check("1枚と3枚、その後に5枚", "80\n240\n400\n", { observe: "bill(5)", value: null })], "呼ぶときに変わる枚数を、関数の中の掛け算に使います。"),
       },
       {
-        title: "計算した値を受け取る", text: "金額を次の計算に使うには、関数の中で return を書きます。呼び出した位置が返された値に置き換わり、外の名前に入れられます。関数の中で表示する必要はありません。",
+        title: "計算した値を受け取る", text: "金額を次の計算に使うには、関数の中で return を書きます。この例では price(2) が 200 を返し、amount = price(2) でその 200 を amount に入れます。return は呼んだ側に値を渡すだけなので、表示は最後の print で行います。",
         code: "def price(count):\n    return count * 100\namount = price(2)\nprint(amount + 10)", output: "210",
         quiz: ["price(3) の返り値を amount に入れる行は？", ["price = amount(3)", "amount = price(3)", "print(amount)", "def amount(3):"], 1, "右で関数を呼び、戻ってきた値に左の名前を付けます。"],
         guide: exercise("表示だけする price に、1枚100円の金額を返させましょう。この課題では定義だけを書き、採点が2枚・7枚で呼びます。", "def price(count):\n    print(count * 100)", "def price(count):\n    return count * 100", returnChecks("price", [200, 700]), "金額が見えていても、次の計算には return count * 100 で渡します。"),
@@ -40,7 +40,7 @@
         write: exercise("金額 amount から3円引いた値を返す関数 sale を書きましょう。この課題では関数の定義だけを書きます。", "", "def sale(amount):\n    return amount - 3", returnChecks("sale", [9, 14], [12, 17]), "呼んだ側が使えるように、割引後の値を return します。"),
       },
       {
-        title: "関数の内側と外側の名前", text: "引数の名前は呼び出すたびに、その関数の中で使われます。外に同じ名前があっても別の値です。外に計算結果を渡したいときは return を使います。",
+        title: "関数の内側と外側の名前", text: "引数の名前は呼び出すたびに、その関数の中で使われます。外に同じ名前があっても別の変数です。外に計算結果を渡したいときは return を使います。",
         code: "amount = 100\ndef discount(amount):\n    amount = amount - 10\n    return amount\nprint(discount(40))\nprint(amount)", output: "30\n100",
         quiz: ["discount(40) のあと、外の amount は？", ["30", "40", "90", "100"], 3, "関数の中だけで使う amount を変更しても、外の100は変わりません。"],
         guide: exercise("外の100を保ち、関数の中だけで5円引きにしましょう。discount(40) の結果と、外の amount を表示します。", "amount = 100\ndef discount(amount):\n    return amount - 10\nprint(discount(40))\nprint(amount)", "amount = 100\ndef discount(amount):\n    return amount - 5\nprint(discount(40))\nprint(amount)", [check("内35と外100", "35\n100\n", { observe: "discount(20)", value: 15 })], "関数の中の引く金額だけを5にします。"),
