@@ -6,7 +6,7 @@ pythonChapters.push({
   demo: { code: 'name = input()\ncount = int(input())\nprint(name)\nprint(count + 1)', input: "つばき\n2", prompt: "1行目に名前、2行目にチケットの枚数を書いて実行してみましょう。「つばき」と「2」なら「つばき」と「3」が表示されます。" },
   lessons: [
     {
-      title: "文字を表示する", text: 'print("入口") を実行すると、画面に「入口」と表示されます。表示したい文字を引用符で囲み、print の丸かっこに入れます。引用符は画面に出ません。',
+      title: "文字を表示する", text: 'この教材では、Pythonのコードをブラウザの中で実行できます。print は、丸かっこに入れた値を表示する、Pythonに用意された関数（名前の付いた処理）です。print("入口") では、引用符の内側の「入口」だけが表示されます。引用符は文字列の範囲を示す目印です。',
       code: 'print("入口")', output: "入口",
       quiz: ["何と表示されますか。", ["入口", '"入口"', "print", "何も出ない"], 0, "print が受け取る文字は、引用符の内側の「入口」です。"],
       guide: exercise("見本の「入口」を「受付」に書き換えて、一行表示しましょう。", 'print("入口")', 'print("受付")', [check("「受付」を表示", "受付\n")], "引用符の間を「受付」にします。"),
@@ -27,7 +27,7 @@ pythonChapters.push({
       write: exercise("stock には今の枚数が入っています。4枚足した合計を表示しましょう。", "", "print(stock + 4)", [check("stock が2", "6\n", { before: "stock = 2" }), check("stock が0", "4\n", { before: "stock = 0" })], "print の丸かっこの中で、stock に4を足します。"),
     },
     {
-      title: "入力した文字を受け取る", text: "input() は入力欄の1行を文字として読み取ります。「ゆき」と入力すると、guest に「ゆき」が入り、次の行でその名前が表示されます。",
+      title: "入力した文字を受け取る", text: "print は値を表示し、input は使う人から値を受け取ります。この教材で入力欄に「ゆき」と書くと、input() がその1行を文字列として受け取り、guest という名前で使えるようになります。次の行の print(guest) が「ゆき」を表示します。",
       code: "guest = input()\nprint(guest)", input: "ゆき", output: "ゆき",
       quiz: ["「なつ」と入力すると何が見えますか。", ["guest", "ゆき", "input", "なつ"], 3, "受け取る値が「なつ」に変わるので、表示も変わります。"],
       guide: exercise("決まった「ゆき」の代わりに入力した名前を受け取り、その名前を表示しましょう。", 'guest = "ゆき"\nprint(guest)', "guest = input()\nprint(guest)", [check("入力が「ゆき」", "ゆき\n", { input: "ゆき" }), check("入力が「なつ」", "なつ\n", { input: "なつ" })], "名前を固定した行の右側を input() に変えます。"),

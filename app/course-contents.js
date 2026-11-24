@@ -48,7 +48,9 @@ window.CourseContents = (() => {
     if (!resume || resume.href !== start) actions.append(link(startLabel, start, resume ? "review" : "next"));
     const extra = element("details", undefined, "course-toc-extra");
     extra.append(element("summary", "学ぶ内容と始める目安"), facts);
-    block.append(actions, extra);
+    block.append(actions);
+    if (id === "tailwind") block.append(CourseGuide.tailwindComparisonDetails());
+    block.append(extra);
     return block;
   }
 

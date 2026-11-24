@@ -191,7 +191,7 @@ except ValueError as error:
       },
       {
         title: "読書時間を文字から整数に変える",
-        text: "DictReader で読んだ値は文字です。15を読み取っても、文字のまま2倍すると「1515」になります。int に渡して整数に変えると、掛け算や足し算ができます。",
+        text: 'このCSVの minutes 列を DictReader で読むと、見た目が数字でも文字列の "15" です。"15" * 2 は文字の繰り返しで "1515"、int("15") * 2 は整数の掛け算で 30 になります。入力欄の input() と同じように、合計する前に数に変えます。',
         files: { "reading.csv": files["reading.csv"] },
         code: read(`    row = next(reader)
     print(row["minutes"] * 2)

@@ -469,12 +469,35 @@ main:has(.path-course) > h1 + p, main:has(.family-cards) > h1 + p {
 .course-support summary { color: var(--muted-ink); }
 .course-support details[open] { padding: 0 .8rem .75rem; background: #f7f8f1; border-radius: .4rem; }
 .course-support details[open] summary { font-weight: 700; }
-.spacing-samples { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; margin-top: .7rem; }
-.spacing-samples figure { display: grid; justify-items: start; gap: .18rem; }
-.spacing-samples figcaption { font-size: .8rem; color: #405543; }
-.spacing-samples span { color: #2d4836; background: #fffcf1; border: 1px dashed #94a486; font-size: .86rem; }
-.spacing-samples .p-2 { padding: .5rem; }
-.spacing-samples .p-4 { padding: 1rem; }
+.tailwind-comparison {
+  border-block-start: 1px solid #c5d0bd;
+  margin-block: 1rem 0;
+  padding-block-start: .8rem;
+}
+.course-example > .tailwind-comparison { border: 0; padding: 0; margin: 0 0 .9rem; }
+.tailwind-comparison h3 {
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  color: #263f30;
+}
+.spacing-comparison-examples { display: grid; gap: .6rem; margin: .6rem 0 .75rem; }
+.spacing-comparison-examples figure {
+  display: flex; flex-direction: column;
+  min-width: 0; gap: .35rem; padding: .65rem .55rem;
+  background: #fffefa; border: 1px solid #d0d8c9; border-radius: .35rem;
+}
+.spacing-comparison-examples figcaption { color: #2d4936; font-weight: 750; line-height: 1.45; }
+.spacing-comparison-examples pre { background: #edf0e6; border-radius: .25rem; padding: .35rem .5rem; font-size: .79rem; }
+.spacing-comparison-examples figure p { margin: 0; font-size: .82rem; color: #40564a; }
+.spacing-output { margin-top: auto; padding-top: .25rem; }
+main .tailwind-comparison > p { font-size: .92rem; margin: .55rem 0 0; }
+.tailwind-comparison-details { margin: .5rem 0; }
+.tailwind-comparison-details > summary { min-height: 44px; font-weight: 650; padding-block: .55rem; }
+.tailwind-comparison-details[open] > .tailwind-comparison { margin-top: .25rem; }
+@media (min-width: 365px) {
+  .spacing-comparison-examples { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .path-tools {
   margin: .8rem 0 0;
   border: 1px solid #d5dbd5;

@@ -20,7 +20,7 @@ function cardUnit(id, title, why, part, before, after, result, prompt, solution,
 }
 
 cardUnit("padding", "カードの内側の余白を変える（padding）",
-  "カードの端と文字の間を空けるには、内側の余白（padding）を指定します。Tailwind CSS では、用意された名前を HTML の class に書くと対応する CSS が適用されます。この見本では p-2 が上下左右 0.5rem（8px）、p-4 が 1rem（16px）です。",
+  "カードの端と文字の間を空けるには、内側の余白（padding）を指定します。手書きのCSSなら padding の値を変えます。TailwindならHTMLのクラス名を変え、対応するCSSのルールを使います。この教材の見本にある p-2 は 0.5rem、p-4 は 1rem です。",
   "card", "p-2", "p-4", "カードの端と文字の間の余白が広がります。",
   "「夜の庭」のカードの内側に、上下左右とも 0.5rem の余白を付けてください。1rem はこの見本では16pxです。", "p-2",
   ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft"], "カードの四辺の内側を 0.5rem にしましょう。",

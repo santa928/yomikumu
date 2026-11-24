@@ -26,7 +26,7 @@ list.onclick = event => {
   steps: [
     {
       title: "目印のIDで見出しを探して文字を変える",
-      explain: "DOMは、ブラウザがHTMLを読み取って作るページの構造です。見本では document.querySelector(\"#heading\") で id が heading の要素を探します。見つかれば textContent で表示する文字を変えます。なければ null が返り、if (title) の後の処理は行いません。",
+      explain: "HTMLはページの原稿、DOMはブラウザが原稿を読み取って組み立てた、書き換えられる見取り図です。JavaScriptの document.querySelector(\"#heading\") は、その中から id が heading の要素を探します。見つかったときだけ textContent を変えるので、原稿を保存し直さなくても表示が変わります。見つからなければ null が返り、書き換えません。",
       html: quizLists,
       example: `const title = document.querySelector("#heading");
 if (title) title.textContent = "雨の問題";`,
@@ -42,7 +42,7 @@ if (title) title.textContent = "雨の問題";`,
     {
       title: "CSSクラスを付け外しして行を強調する",
       html: '<ul id="quiz"><li id="rain">雨音</li><li id="dawn" class="chosen">夜明け</li></ul>',
-      explain: "classList.add('chosen') は要素に chosen クラスを付け、classList.remove('chosen') はそのクラスを外します。このページでは chosen のある行が黄色く太字になります。",
+      explain: "黄色と太字にするルールは、CSSの .chosen に書いてあります。JavaScriptの classList.add は要素に chosen という印を付け、remove は外します。JavaScriptで色を指定し直すのではなく、どの行にCSSのルールを効かせるかを切り替えます。",
       example: `const rain = document.querySelector("#rain");
 const dawn = document.querySelector("#dawn");
 dawn.classList.remove("chosen");

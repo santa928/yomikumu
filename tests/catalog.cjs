@@ -39,6 +39,7 @@ const expected = {
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), label);
           const intro = main.locator(".course-toc-intro");
           assert.match(await intro.getByRole("heading", { level: 2 }).innerText(), /？$/);
+          assert.ok(!(await intro.locator("p").first().innerText()).includes("`"), title + "の目次では説明のMarkdown記号をそのまま表示しない");
           assert.ok(await intro.getByRole("link", { name: /^最初の課題：|^前回の続きへ/ }).first().isVisible(), label + "から学習を開始できる");
           if (width === 375) {
             await page.evaluate(async () => {

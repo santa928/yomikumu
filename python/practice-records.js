@@ -25,14 +25,14 @@
       code: "from archive import Notes, valid\nnotes = Notes([int(input()), 60])\n" + aggregate(30) + "\nprint(notes.closed)" },
     lessons: [
       {
-        title: "型注釈は何を知らせる？", text: "minutes: int は「分には整数を入れる予定」と読み手に知らせる型注釈です。コロンの右が型です。注釈を書いても、実行時に別の種類の値を自動で拒むわけではありません。",
+        title: "型注釈は何を知らせる？", text: "minutes: int は「minutes は整数として使う」という型注釈です。人や型を検査する道具の手掛かりになります。Pythonが実行中に文字列を自動で拒んだり、整数に変えたりするわけではありません。見本でも、数の12のあとに文字列の「十二」を代入でき、そのまま表示されます。",
         code: 'minutes: int = 12\nprint(minutes)\nminutes = "十二"\nprint(minutes)', output: "12\n十二",
         quiz: ["minutes: int に「十二」を代入すると、注釈だけでどうなる？", ["自動で12になる", "必ず拒否される", "文字も代入できる", "変数が消える"], 2, "型を伝える注釈と、実行時のチェックは別です。"],
         guide: exercise("読書時間の値を15にし、int の注釈と表示は残しましょう。", "minutes: int = 12\nprint(minutes)", "minutes: int = 15\nprint(minutes)", [check("値と注釈", "15\n", { observe: "__annotations__.get('minutes') is int", value: true })], "コロンの右の型は int のまま、値だけ15にします。"),
         write: exercise("冊数 count に整数の注釈を付け、0を入れて表示しましょう。", "", "count: int = 0\nprint(count)", [check("冊数0と型注釈", "0\n", { observe: "__annotations__.get('count') is int", value: true })], "count: int = 0 と書くと、初期値と型の両方が読めます。"),
       },
       {
-        title: "dataclass で記録の項目をまとめる", text: "Record(15) で15分の読書記録を作り、entry.minutes で15を取り出します。class Record の上に @dataclass を付けると、項目名と型に合わせて、値を受け取って保存する処理が用意されます。",
+        title: "dataclass で記録の項目をまとめる", text: "Record(15) で15分の読書記録を作り、entry.minutes で15を取り出します。Book の例では __init__ を手書きしました。class Record の上に @dataclass を付けると、型注釈のある項目から __init__ が作られます。型注釈はあっても、値が正しいかの検査は別に書きます。",
         code: record + "\nentry = Record(15)\nprint(entry.minutes)", output: "15",
         quiz: ["entry = Record(20) のあと、読書時間の20を取り出す式は？", ["Record.minutes(20)", "entry.minutes", "entry[20]", "dataclass(20)"], 1, "entry に一件が入っていれば、ドットの後に項目名を書いて取り出せます。"],
         guide: exercise("Record を作る引数を20に変え、entry の minutes を表示しましょう。", record + "\nentry = Record(15)\nprint(entry.minutes)", record + "\nentry = Record(20)\nprint(entry.minutes)", [check("読書20分", "20\n", { observe: "[entry.minutes, Record(0).minutes]", value: [20, 0] })], "作成する Record(…) の中身を変更します。"),

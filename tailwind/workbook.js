@@ -133,11 +133,12 @@ async function showSample(unit, values, name, settings, container, width) {
 function slide(unit) {
   const ex = unit.example;
   const state = unit.checks.find(check => check.state)?.state;
-  main.insertAdjacentHTML("beforeend", `<p>${unit.why}</p><p><strong>${ex.source ? "status.js" : partLabels[ex.part]}</strong>の変更する箇所</p>
+  main.insertAdjacentHTML("beforeend", `<p>${unit.why}</p><p id="snippet-label"><strong>${ex.source ? "status.js" : partLabels[ex.part]}</strong>の変更する箇所</p>
     <pre class="reading-code" id="snippet"></pre>${windowHtml()}${unit.widths ? widthTools() : ""}
     <div class="tools"><button id="switch" type="button" aria-pressed="false">${ex.after ? "見本を一か所変える" : "指定を外して比べる"}</button>
     ${state && state !== "disabled" ? '<button type="button" id="state" aria-pressed="false">状態見本に切り替える</button>' : ""}</div>
     <p id="result" role="status"></p><a class="next" href="#${addr(unit, "quiz")}">表示を予測する</a>`);
+  if (unit.id === "padding") main.querySelector("#snippet-label").before(CourseGuide.tailwindComparisonDetails());
   let changed = false;
   let width = ex.width;
   let statePreview = false;

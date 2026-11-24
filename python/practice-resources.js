@@ -30,7 +30,7 @@
         write: exercise("一件を開き、読んだ数に2を足して表示し、閉じましょう。", "", start + "note = Memo(input())\nprint(note.read() + 2)\nnote.close()", [checkLog("件数に2を足す", "7\n", "5", three), checkLog("入力が0", "2\n", "0", three)], "読むのは一度です。表示したら同じメモを閉じます。", { files: file }),
       },
       {
-        title: "with で使う範囲を囲む", text: "with Memo(...) as note: と書くと、字下げした行の間だけ使い、抜けるときにメモの終了処理が動きます。手で close を重ねる必要はありません。",
+        title: "with で使う範囲を囲む", text: "with Memo(...) as note: の中に「メモを読んでいる間の処理」を書きます。抜けるときは、Memo に用意された終了処理がメモを閉じるので、手で close を書く必要はありません。with の外でも note という名前は残ります。Memo は後片付けの順番を示す見本で、実際のファイルなら閉じたあとに読むには開き直します。",
         files: file, code: managed + "\nprint(events)", input: "3", output: "3\n['開く', '読む', '閉じる']",
         quiz: ["with から出た直後に記録される作業は？", ["開く", "読む", "閉じる", "もう一度読む"], 2, "with の処理が終わると、Memo の close が1回呼ばれます。"],
         guide: exercise("with が閉じたあとで二度目の close を呼ぶ見本を直しましょう。", managed + "\nnote.close()", managed, normal, "with の外の close を取り除くと、閉じた回数が一度になります。", { files: file }),

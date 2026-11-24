@@ -22,9 +22,9 @@ const pathCourses = {
   },
   tailwind: {
     page: "tailwind/index.html", catalog: "tailwind/index.html", start: "tailwind/index.html#padding/slide",
-    question: "カードの内側に余白をつけるCSSの指定はどちら？",
-    choices: ["padding", "margin"], correct: 0,
-    feedback: ["そうです。同じ余白をTailwindで付けて、二つの結果を見比べます。", "margin はカードの外側の余白を指定します。文字とカードの端を離すには padding を使います。"],
+    question: 'Tailwindで生成したCSSも、自分で用意したCSSもありません。HTMLに class="p-4" と書くだけで余白は増える？',
+    choices: ["増えない", "増える"], correct: 0,
+    feedback: ["そうです。p-4 に対応するCSSのルールがあって初めて、内側の余白が変わります。", "HTMLのクラス名には、それだけで余白を付ける力はありません。対応するCSSを読み込む必要があります。"],
     review: ["CSSの余白を試す", "#padding/1"],
   },
   typescript: {
@@ -46,7 +46,7 @@ const pathCourses = {
     page: "python/index.html", catalog: "python/index.html#59/demo/toc", start: "python/index.html#63/1/slide/practice",
     question: "読書記録が2件あります。「30分」を「0.5時間」に、「60分」を「1時間」に書き換えました。書き換えた後、記録は何件ありますか。",
     choices: ["1件", "2件"], correct: 1,
-    feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。実践の最初の練習でそれぞれを変換してみましょう。"],
+    feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。共通のクラス入門のあとで、こうした変換をまとめて行う練習に進みます。"],
     review: ["Pythonのリストを読み直す", "python/index.html#56/1/slide"],
     afterIntro: ["クラスを学習済みなら実践へ", "python/index.html#59/1/slide"],
   },
@@ -139,19 +139,9 @@ function courseEntry(course, positions) {
   const example = node("div", undefined, "course-example");
   const outcome = node("p");
   outcome.append(CourseGuide.richText(guide.example));
-  example.append(node("h3", "このコースでできること"), outcome);
-  if (course === "tailwind") {
-    // The preview is intentionally static: it shows the exact change in lesson one.
-    const samples = node("div", undefined, "spacing-samples");
-    for (const [token, caption] of [["p-2", "余白が狭い"], ["p-4", "余白が広い"]]) {
-      const sample = node("figure");
-      const label = node("figcaption");
-      label.append(node("code", token), " · ", caption);
-      sample.append(label, node("span", "本の紹介", token));
-      samples.append(sample);
-    }
-    example.append(samples);
-  }
+  if (course === "tailwind") example.append(CourseGuide.tailwindComparison());
+  const outcomeHeading = node("h3", "このコースでできること");
+  example.append(outcomeHeading, outcome);
 
   const prerequisite = node("p", undefined, "course-prerequisite");
   prerequisite.append(node("strong", "始める目安"), document.createTextNode(guide.prerequisite));

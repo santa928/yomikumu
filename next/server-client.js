@@ -26,7 +26,7 @@ nextLessons.push({
   "slides": [
     [
       "inventory.json から一冊を読み込む",
-      "サーバー側のページから readBook に本の id を渡します。readBook は inventory.json を開いてその本のデータを返します。await で読み込みを待ってから title を使います。",
+      "教材の inventory.json はサーバー側にあります。readBook がサーバーで本のデータを読み、await で完了を待ってから題名を表示します。ブラウザに必要なのは表示する題名で、ファイルを開くコードをブラウザに渡す必要はありません。",
       "const selected = await readBook(\"bridge\");\nreturn <h1>{selected.title}</h1>;",
       "/client-lab/read には「石橋のスケッチ」が届きます。"
     ],
