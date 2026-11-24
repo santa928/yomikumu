@@ -51,7 +51,9 @@ async function fromPractice(browser) {
     await phone.goto(workbook + "#61/3/write");
     const steps = phone.getByRole("navigation", { name: "この単元の移動" });
     await follow(phone, steps.locator(".next"), workbook + "#63/1/slide/practice", true);
-    await phone.getByText("Python OOPの目次", { exact: true }).tap();
+    await follow(phone, phone.getByRole("link", { name: "Python実践の目次", exact: true }), workbook + "#59/demo/toc", true);
+    await phone.getByRole("heading", { name: "Python実践の目次", exact: true }).waitFor();
+    assert.equal(await phone.locator("#contents").getByRole("link", { name: "self で呼ばれた本だけ更新する" }).getAttribute("href"), "#63/3/slide/practice");
     await phone.locator("#contents").getByRole("link", { name: "self で呼ばれた本だけ更新する" }).tap();
     await phone.getByRole("link", { name: "見本を変えてみる" }).tap();
     await phone.getByRole("link", { name: "自分で解く課題へ" }).tap();
@@ -149,15 +151,52 @@ async function independentResume(browser) {
 async function openCourseToc(browser) {
   const page = await browser.newPage();
   try {
-    for (const [name, id] of [["Python基礎", 54], ["Python実践", 59], ["Python OOP", 63]]) {
-      await page.goto(home + "#paths/python");
-      await page.getByRole("link", { name: name + "の単元を選ぶ" }).click();
-      const toc = page.getByText(name + "の目次", { exact: true });
+    for (const [name, id, route, other, context] of [
+      ["Python基礎", 54, "names/1/write", 59, "basics"],
+      ["Python実践", 59, "61/1/write", 54, "practice"],
+      ["Python OOP", 63, "64/1/write", 54, ""],
+    ]) {
+      const assignment = workbook + "#" + route;
+      await page.goto(assignment);
+      await page.getByLabel("main.py のコード").fill("# 保存した下書き");
+      const url = workbook + "#" + id + "/demo/toc";
+      const toc = page.getByRole("heading", { name: name + "の目次", exact: true });
+      const snapshot = () => page.evaluate(() => JSON.stringify(Object.entries(localStorage).sort()));
+      const before = await snapshot();
+      await follow(page, page.getByRole("link", { name: name + "の目次", exact: true }), url);
       await toc.waitFor();
-      assert.equal(await toc.evaluate(element => element.parentElement.open), true);
       assert.equal(await toc.evaluate(element => element === document.activeElement), true);
-      await page.goto(workbook + "#" + id + "/demo");
-      await page.locator("details:not([open]) > #course-toc").waitFor();
+      assert.equal(await page.locator("#lesson-content").isVisible(), false);
+      assert.equal(await page.getByRole("button", { name: "コードを実行" }).count(), 0);
+      assert.ok(await page.locator("#contents > li > h2").count());
+      assert.equal(await page.locator("#contents > li > h2 > a").count(), 0);
+      assert.ok(await page.locator("#catalog-intro").textContent());
+      assert.ok(await page.locator("#contents > li > a").filter({ hasText: "完成例を見る" }).count());
+      const desktop = page.viewportSize();
+      for (const width of [375, desktop.width]) {
+        await page.setViewportSize({ width, height: desktop.height });
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          name + "の目次が幅 " + width + "px に収まる");
+      }
+      assert.ok(await page.locator("#contents > li > ol > li > a").count());
+      assert.equal(await page.locator("#contents a[href^='#" + other + "']").count(), 0);
+      assert.equal(await snapshot(), before, "目次を開いても保存済みの学習位置を変更しない");
+      await page.goBack();
+      await page.getByRole("heading", { name: "自分で解く", exact: true }).waitFor();
+      assert.equal(await page.getByLabel("main.py のコード").inputValue(), "# 保存した下書き");
+      await page.goto(home + "#paths/python");
+      await page.getByRole("link", { name: name + "の目次" }).click();
+      await toc.waitFor();
+      assert.equal(page.url(), url);
+      if (context) {
+        const classUrl = workbook + "#63/1/slide/" + context;
+        await follow(page, page.locator("#contents").getByRole("link", { name: "Book クラスで1冊分の記録を作る", exact: true }), classUrl);
+        await follow(page, page.getByRole("link", { name: name + "の目次", exact: true }), url);
+        await toc.waitFor();
+      }
+      await page.goto(url);
+      await toc.waitFor();
+      await follow(page, page.getByRole("link", { name: "全コース目次", exact: true }), new URL("#paths", home).href);
     }
   } finally { await page.close(); }
 }

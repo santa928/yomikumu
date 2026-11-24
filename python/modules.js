@@ -12,9 +12,9 @@
     check("初めから誤入力", "数字を入力\n", { input: "紙\n4" }),
   ];
   pythonChapters.push({
-    id: "58", title: "別ファイルの関数で2行の返却数を集計する",
-    goal: "入力した2行の返却数を整数に変え、1行目の件数と2行の合計を表示します。整数に変えられないときは「数字を入力」と表示します。",
-    demo: { prompt: "二行目を「紙」に変え、その後に数字へ直すとどうなるか試しましょう。", code: total, input: "2\n5", files: counts },
+    id: "58", title: "別ファイルの関数を使い、入力エラーに対応する",
+    goal: "図書館に返された本の冊数を1行ずつ入力します。別ファイルの関数で入力を整数に変え、1行目の冊数と2行の合計を表示します。整数に変えられないときは「数字を入力」と表示します。",
+    demo: { prompt: "1行目と2行目に、別の日に返された本の冊数が入っています。2行目を「紙」に変え、その後に数字へ戻すと、表示はどう変わりますか。", code: total, input: "2\n5", files: counts },
     lessons: [
       {
         title: "関数を別のファイルに書く", text: "counts.py には、数に1を足す関数 add_one が書いてあります。main.py から add_one(3) を呼ぶと、4が返り、画面にも4と表示されます。",
@@ -31,21 +31,21 @@
         write: exercise("別ファイルの as_count を読み込み、一行の入力を数にして、2枚足した結果を表示しましょう。", "", "from counts import as_count\nprint(as_count(input()) + 2)", [check("数の加算", "6\n", { input: "4", observe: "as_count('09')", value: 9 }), check("入力が0", "2\n", { input: "0" })], "import した関数に入力を渡し、返った数に2を足します。", { files: counts }),
       },
       {
-        title: "変換できない行を観察する", text: "int は「3」を整数にできますが、「紙」は整数にできません。このとき ValueError という例外が発生し、その行で通常の流れが止まります。エラーの場合も、そこまでの表示は残ります。",
+        title: "整数に変えられない入力で起きるエラーを見る", text: "int は「3」を整数にできますが、「紙」は整数にできません。このとき ValueError という例外が発生し、その行で通常の流れが止まります。エラーの場合も、そこまでの表示は残ります。",
         files: counts, code: 'from counts import as_count\nprint("読取")\nprint(as_count(input()))', input: "紙", output: "読取", error: "ValueError",
         quiz: ["「紙」を変換しようとすると、何が起きますか。", ["0に変わる", "紙が消える", "必ず次の行に進む", "ValueErrorで通常の流れが止まる"], 3, "数字にできない理由を示す例外が出ます。"],
         guide: exercise("固定の「2」の代わりに入力を変換し、正しい値と ValueError の両方を観察しましょう。", 'from counts import as_count\nprint(as_count("2"))', one, [check("数字なら表示", "2\n", { input: "2" }), check("数字以外なら停止", "", { input: "豆", error: "ValueError" })], "関数に渡す文字を input() で受け取りましょう。", { files: counts }),
         write: exercise("最初に「開始」を表示してから入力を数に直して表示しましょう。数字以外のときは「開始」まで残れば成功です。", "", 'from counts import as_count\nprint("開始")\nprint(as_count(input()))', [check("数字を読む", "開始\n4\n", { input: "4" }), check("途中で止まる", "開始\n", { input: "羽", error: "ValueError" })], "開始を先に表示し、次の行で変換を試します。", { files: counts }),
       },
       {
-        title: "変換に失敗したときの表示を決める", text: "「2」を入力すると try の中で整数に変換でき、2が表示されます。「紙」の場合は as_count が ValueError を起こし、main.py の except ValueError: の下にある「数字を入力」が表示されます。",
+        title: "try と except でエラー時の表示を決める", text: "「2」を入力すると try の中で整数に変換でき、2が表示されます。「紙」の場合は as_count が ValueError を起こし、main.py の except ValueError: の下にある「数字を入力」が表示されます。",
         files: counts, code: recover, input: "紙", output: "数字を入力",
         quiz: ["入力が「2」、次の実行で「紙」。通る順番は？", ["両方とも except", "成功して表示、次は except の案内", "最初だけ except", "両方ともエラーのまま"], 1, "「2」は try の表示へ進み、「紙」は呼出元の except に届きます。"],
         guide: exercise("エラーを受けた時の案内だけを「もう一度」に変えましょう。", recover, recover.replace("数字を入力", "もう一度"), [check("数字ならそのまま", "4\n", { input: "4" }), check("誤入力なら案内", "もう一度\n", { input: "紙" })], "except の中に置いた print の文字だけを変えます。", { files: counts }),
         write: exercise("入力を数にして1足した結果を表示し、数字以外なら「数を確認」と知らせましょう。", "", 'from counts import as_count\ntry:\n    print(as_count(input()) + 1)\nexcept ValueError:\n    print("数を確認")', [check("正常な枚数", "7\n", { input: "6" }), check("不正な枚数", "数を確認\n", { input: "空" })], "try に変換と足し算を置き、except ValueError で短い案内を表示します。", { files: counts }),
       },
       {
-        title: "二件の途中経過と合計を出す", text: "一件目を数にできたら先に表示します。二件目が正しいときにだけ合計へ進みます。二件目で失敗しても、一件目が読めたことと、直すべき入力が分かります。",
+        title: "2行の入力を順に変換して合計する", text: "一件目を数にできたら先に表示します。二件目が正しいときにだけ合計へ進みます。二件目で失敗しても、一件目が読めたことと、直すべき入力が分かります。",
         files: counts, code: total, input: "3\n4", output: "3\n7",
         quiz: ["3、紙 の二行なら、順に何が見えますか。", ["3、数字を入力", "3、0", "数字を入力だけ", "3、紙"], 0, "二件目で例外になる前に、一件目の3は表示済みです。"],
         guide: exercise("二件目だけを出す見本の最後の計算を、一件目と二件目の合計に変えましょう。", total.replace("first + second", "second"), total, cases, "二件を受け取った後の print に first + second を渡します。", { files: counts }),

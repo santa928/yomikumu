@@ -24,7 +24,14 @@ async function verifyJavaScript(browser, base) {
   }
   try {
     await open(pc, "home");
-    await pc.getByRole("link", { name: "JavaScript の得点クイズへ" }).click();
+    await pc.getByRole("heading", { name: "HTML / CSSの目次", level: 1 }).waitFor();
+    await pc.getByRole("heading", { name: "画面の幅に合わせる", level: 2 }).waitFor();
+    await pc.getByRole("link", { name: "次のコース：JavaScriptの目次" }).click();
+    await pc.getByRole("heading", { name: "JavaScriptの目次", level: 1 }).waitFor();
+    const conditions = pc.locator("main .catalog-chapters > li").filter({
+      has: pc.getByRole("heading", { name: "条件に応じて処理を分ける", level: 2 }),
+    });
+    await conditions.getByRole("link", { name: "比較で「指定した数以上」を判定する" }).waitFor();
     await pc.getByRole("link", { name: "最初のスライドへ →" }).click();
     const sample = pc.getByRole("button", { name: "見本を実行" });
     await sample.click();
@@ -80,6 +87,8 @@ async function verifyJavaScript(browser, base) {
     const err = "let score = initialScore;\nconsole.log(scroe);";
     await submit(err, "2行目");
     await pc.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    await pc.getByRole("link", { name: "← 前のスライドへ" }).click();
+    await pc.getByRole("link", { name: "次のスライドへ →" }).click();
     await pc.reload();
     await pc.getByRole("link", { name: /解きかけの問題へ戻る/ }).click();
     assert.equal(await editor.inputValue(), err);
@@ -109,6 +118,8 @@ async function verifyJavaScript(browser, base) {
     await phone.getByText("進捗と下書きの引き継ぎ", { exact: true }).tap();
     await phone.locator('input[type="file"]').setInputFiles(exported);
     await phone.getByRole("button", { name: "この記録を読み込む" }).tap();
+    // Progress transfers across courses, but a course TOC resumes only its own lessons.
+    await phone.getByRole("link", { name: "次のコース：JavaScriptの目次" }).tap();
     await phone.getByRole("link", { name: "前回の続きへ →" }).tap();
     await phone.getByRole("link", { name: "キーボードで書く" }).tap();
     assert.equal(await phone.getByRole("textbox", { name: "JavaScript" }).inputValue(), final);

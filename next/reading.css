@@ -10,3 +10,6 @@ main .parts button[aria-pressed="true"] {
   font-weight: bold;
 }
 .result-list { padding-inline-start: 1.25rem; }
+main .catalog h2 { margin: 0; }
+main .chapter-lessons { padding-inline-start: 1.5rem; }
+main .chapter-lessons a { display: inline; }

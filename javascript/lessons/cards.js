@@ -8,11 +8,11 @@ const showCardSource = 'function showCard(cards, index) {\n  const { title, answ
 
 const javascriptCardLessons = [
   {
-    id: "js-title-list", topic: "問題をまとめる", title: "問題の名前を一つの一覧にする",
+    id: "js-title-list", topic: "問題をまとめる", title: "複数の値を順番のある配列にまとめる",
     goal: "一つの名前で、順番のある複数の値を扱う。",
     slides: [
       { title: "三つの問題名を配列にまとめる", body: "「月の版画」「森の冊子」「星の栞」の順にクイズを出します。[ と ] の中に、値をカンマで区切って並べます。この順番付きの一覧を配列と呼びます。見本のコンソールには三つの名前が入った一つの配列が出ます。", code: exhibitionTitles + "\nconsole.log(titles);" },
-      { title: "一問だけでも同じ形", body: "一つの値でも、角かっこで囲むと一件の配列になります。文字の「月」と、一件だけ入った配列をコンソールで見比べてみましょう。", code: 'console.log("月");\nconsole.log(["月"]);' },
+      { title: "一件しかなくても配列にできる", body: "一つの値でも、角かっこで囲むと一件の配列になります。文字の「月」と、一件だけ入った配列をコンソールで見比べてみましょう。", code: 'console.log("月");\nconsole.log(["月"]);' },
     ],
     quiz: { prompt: "「紙」「木」の順に入った一つの配列は？", options: ['"紙、木"', '["紙", "木"]', '["木", "紙"]', '"紙"'], correct: 1,
       reasons: ["一続きの文字です。","角かっこの中に二つの値が順に並んでいます。","木が先に並んでいます。","一件の文字だけです。"] },
@@ -23,7 +23,7 @@ const javascriptCardLessons = [
       expected: () => [["街灯","夜空","朝霧"]], hints: ["一続きの文字ではなく、街灯・夜空・朝霧をこの順に入れた一つの配列を表示しましょう。"] },
   },
   {
-    id: "js-list-position", topic: "一覧の位置", title: "先頭と末尾の問題を読む",
+    id: "js-list-position", topic: "一覧の位置", title: "配列の先頭と末尾の値を読む",
     goal: "配列の位置が0から始まることを確かめ、何件あっても最後の問題を選ぶ。",
     slides: [
       { title: "一問目の位置は0", body: "titles[0] は、配列 titles の先頭を読む書き方です。角かっこの中の位置を添字と呼びます。二問目の添字は1です。見本で二行を比べましょう。", code: exhibitionTitles + "\nconsole.log(titles[0]);\nconsole.log(titles[1]);" },
@@ -37,7 +37,7 @@ const javascriptCardLessons = [
       expected: () => ["池","池","星","月"], hints: ["一問だけの一覧では先頭の「池」を出しましょう。","最初の表示はできました。一問だけなら末尾も「池」です。","三問に変わったら新しい一覧の先頭を読みます。","最後に、三問の一覧の末尾「月」を表示しましょう。"] },
   },
   {
-    id: "js-each-title", topic: "一覧を順に読む", title: "問題名を一行ずつ表示する",
+    id: "js-each-title", topic: "一覧を順に読む", title: "配列の値を順番に取り出して表示する",
     goal: "件数に合わせて同じ表示を繰り返し、問題の並び順を保つ。",
     slides: [
       { title: "今の一問だけに名前を付ける", body: "for (const title of titles) は、一覧 titles の先頭から値を一つずつ title に受け取ります。中の表示は問題の数だけ実行されます。", code: exhibitionTitles + "\nfor (const title of titles) {\n  console.log(title);\n}" },
@@ -51,11 +51,11 @@ const javascriptCardLessons = [
       expected: () => ["池","月","星","森"], hints: ["一問の配列から「池」を表示しましょう。","三問の配列から最初の「月」を表示しましょう。","先頭は読めました。繰り返して二件目も表示しましょう。","最後の問題まで配列の順に表示します。"] },
   },
   {
-    id: "js-card-fields", topic: "一問の中身", title: "問題の題名と答えを一組にする",
+    id: "js-card-fields", topic: "一問の中身", title: "題名と答えを一つのオブジェクトにまとめる",
     goal: "一問分の値に項目名を付け、欲しい項目を名前で読む。",
     slides: [
-      { title: "title と answer を一つにまとめる", body: "同じ問題の題名と答えを波かっこの中にまとめます。title と answer は項目の名前です。項目名の右にコロンを置き、その項目の値を書きます。このように項目名と値を組にしたものをオブジェクトと呼びます。", code: 'const card = { title: "夜空の色", answer: "紺" };\nconsole.log(card);' },
-      { title: "ドットの後に欲しい名前を書く", body: "card.answer は、カードから answer の値だけを読む書き方です。項目が書かれた順番を変えても、その名前を使えば同じ答えを読めます。", code: 'const card = { answer: "紺", title: "夜空の色" };\nconsole.log(card.title);\nconsole.log(card.answer);' },
+      { title: "title と answer を一つにまとめる", body: "クイズの一問分の題名と答えを、一つのデータにまとめます。この教材では、その一まとまりをカードと呼びます。波かっこの中に項目を並べます。title と answer は項目の名前です。項目名の右にコロンを置き、その項目の値を書きます。このように項目名と値を組にしたものをオブジェクトと呼びます。", code: 'const card = { title: "夜空の色", answer: "紺" };\nconsole.log(card);' },
+      { title: "ドットの後に読みたい項目名を書く", body: "card.answer は、カードから answer の値だけを読む書き方です。項目が書かれた順番を変えても、その名前を使えば同じ答えを読めます。", code: 'const card = { answer: "紺", title: "夜空の色" };\nconsole.log(card.title);\nconsole.log(card.answer);' },
     ],
     quiz: { prompt: 'card = { title: "栞の色", answer: "赤" } のとき、「赤」を読む式は？', options: ["card.answer", "card.title", '"answer"', "card[0]"], correct: 0, reasons: ["答えの項目を名前で読めます。","題名の「栞の色」を読みます。","項目名と同じ文字になります。","このオブジェクトに0という項目はありません。"] },
     exercise: { field: "javascript", task: "makeCard が、渡された題名を title、答えを answer として一問にまとめ、返すようにしてください。確認用コードが二つのカードから題名と答えを読みます。",
@@ -65,7 +65,7 @@ const javascriptCardLessons = [
       expected: () => ["月の色","黄","栗"], hints: ["一件目の題名を title に入れましょう。","題名はできました。answer にその問題の答えを入れましょう。","別のカードの答えも、渡された reply から取りましょう。"] },
   },
   {
-    id: "js-unpack-card", topic: "必要な項目だけ読む", title: "カードから表示名だけを取り出す",
+    id: "js-unpack-card", topic: "必要な項目だけ読む", title: "オブジェクトから必要な項目を名前で取り出す",
     goal: "項目名を指定してオブジェクトから値を受け取る。",
     slides: [
       { title: "表示する題名だけが欲しい", body: "const { title } = card; は card の title を読んで、同じ名前で使えるようにする一行です。このように、まとまりの中から欲しい値を受け取る書き方を分割代入と呼びます。", code: 'const card = { title: "水面", answer: "銀" };\nconst { title } = card;\nconsole.log(title);' },
@@ -79,7 +79,7 @@ const javascriptCardLessons = [
       expected: () => ["月","森"], hints: ["答えの「黄」ではなく、題名の「月」を出しましょう。","項目の順が変わっても、名前 title から題名を読みましょう。"] },
   },
   {
-    id: "js-question-deck", topic: "問題集の仕上げ", title: "並び替えても題名と正答を一緒に読む",
+    id: "js-question-deck", topic: "問題集の仕上げ", title: "配列から一件選び、題名と答えを読む",
     goal: "問題一覧を自分で作り、位置で一件を選んで、その中の項目を名前で読む。",
     slides: [
       { title: "位置で一問を選び、名前で中身を読む", body: "cards[1] で一覧から二問目を選んでから、title と answer を取り出します。先にどの一問か、次にどの項目かを決める二段階です。", code: 'const cards = [{ title: "窓", answer: "四角" }, { title: "月", answer: "丸" }];\nconst { title, answer } = cards[1];\nconsole.log(title);\nconsole.log(answer);' },

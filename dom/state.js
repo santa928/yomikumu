@@ -32,12 +32,12 @@ const testsForSearch = [
   [t => { t.click("#clear"); return t.q("#filter").value === "" && t.all("#rows li").map(n=>n.textContent).join("/") === "雨音/月影/雨雲" && t.q("#count").textContent === "3件"; }, "検索語を空にし、保存した元の3件から描き直します。"],
 ];
 const stateUnit = {
-  id:"state", title:"回答を保存し、検索結果と件数を表示する",
-  intro:"回答を配列に保存し、入力した文字を含む回答だけを一覧に表示します。検索欄を空にすると、元の回答がすべて表示されます。",
+  id:"state", title:"データを覚えて、一覧と件数を更新する",
+  intro:"画面に必要な件数や回答を、変数や配列に覚えておきます。このようにプログラムが保持する現在のデータを状態と呼びます。練習では回答の一覧を作り、検索欄に入力した文字を含む行とその件数だけを表示します。検索欄を空にすると全件が戻ります。",
   demo:{html:filterHtml,code:searchCode,tip:"「雨」と入力して2件、続いて「石」で0件にします。「絞り込みを解除」で全3件に戻ることを確認してください。"},
   steps:[
     {
-      title:"前回の件数に1を足す", html:tallyHtml,
+      title:"クリックにまたがって件数を覚える", html:tallyHtml,
       explain:"クリックの中で毎回let total = 0を実行すると、一回前の値が消えます。ボタンを二度押して表示を見てください。外側で一度だけ用意した変数なら、次の操作でも値を使えます。",
       example:`document.querySelector("#plus").onclick = () => {
   let total = 0;
@@ -53,7 +53,7 @@ const stateUnit = {
       ],
     },
     {
-      title:"初期状態を最初に表示する",html:tallyHtml,
+      title:"操作する前から、最初の件数を表示する",html:tallyHtml,
       explain:"この画面では表示に使う件数を変数 total に保存します。このように、操作の間も保持する値を「状態」と呼びます。関数 render を呼ぶと、その時点の件数を表示できます。見本は最初に3件を表示します。",
       example:`let total = 3;
 function render() {
@@ -66,7 +66,7 @@ render();`,
       tests:[[t=>t.q("#count").textContent==="5件","初期状態を5とし、操作前に5件と表示します。"]],
     },
     {
-      title:"更新してから描き直す",html:tallyHtml,
+      title:"件数を増やしてから表示を更新する",html:tallyHtml,
       explain:"renderは呼んだ時点の値を読みます。見本では先に描くため、表示が一回遅れます。ボタンを二度押して確かめてください。",
       example:`let total = 2;
 function render() { document.querySelector("#count").textContent = total + "件"; }
@@ -99,11 +99,11 @@ document.querySelector("#plus").onclick = () => {
       tests:testsForSearch,
     },
     {
-      title:"星の観測記録を絞り込み、全件へ戻す",html:filterHtml,
+      title:"練習：一覧を文字で絞り込み、解除で全件に戻す",html:filterHtml,
       explain:"検索語・元の配列・表示に使う配列を分けて考えます。見本は二つの観測地から「丘」を含む地名の一覧を作ります。",
       example:'const places = ["青の丘", "北の森"];\n'+drawList+'\ndraw(places.filter(place => place.includes("丘")));',
       question:"検索が0件で、そのあと解除したときの一覧はどうなりますか。",options:["ずっと0件","最後に消えた一件","元の全件","検索語一文字"],correct:2,feedback:"元の配列を保っていれば、解除で全件を表示できます。",
-      task:"観測地「青の丘」「北の森」「丘の上」をこの順に表示してください。入力を含む地名とその件数（例：2件）を毎回表示し、解除で検索欄を空にして全3件へ戻します。見本のdraw関数を使えます。",
+      task:"星を観測した場所を探せる一覧を作ります。「青の丘」「北の森」「丘の上」をこの順に表示してください。入力を含む地名とその件数（例：2件）を毎回表示し、解除で検索欄を空にして全3件へ戻します。見本のdraw関数を使えます。",
       starter:drawList+'\n',build:[searchCode.replace(initialAnswers,'const answers = ["青の丘","北の森","丘の上"];').replace('name.includes(field.value)','《1》').replace('field.value = "";','《2》'),["name.includes(field.value)","name === field.value"],['field.value = "";','field.value = "丘";']],
       tests:[
         [t=>t.all("#rows li").map(n=>n.textContent).join("/")==="青の丘/北の森/丘の上" && t.q("#count").textContent==="3件","元の順に全3件を表示します。"],

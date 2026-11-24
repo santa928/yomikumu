@@ -64,7 +64,7 @@ function shareQuestionAmongRounds(source) {
 async function verifyDesktop(browser) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
   await page.goto(url + "#practical");
-  await page.getByRole("heading", { name: "複数ファイルで採点を改修する" }).waitFor({ timeout: 5000 });
+  await page.getByRole("heading", { name: "複数ファイルで型を共有し、採点機能を直す" }).waitFor({ timeout: 5000 });
   const files = page.getByLabel("編集するファイル");
   const editor = page.getByRole("textbox", { name: "TypeScript コード" });
   const check = page.getByRole("button", { name: "型を検査", exact: true });
@@ -161,9 +161,9 @@ async function verifyDesktop(browser) {
 async function verifyMobile(browser) {
   const page = await browser.newPage({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
   const practice = [
-    ["採点結果の型を共有する", "型検査が score を読んでいる行を示す", ["result.status", "result.score"]],
-    ["届いた配点を読めるか確かめる", "points が 0 より小さいかを見る", ['!("points" in raw)', "raw.points < 0"]],
-    ["問題と採点のクラスを作る", "各インスタンスの問題", ["this.question.answer", "this.question.points"]]
+    ["ほかのファイルから同じ型を使う（import type）", "型検査が score を読んでいる行を示す", ["result.status", "result.score"]],
+    ["外から届いた値が0以上の整数か確かめる", "points が 0 より小さいかを見る", ['!("points" in raw)', "raw.points < 0"]],
+    ["データと処理を一つにまとめる（クラス）", "各インスタンスの問題", ["this.question.answer", "this.question.points"]]
   ];
   for (const [title, answer, picks] of practice) {
     await page.goto(url + "#practical");

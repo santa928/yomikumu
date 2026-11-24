@@ -51,7 +51,7 @@ const notesLink = '<a href="#notes">メモを読む</a>';
 const lessons = [
   {
     id: "first-edit",
-    title: "作品名を一行だけ書き換える",
+    title: "HTMLの見出しを書き換える",
     topic: "はじめてのHTML",
     goal: "コードの中の作品名を変え、画面で同じ文字を見つける。",
     slides: [
@@ -87,7 +87,7 @@ const lessons = [
   },
   {
     id: "structure",
-    title: "作品名と紹介文を書く",
+    title: "HTMLで見出しと段落を書く",
     topic: "HTML",
     goal: "作品名と紹介文を、見出しと段落に分ける。",
     slides: [
@@ -139,7 +139,7 @@ const lessons = [
   },
   {
     id: "link",
-    title: "作品メモへ移動する",
+    title: "同じページの別の場所へ移動するリンクを作る",
     topic: "HTML",
     goal: "リンクの文字と、クリックしたときの移動先を結び付ける。",
     slides: [
@@ -200,7 +200,7 @@ const lessons = [
   },
   {
     id: "word-language",
-    title: "英語で読む作品名を知らせる",
+    title: "英語の部分に言語を指定する",
     topic: "HTML",
     goal: "日本語のページで、英語の作品名を読み上げるための手がかりを付ける。",
     slides: [
@@ -232,7 +232,7 @@ const lessons = [
   },
   {
     id: "page-names",
-    title: "ページのタイトルと見出しを分ける",
+    title: "ブラウザのタブ名とページ内の見出しを分ける",
     topic: "HTML",
     goal: "タブを探すための名前と、本文に出す作品名をそれぞれ指定する。",
     slides: [
@@ -274,7 +274,7 @@ const lessons = [
   ...contactLessons,
   {
     id: "class",
-    title: "指定した文字に色を付ける",
+    title: "CSSで指定した部分の文字色だけを変える",
     topic: "CSS",
     goal: "CSSを、変えたい箇所だけに適用する。",
     slides: [
@@ -326,7 +326,7 @@ const lessons = [
   ...typeLessons,
   {
     id: "card",
-    title: "一つの作品をカードにまとめる",
+    title: "見出しと紹介文をまとめ、枠を付ける",
     topic: "HTML と CSS",
     goal: "見出しと紹介文をひとまとまりにし、カード全体に枠を付ける。",
     slides: [
@@ -369,7 +369,7 @@ const lessons = [
   },
   {
     id: "padding",
-    title: "札の内側に余白をつくる",
+    title: "枠と文字の間に余白をつくる",
     topic: "CSS",
     goal: "文字と枠の間隔を上下・左右ごとに決める。",
     slides: [
@@ -418,7 +418,7 @@ const lessons = [
   ...flexLessons,
   {
     id: "layout",
-    title: "二つの作品を並べる",
+    title: "CSSで二つのカードを並べる",
     topic: "レイアウト",
     goal: "複数のカードを外側からまとめて配置する。",
     slides: [

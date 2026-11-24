@@ -52,12 +52,12 @@ const retryCheck=[
  [t=>{training.click("#root section > button");return t.q("input").value==="" && t.q('[role="status"]').textContent==="未回答" && !t.q("form button").disabled;},"リセットで欄と判定を元に戻します。"],
 ];
 const reactTypedQuiz = {
- id:"retry-quiz",title:"型付きクイズで、誤答の後に再回答する",setup:{typed:true},
+ id:"retry-quiz",title:"TypeScriptで回答の型を決め、採点と再回答を作る",setup:{typed:true},
  intro:"問題文と正答の型を決め、フォームの回答を採点するクイズを作ります。間違えたときは回答を書き直し、正解したらリセットしてもう一度挑戦できます。",
  demo:{code:integrated,tip:"「船」を送ってから「灯台」に直し、採点をやり直してください。正解した後はリセットで最初に戻ります。"},
  steps:[
   {
-   language:"App.tsx",title:"型付きの問題を部品へ渡す",
+   language:"App.tsx",title:"問題データの型を決めて部品に渡す",
    explain:"TSX では、JSX と一緒に値の型を書けます。この例の Question は、問題文と正答を持つデータの型です。受け取る値を{ question: Question }と決めると、存在しない名前は表示する前に型検査で見つかります。上部のimportはReactをこのファイルから使うための宣言です。",
    example:typedPrompt.replace("question.prompt}</h2>","question.answer}</h2>"),
    question:"出題する見出しで読む値はどれですか。",options:["question.answer","Questionという文字","question.prompt","正誤の状態"],correct:2,feedback:"問題文を入れたpromptを読み、正答は採点するときに使います。",
@@ -66,7 +66,7 @@ const reactTypedQuiz = {
    tests:[[t=>t.q("#root h2")?.textContent==="海を照らす建物は？","渡された問題のpromptを見出しにします。"],[t=>{const p=training.elements.find(n=>n.props?.question);if(!p)return false;training.mount(p.type,{question:{prompt:"夜の光は？",answer:"月"}});return t.q("#root h2").textContent==="夜の光は？";},"別の問題を渡しても、その問題の文章が表示されるようにします。"]],
   },
   {
-   language:"App.tsx",title:"採点規則を純粋な関数にする",
+   language:"App.tsx",title:"画面を書き換えず、正誤だけを返す関数を作る",
    explain:"gradeは正答と入力という二つの文字列を受けて、合うかどうかをbooleanで返します。状態や画面を書き換えず、同じ二つの値から同じ判定が出る関数を純粋な関数と呼びます。",
    example:gradeExample.replace("received.trim() === expected","received === expected"),
    question:"gradeが返す型に合う値はどれですか。",options:["文字列の正解","trueかfalse","表示用のp","入力欄"],correct:1,feedback:"booleanは、はい・いいえに当たるtrueとfalseです。",
@@ -75,7 +75,7 @@ const reactTypedQuiz = {
    tests:[[()=>{const g=training.read("App").grade;return g("灯台"," 灯台 ")===true && g("月","つき")===false && g("灯台"," 灯台 ")===true;},"同じ入力で同じ真偽を返し、空白だけを無視して二つの文字を比べます。"],[t=>t.q("#root p").textContent==="正解","採点結果を画面にも反映します。"]],
   },
   {
-   language:"App.tsx",title:"親で入力・正誤・再回答をつなぐ",
+   language:"App.tsx",title:"回答が不正解なら、ボタンで再回答できるようにする",
    explain:"親に今の回答と判定を置き、採点時に関数を呼びます。状態を文字列三つの型に限ると、別の表記をうっかり代入した時も型検査で気づけます。正解するまでは採点を続けます。",
    example:integrated.replace('disabled={result === "正解"}','disabled={result !== "未回答"}'),
    question:"誤答のすぐ後に残す操作はどれですか。",options:["終了しか押せない","正解にして進む","すべて消す","回答を書き直して採点"],correct:3,feedback:"誤答は再回答を表示し、修正して再度採点できるようにします。",
@@ -83,7 +83,7 @@ const reactTypedQuiz = {
    build:reactBuild(integrated,['disabled={result === "正解"}','disabled={result !== "未回答"}'],['setResult("未回答");','setResult("再回答");']),tests:retryCheck,
   },
   {
-   language:"App.tsx",title:"「月」と「つき」の両方を正解にする",
+   language:"App.tsx",title:"正解候補を配列にまとめ、どれかと一致するかを判定する",
    explain:"二つの言い方を正解にするには、問題と正答の配列を一組にしてincludesで判定できます。見本の短い部品は「月」と「つき」の二つを表示します。",
    example:reactImport+'function App() {\n  const accepted: string[] = ["月", "つき"];\n  return <p>{accepted.join("・")}</p>;\n}',
    question:"「星」で誤答したあとに「つき」と送り直した結果はどれですか。",options:["誤答のまま","正解","未回答に戻る","送れない"],correct:1,feedback:"修正した回答を正答の配列で調べ直し、つきも正解として扱います。",

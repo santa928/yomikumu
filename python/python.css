@@ -2,7 +2,14 @@
 #content h1 { line-height: 1.4; font-size: clamp(1.55rem,4vw,2.4rem); }
 #content h2 { font-size: 1.25rem; }
 #content h3 { font-size: 1rem; margin-bottom: .35rem; }
-#content nav details { margin-top: .5rem; }
+#course-toc { margin-left: 1rem; }
+#catalog:not([hidden]) { display: block; }
+#contents, #contents ol { padding-inline-start: 1.65rem; }
+#contents > li { margin-block: 1.25rem; }
+#contents h2 { display: inline; line-height: 1.55; }
+#contents ol { margin-top: .25rem; }
+#contents a { display: inline-flex; align-items: center; min-height: 44px; }
+#contents > li > a { margin-inline-start: 1.65rem; font-size: .9rem; }
 #position { color: #4b624e; font-size: .9rem; margin-bottom: .4rem; }
 #content section { margin: 1.3rem 0; padding: clamp(.8rem,3vw,1.4rem); border: 1px solid #c1cdbd; background: #fffdf6; border-radius: .4rem; }
 #content label, #content legend { display: block; font-weight: 700; }

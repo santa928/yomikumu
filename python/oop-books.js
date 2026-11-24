@@ -10,7 +10,7 @@
   const independent = [inspect("二冊の状態", "[first.pages, second.pages, first is second]", [8, 4, false])];
   const demo = three + "\npages = int(input())\nb = Book(pages)\nprint(b.mine())\nprint(Book.quote(pages))\nprint(Book.multiply(pages, 2))";
   pythonChapters.push({
-    id: "63", title: "本ごとにページ数を記録し、印刷代を計算する",
+    id: "63", title: "クラスで本ごとのデータと操作をまとめる",
     goal: "本ごとに読んだページ数を記録します。ページ数と単価をどこから受け取るかで、印刷代を計算するメソッドの書き方が変わります。",
     demo: { code: demo, input: "6", prompt: "6ページ、1ページ2円なら、三つの計算結果はいずれも12です。入力欄のページ数を変えてみましょう。" },
     lessons: [
@@ -36,21 +36,21 @@
         write: exercise("Book を作るときに、引数 pages で読んだページ数を受け取りましょう。reset() を呼ぶと、その本のページ数だけが0に戻るようにします。", "", book + "\n    def reset(self):\n        self.pages = 0", [inspect("更新した本ともう1冊のページ数", "[a.reset(), a.pages, b.pages]", [null, 0, 8])], "reset の中で self.pages だけを0にします。", { after: "a = Book(3)\nb = Book(8)" }),
       },
       {
-        title: "cls で、そのクラスの一冊を作る", text: "@classmethod の最初の引数 cls に来るのは、呼んだクラスです。cls(0) は、その種類の0ページの一冊を作ります。呼ぶ側は Book.blank() と書き、cls を自分で渡しません。",
+        title: "クラスメソッドで新しい記録を作る", text: "@classmethod の最初の引数 cls に来るのは、呼んだクラスです。cls(0) は、その種類の0ページの一冊を作ります。呼ぶ側は Book.blank() と書き、cls を自分で渡しません。",
         code: make + "\nentry = Book.blank()\nprint(entry.pages)", output: "0",
         quiz: ["Book.blank() の cls に入るのは？", ["作った一冊", "数の0", "Book クラス", "文字のBook"], 2, "ドットの左にあるクラスが暗黙に渡ります。"],
         guide: exercise("いつも1ページで作る blank を、呼ばれたクラスの0ページの一冊を返すよう直しましょう。", make.replace("cls(0)", "cls(1)"), make, [inspect("基本と別種類", "[Book.blank().pages, isinstance(Extra.blank(), Extra)]", [0, true])], "return cls(0) なら呼んだ種類で作れます。", { after: "class Extra(Book):\n    pass" }),
         write: exercise("Book に from_text(cls, text) を作りましょう。数字の文字を整数にして、そのページ数の一冊を呼ばれたクラスで作って返します。", "", book + "\n    @classmethod\n    def from_text(cls, text):\n        return cls(int(text))", [inspect("二つの種類で生成", "[Book.from_text('07').pages, isinstance(Extra.from_text('3'), Extra)]", [7, true])], "文字列を int で整数にし、その数を cls に渡します。", { after: "class Extra(Book):\n    pass" }),
       },
       {
-        title: "staticmethod で引数だけを使って計算する", text: "@staticmethod を付けると、self や cls は自動では渡されません。この例では、呼ぶ側が渡したページ数だけを使います。ここではページ数に2を掛けて印刷代に変換します。",
+        title: "静的メソッドで渡された値だけを使う", text: "@staticmethod を付けると、self や cls は自動では渡されません。この例では、呼ぶ側が渡したページ数だけを使います。ここではページ数に2を掛けて印刷代に変換します。",
         code: staticFee + "\nprint(Book.cost(3))\nprint(Book().cost(3))", output: "6\n6",
         quiz: ["Book.cost(3) が受け取るものは？", ["self と3", "cls と3", "3だけ", "本の全ページ"], 2, "staticmethod は引数を自動で付け足しません。"],
         guide: exercise("単価を2円から3円に変え、Book.cost で計算できるようにしましょう。", staticFee, staticFee.replace("* 2", "* 3"), [inspect("クラス・一冊からの呼び出し", "[Book.cost(4), Book().cost(2)]", [12, 6])], "渡されたページに3を掛けます。"),
         write: exercise("Book に、文字のページ数を整数へ変換する staticmethod number(text) を作ります。Book とその一冊のどちらから呼んでも働かせましょう。", "", "class Book:\n    @staticmethod\n    def number(text):\n        return int(text)", [inspect("同じ変換", "[Book.number('04'), Book().number('12')]", [4, 12])], "number の引数は text だけです。上に @staticmethod を付けます。"),
       },
       {
-        title: "三つのメソッドで印刷代を比べる", text: "b.mine() は b に記録したページ数を使います。Book.quote(4) はページ数を引数で受け取り、単価はクラスから読みます。Book.multiply(4, 2) はページ数と単価の両方を引数で受け取ります。この例ではどの方法でも印刷代は8円です。",
+        title: "三つのメソッドが使う値を比べる", text: "b.mine() は b に記録したページ数を使います。Book.quote(4) はページ数を引数で受け取り、単価はクラスから読みます。Book.multiply(4, 2) はページ数と単価の両方を引数で受け取ります。この例ではどの方法でも印刷代は8円です。",
         code: three + "\nb = Book(4)\nprint(b.mine())\nprint(Book.quote(4))\nprint(Book.multiply(4, 2))", output: "8\n8\n8",
         quiz: ["一冊もクラスの単価も使わず、両方を明示するのは？", ["b.mine()", "Book.quote(4)", "Book.multiply(4, 2)", "Book(4)"], 2, "multiply はページと単価の二つを受け取ります。"],
         guide: exercise("同じ4ページを使って、mine、quote、multiply の順で同じ結果を表示しましょう。", "b = Book(4)\nprint(b.mine())\nprint(Book.quote(4))\nprint(Book.multiply(4, 1))", "b = Book(4)\nprint(b.mine())\nprint(Book.quote(4))\nprint(Book.multiply(4, 2))", [check("三つの計算結果", "8\n8\n8\n", { before: three })], "multiply にはクラスの標準単価2も明示して渡します。"),

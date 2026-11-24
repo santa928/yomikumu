@@ -2,18 +2,18 @@
 const answerState = 'type Answer = { kind: "waiting" } | { kind: "scored"; points: number };';
 const hintShape = 'type Card = { text: string; hint?: string };';
 tsChapters.push({
-  title: "回答の状態とヒントの有無で表示を変える",
+  title: "状態や項目の有無に合わせて、使える値を絞る",
   intro: "回答する前は案内を表示し、採点した後は得点を表示します。状態を切り替えて、label が返す文字列を確かめましょう。",
   demo: ["回答前の表示", "採点後の表示"],
   code: n => answerState + '\nfunction label(a: Answer) {\n  if (a.kind === "waiting") return "回答してください";\n  return a.points + "点";\n}\nconsole.log(label(' + (n ? '{kind:"scored", points:2}' : '{kind:"waiting"}') + '));'
 });
 tsLessons.push({
-  id: "union", chapter: 1, title: "状態の候補を二つにする",
+  id: "union", chapter: 1, title: "「回答待ち」か「採点済み」だけを許す（ユニオン型）",
   why: '回答の状態を表す変数に、どの値を代入できるか決めます。"open" | "done" の縦線は「どちらか」という選択の印です。この型をユニオンといいます。',
   before: 'type Stage = "open" | "done";\nlet stage: Stage = "open";\nconsole.log(stage);',
   after: 'type Stage = "open" | "done";\nlet stage: Stage = "done";\nconsole.log(stage);', change: "stage を回答済みに変える",
   question: ['type Stage = "open" | "done" に入る値は？', ['"other"', '4', '"done"', 'true'],2,"縦線で並べた二つの文字のどちらかを選びます。"],
-  prompt:'クイズの状態を表す Stage の値は "waiting" と "scored" の二種類だけ。stage を "waiting" で開始してください。',
+  prompt:'クイズの状態を表す Stage の値は "waiting"（回答待ち）と "scored"（採点済み）の二種類だけ。stage を "waiting" で開始してください。',
   template:'type Stage = "waiting" § §;\nlet stage: Stage = §;',
   slots:[["候補のつなぎ方","|","&"],["回答後の候補",'"scored"','"closed"'],["開始時",'"waiting"','"scored"']],
   starter:'type Stage = "waiting";\nlet stage: Stage = "waiting";',
@@ -21,7 +21,7 @@ tsLessons.push({
   contractHint:"Stage に waiting と scored だけを許す型を書きます。",
   probes:[trial("stage","waiting","最初は回答前の waiting にします。")]
 },{
-  id:"narrow", chapter:1, title:"採点済みのときだけ points を読む",
+  id:"narrow", chapter:1, title:"状態を確かめてから、得点の項目を読む",
   why:'Answer のうち、points を持つのは kind が "scored" の場合だけです。先に "waiting" の場合の値を return すると、残りの行では TypeScript が a の型を絞り込み、a.points を読めます。',
   before:answerState+'\nfunction pointsLabel(a: Answer) { return a.points + "点"; }\nconsole.log(pointsLabel({kind:"waiting"}));',
   after:answerState+'\nfunction pointsLabel(a: Answer) {\n  if (a.kind === "waiting") return "未回答";\n  return a.points + "点";\n}\nconsole.log(pointsLabel({kind:"waiting"}));',change:"回答前の表示を先に返す",
@@ -33,7 +33,7 @@ tsLessons.push({
   contract:'const __label: (a: Answer) => string = result;',contractHint:"Answer を受け文字を返す result を用意します。",
   probes:[trial('result({kind:"waiting"})',"受付中","回答前は「受付中」を返しましょう。"),trial('result({kind:"scored",points:0})',"0点","kind が scored なら、0 点のときも points を使います。"),trial('result({kind:"scored",points:5})',"5点","実際の点数を表示します。")]
 },{
-  id:"optional", chapter:1,title:"ヒントがあるときだけ読む",
+  id:"optional", chapter:1,title:"省略できる項目を安全に読む",
   why:'すべての問題にヒントがあるとは限りません。hint?: string の ? は省略可能の印です。hint ?? "ヒントなし" は、値がないときだけ右の案内を使います。空文字は値の一つです。',
   before:hintShape+'\nconst card:Card={text:"星",hint:"夜空"};\nconsole.log(card.hint ?? "ヒントなし");',
   after:hintShape+'\nconst card:Card={text:"星"};\nconsole.log(card.hint ?? "ヒントなし");', change:"問題からヒントだけを外す",
@@ -45,7 +45,7 @@ tsLessons.push({
   contract:'const __read:(card:Card)=>string=readHint; const __blank:Card={text:"森"};',contractHint:"hint を省略した Card も受け取れる関数にします。",
   probes:[trial('readHint({text:"池",hint:"水辺"})',"水辺","card.hint に文字列があればその値を返します。"),trial('readHint({text:"星"})',"自分で考える","ヒントなし用の案内を返してください。"),trial('readHint({text:"星",hint:""})',"","hint に空文字を指定した場合は空文字を返します。")]
 },{
-  id:"result-sign",chapter:1,title:"回答前はヒント、採点後は得点を表示する",
+  id:"result-sign",chapter:1,title:"練習：状態と項目の有無に合わせて表示を変える",
   why:'採点後はすぐに得点を返します。回答前は hint を読み、ヒントを省略した問題には代わりの案内を返します。',
   before:answerState+'\n'+hintShape+'\nfunction sign(a:Answer,c:Card) {\n  if(a.kind==="scored") return a.points+"点";\n  return c.hint ?? "挑戦";\n}\nconsole.log(sign({kind:"waiting"},{text:"月"}));',
   after:answerState+'\n'+hintShape+'\nfunction sign(a:Answer,c:Card) {\n  if(a.kind==="scored") return a.points+"点";\n  return c.hint ?? "挑戦";\n}\nconsole.log(sign({kind:"scored",points:2},{text:"月"}));',change:"採点済みの状態を渡す",

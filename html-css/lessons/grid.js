@@ -14,7 +14,7 @@ const threeCatalog = gridCatalog.split("\n").filter(line => !line.includes("<h3>
 
 const gridLessons = [
   {
-    id: "equal-tracks", title: "同じ幅の列を必要な数だけ作る", topic: "Grid",
+    id: "equal-tracks", title: "CSS Gridで同じ幅の列を作る", topic: "Grid",
     goal: "作品を囲む要素に列数を指定し、余った幅を等分して作品を並べる。",
     slides: [
       {
@@ -76,7 +76,7 @@ const gridLessons = [
     },
   },
   {
-    id: "grid-lines", title: "おすすめの作品に二列分を使う", topic: "Grid",
+    id: "grid-lines", title: "CSS Gridで一つの要素を二列分に広げる", topic: "Grid",
     goal: "列の境界の番号を読み、指定した一枚だけを横に広げる。",
     slides: [
       {
@@ -104,7 +104,7 @@ const gridLessons = [
     },
   },
   {
-    id: "grid-catalog", title: "各作品のカードに二つのリンクを並べる", topic: "HTML と CSS",
+    id: "grid-catalog", title: "カードの列と、カード内のリンクの並びを別々に整える", topic: "HTML と CSS",
     goal: "作品一覧の列と各カードのリンクを別々に整え、作品を一枚追加する。",
     slides: [
       {

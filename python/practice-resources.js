@@ -18,12 +18,12 @@
   const manager = "class Session:\n    def __enter__(self):\n        return self\n    def __exit__(self, kind, value, trace):\n        events.append('閉じる')\n        return False";
   const use = "try:\n    with Session() as current:\n        events.append('読む')\n        number = int(input())\n        print(number)\nexcept ValueError:\n    print('読めません')\nprint(events)";
   pythonChapters.push({
-    id: "61", title: "途中で失敗してもメモを閉じる",
-    goal: "入力を整数に変えられたときも、エラーが出たときも、読書メモを1回閉じます。実行すると、開いてから閉じるまでの操作が順に表示されます。",
+    id: "61", title: "with でエラーが出ても後片付けする",
+    goal: "開いたファイルなどは、読み取りの途中で失敗しても閉じる必要があります。ここではファイルの代わりに教材の読書メモを使い、成功してもエラーが出ても1回だけ閉じることを確かめます。実行すると、開いてから閉じるまでの操作が順に表示されます。",
     demo: { prompt: "「5」と「紙」で試し、最後に出る作業記録の順番を比べましょう。", code: caught, input: "5", files: file },
     lessons: [
       {
-        title: "開く・読む・閉じる", text: "教材の Memo は、この画面のメモリにある一件を扱います。Memo(文字) で開き、note.read() で数を読み、note.close() で閉じます。events は実際に行った操作の記録です。",
+        title: "データを開き、読み、使い終えたら閉じる", text: "教材の Memo は、この画面のメモリにある一件を扱います。Memo(文字) で開き、note.read() で数を読み、note.close() で閉じます。events は実際に行った操作の記録です。",
         files: file, code: start + 'note = Memo("4")\nprint(note.read())\nnote.close()\nprint(events)', output: "4\n['開く', '読む', '閉じる']",
         quiz: ["読んだ後に使わなくなったメモの操作は？", ["read を二度", "close を一度", "新しく開く", "events を消す"], 1, "使い終わった一件を close で閉じます。"],
         guide: exercise("閉じる行を一行足し、読んだ数を表示してからメモを閉じましょう。", start + "note = Memo(input())\nprint(note.read())", start + "note = Memo(input())\nprint(note.read())\nnote.close()", normal, "最後に note.close() を一度呼びます。", { files: file }),
@@ -37,7 +37,7 @@
         write: exercise("with でメモを開き、読んだ数の2倍を表示しましょう。最後は自動で一度閉じます。", "", start + "with Memo(input()) as note:\n    print(note.read() * 2)", [checkLog("3件を倍に", "6\n", "3", three), checkLog("5件を倍に", "10\n", "5", three)], "with の内側で読み、表示します。外に close を足す必要はありません。", { files: file }),
       },
       {
-        title: "エラーが出てもメモが閉じることを確かめる", text: "入力が「紙」なら、note.read() で ValueError が発生します。メモを閉じる処理が先に実行され、次に except の行で「読めません」と表示されます。",
+        title: "エラーが出ても with の終了処理が動くか確かめる", text: "入力が「紙」なら、note.read() で ValueError が発生します。メモを閉じる処理が先に実行され、次に except の行で「読めません」と表示されます。",
         files: file, code: caught, input: "紙", output: "読めません\n['開く', '読む', '閉じる']",
         quiz: ["読めないときの順番は？", ["読む→閉じる→外の案内", "読む→外の案内だけ", "閉じる→読む", "閉じるを二度"], 0, "except の処理が始まる前に、with がメモを閉じます。"],
         guide: exercise("不正な入力の案内を「数字を確認」に変えます。正常時は件数、最後にどちらも作業記録を表示しましょう。", caught, caught.replace("読めません", "数字を確認"), [checkLog("正しい入力", "3\n" + display, "3", three), checkLog("読めない入力", "数字を確認\n" + display, "紙", three)], "外の except の中の案内だけを変えます。", { files: file }),

@@ -23,7 +23,7 @@ async function verifyNext() {
       await option.click();
       assert.equal(await option.getAttribute("aria-pressed"), "true");
       assert.equal(await pc.locator(".code-result pre").textContent(), result);
-      await pc.getByRole("link", { name: "図書室の目次" }).click();
+      await pc.getByRole("link", { name: "Next.jsの目次" }).click();
     }
     await pc.goto(base + "#routes");
     await pc.getByRole("button", { name: "/books/reed", exact: true }).click();

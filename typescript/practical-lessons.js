@@ -36,14 +36,14 @@ const twoRoundsExample = `const moss = new QuizRound({ answer: "苔", points: 4 
 const stone = new QuizRound({ answer: "石", points: 7 });`;
 
 tsChapters.push({
-  title: "複数ファイルで採点を改修する",
-  intro: "共有型と利用側のファイルを順に変えます。届いた問題データを確かめ、クラスに渡して採点します。",
+  title: "複数ファイルで型を共有し、採点機能を直す",
+  intro: "別々のファイルから同じ型を使う方法を学びます。練習では、外から届く問題データを確かめ、問題と採点処理をまとめたクラスに渡します。",
   demo: [],
   practical: true
 });
 
 tsLessons.push({
-  id: "shared-result", chapter: practicalChapter, title: "採点結果の型を共有する",
+  id: "shared-result", chapter: practicalChapter, title: "ほかのファイルから同じ型を使う（import type）",
   why: "採点した側と表示する側で、得点と結果の名前をそろえます。別ファイルから型を使うときは、定義側で export type、使う側で import type と書きます。見本には二つのファイルの役割を並べました。型の score だけを points に変えると、古い名前を読んでいる場所が型検査に出ます。",
   before: sharedExample, after: sharedExample.replace("score: number", "points: number"), change: "共有型の項目名だけを変える",
   question: [
@@ -62,7 +62,7 @@ tsLessons.push({
     trial('describe({ score: 0, status: "invalid" })', "invalid 0点", "状態と得点は引数から読み取ります。")
   ]
 }, {
-  id: "points-input", chapter: practicalChapter, title: "届いた配点を読めるか確かめる",
+  id: "points-input", chapter: practicalChapter, title: "外から届いた値が0以上の整数か確かめる",
   why: "外から届くJSONを読み取った値は unknown として受け取ります。まず null 以外のオブジェクトか確かめ、in で points の有無を、typeof で値の種類を調べます。Number.isInteger と 0 との比較で、点として使える数かを調べます。見本は配点だけを確認します。",
   before: inputExample + '\nconsole.log(pointsOf({ points: 4 }));',
   after: inputExample + '\nconsole.log(pointsOf({ points: "4" }));', change: "配点を文字の「4」に変える",
@@ -71,7 +71,7 @@ tsLessons.push({
     ["raw が null かを見る", "points の文字数を調べる", "points が 0 より小さいかを見る", "points in raw をもう一度行う"],
     2, "配点は0以上の整数です。文字か数かに加えて、数の範囲も確かめます。"
   ],
-  prompt: "pointsOf(raw) を作ります。points が0以上の整数ならその数を返し、null、項目の欠落、配点の文字列や負の数、小数を受け取ると null を返します。",
+  prompt: "pointsOf(raw) を作ります。raw は外から受け取った値です。raw にある points（配点）が0以上の整数ならその数を返し、null、項目の欠落、配点の文字列や負の数、小数を受け取ると null を返します。",
   template: inputExample.replace('!("points" in raw)', "§").replace("raw.points < 0", "§"),
   slots: [["points が欠けている条件", '!("points" in raw)', '"points" in raw'], ["配点に使えない数の条件", "raw.points > 0", "raw.points < 0"]],
   starter: inputExample.replace("  if (!Number.isInteger(raw.points) || raw.points < 0) return null;\n", ""),
@@ -87,7 +87,7 @@ tsLessons.push({
     trial("pointsOf({ points: 2.5 })", null, "整数だけを配点として使います。")
   ]
 }, {
-  id: "round-class", chapter: practicalChapter, title: "問題と採点のクラスを作る",
+  id: "round-class", chapter: practicalChapter, title: "データと処理を一つにまとめる（クラス）",
   why: "class で、問題と回答を採点する処理を一つにまとめます。new QuizRound(question) で一問分のオブジェクト（インスタンス）を作ると、constructor が受け取った問題を this.question に保存します。answer はその回の問題を使うメソッドです。",
   before: classExample + '\nconst round = new QuizRound({ answer: "苔", points: 4 });\nconsole.log(round.answer("苔"));',
   after: classExample + "\n\n" + twoRoundsExample + '\nconsole.log(moss.answer("苔"));\nconsole.log(stone.answer("石"));',

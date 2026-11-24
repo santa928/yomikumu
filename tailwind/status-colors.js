@@ -41,8 +41,8 @@ const statusButtonClasses = "focus-visible:outline-2 focus-visible:outline-offse
 const statusBookColors = { card: "text-emerald-700", other: "text-rose-700" };
 
 readingUnits.push({
-  id: "status-colors", chapter: 1, title: "生成されない状態の色を直す",
-  why: "Tailwind CLIは、指定したファイルの文字列からクラス名を探します。見本の最初のコードは、JavaScriptが実行されたあとに text-emerald-700 を作ります。画面の要素にはその名前が入りますが、生成時のファイルに完成した名前がないため、CSSの色は出ません。利用可と貸出中に対応する完成した名前を、表にして書いてみます。",
+  id: "status-colors", chapter: 1, title: "指定した色が表示されない原因を調べ、状態別のCSSを生成する",
+  why: "Tailwind CLIは、指定したファイルの文字列からクラス名を探します。見本の最初のコードは、JavaScriptが実行されたあとに text-emerald-700 を作ります。画面の要素にはその名前が入りますが、生成時のファイルに完成した名前がないため、CSSの色は出ません。例では、本を借りられるときと、すでに誰かが借りているときで文字色を変えます。それぞれの色に対応する、途中で組み立てないクラス名を書いてみます。",
   base: { shelf: "flex flex-col gap-4 sm:flex-row", action: statusButtonClasses },
   example: {
     part: "card", before: statusBookColors.card, after: statusBookColors.card, base: statusBookColors,

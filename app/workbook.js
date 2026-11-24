@@ -62,7 +62,10 @@ function navFor(active) {
   const group = node("details", undefined, "chapter-menu");
   group.open = window.matchMedia("(min-width: 721px)").matches;
   group.append(node("summary", "すべての単元"));
-  nav.replaceChildren(link("コース目次", isJs ? "javascript" : "home", "nav-home"), group);
+  const courseName = isJs ? "JavaScript" : "HTML / CSS";
+  nav.replaceChildren(link("全コース目次", "paths", "nav-home"), link(courseName + "の目次", isJs ? "javascript" : "home", "nav-home"));
+  if (active === "home" || active === "javascript") return;
+  nav.append(group);
   const entries = isJs ? javascriptLessons.map(l => [l.id, l.title]) :
     [...lessons.map(l => [l.id, l.title]), ["studio", "卒業制作"]];
   for (const [id, title] of entries) {
@@ -156,15 +159,14 @@ function home(isJs = false) {
   const units = isJs ? javascriptLessons : lessons;
   heading(
     isJs ? "JavaScript 入門" : "HTML / CSS 入門",
-    isJs ? "展示クイズの得点を記録しよう" : "好きな作品を紹介するページを作ろう",
+    isJs ? "JavaScriptの目次" : "HTML / CSSの目次",
     isJs ? "ボタンを押して見出しの文字を変えてみましょう。次に、クイズの問題を一覧にし、答えに合わせて点を足す方法を学びます。" :
-      "作品名をひとつ書くところから始めます。最後は自分の作品を並べ、完成したページを持ち出せます。",
+      "HTMLで作品名や画像を載せ、CSSで文字の大きさや作品の並べ方を変えます。最後は自分で作ったページをHTMLファイルとして保存します。",
   );
   const state = readProgress();
   const course = isJs ? "javascript" : "html";
   const saved = savedPath();
-  const lastCourse = isJs ? course : saved.last;
-  const resume = pathHref(lastCourse, saved.positions[lastCourse]);
+  const resume = pathHref(course, saved.positions[course]);
   content.append(
     pathLink(
       resume ? "前回の続きへ →" : "最初のスライドへ →",
@@ -172,10 +174,29 @@ function home(isJs = false) {
       "next",
     ),
   );
-  content.append(link(isJs ? "HTML / CSS の作品紹介コースへ" : "JavaScript の得点クイズへ",
-    isJs ? "home" : "javascript", "review"));
-  const list = node("ol", undefined, "catalog");
+  const sections = isJs ? {
+    "js-sign": "値を表示し、変数で計算する", "js-compare": "条件に応じて処理を分ける",
+    "js-call": "処理を関数にまとめる", "js-return-action": "関数の中の値を次の呼び出しに残す",
+    "js-title-list": "配列とオブジェクトで一覧を作る", "js-map-names": "一覧の変換・絞り込み・集計",
+    "js-file-value": "ファイルを分けてコードを使う",
+  } : {
+    "first-edit": "HTMLで文章・リンク・画像・入力欄を作る", "class": "CSSで見た目を指定する",
+    "card": "枠・余白・文字を整える", "flex-parent": "複数の要素を並べる",
+    "device-width": "画面の幅に合わせる", "tab-route": "キーボードでも使える画面にする",
+    "reader-outline": "プロフィールページを組み立てる", "repair-image": "画像・色・フォームの不具合を直す",
+  };
+  const chapters = node("ol", undefined, "catalog catalog-chapters");
+  content.append(chapters);
+  const chapter = title => {
+    const section = node("li");
+    const list = node("ol", undefined, "chapter-lessons");
+    section.append(node("h2", title), list);
+    chapters.append(section);
+    return list;
+  };
+  let list;
   for (const lesson of units) {
+    if (sections[lesson.id]) list = chapter(sections[lesson.id]);
     const item = node("li");
     const record = state.units[lesson.id] || {};
     item.append(link(lesson.title, unitRoute(lesson.id)), node("p", lesson.goal));
@@ -192,31 +213,36 @@ function home(isJs = false) {
     list.append(item);
   }
   if (isJs) {
-    const more = node("li");
-    more.append(pathLink("ブラウザで問題一覧と回答フォームを作る", "dom/index.html"), node("p", pathCourses.dom.project));
-    list.append(more);
-    content.append(list, transfer());
+    content.append(pathLink("次のコース：JavaScriptの画面操作の目次", "dom/index.html", "review"), transfer());
     return;
   }
+  list = chapter("卒業制作");
   const last = node("li");
   last.append(
-    link("卒業制作　わたしの作品展", "studio"),
+    link("卒業制作　2作品を紹介するページを作る", "studio"),
     node("p", "2作品を紹介するページを自力で作り、HTMLとして書き出します。"),
   );
   if (state.units.studio?.writeDone) last.append(node("small", "卒業制作をクリア"));
   list.append(last);
-  content.append(list, transfer());
+  content.append(pathLink("次のコース：JavaScriptの目次", "#javascript", "review"), transfer());
+}
+
+// Returning to a draft is part of the review flow, even after opening another slide.
+function reviewSlideRoute(lesson, position) {
+  const route = unitRoute(lesson.id, position);
+  return revisit ? route + "/" + revisit.origin : route;
 }
 
 function sectionTabs(lesson, part) {
   const links = node("div", undefined, "parts");
+  links.setAttribute("role", "navigation");
   links.setAttribute("aria-label", "この単元の教材");
   for (const [id, label] of [
     ...lesson.slides.map((slide, index) => [String(index + 1), slide.title]),
     ["quiz", "四択"],
     ["write", "コード練習"],
   ]) {
-    const a = link(label, unitRoute(lesson.id, id));
+    const a = link(label, /^\d+$/.test(id) ? reviewSlideRoute(lesson, id) : unitRoute(lesson.id, id));
     if (id === part) a.setAttribute("aria-current", "step");
     links.append(a);
   }
@@ -287,7 +313,7 @@ function keyboardExample(host, doc, motion) {
 function slidePage(lesson, position) {
   const slide = lesson.slides[position];
   heading(
-    lesson.topic + "　スライド " + (position + 1) + " / " + lesson.slides.length,
+    lesson.title + "　スライド " + (position + 1) + " / " + lesson.slides.length,
     slide.title,
     slide.body,
   );
@@ -378,11 +404,14 @@ function slideLinks(lesson, position) {
   if (revisit && revisit.lesson === lesson.id)
     content.append(link("解きかけの問題へ戻る →", revisit.route, "return"));
   if (revisit?.lesson === "studio") content.append(link("卒業制作に戻る →", revisit.route, "return"));
+  if (position > 0) {
+    content.append(link("← 前のスライドへ", reviewSlideRoute(lesson, position), "review"));
+  }
   const next = position + 1 < lesson.slides.length ? position + 2 : "quiz";
   content.append(
     link(
       next === "quiz" ? "四択で確かめる →" : "次のスライドへ →",
-      unitRoute(lesson.id, next),
+      next === "quiz" ? unitRoute(lesson.id, next) : reviewSlideRoute(lesson, next),
       "next",
     ),
   );
@@ -681,9 +710,9 @@ function render() {
   content.replaceChildren();
   const [id, raw = "1", origin] = location.hash.slice(1).split("/");
   revisit = null;
-  if (origin === "studio") revisit = { lesson: "studio", route: "studio/edit" };
+  if (origin === "studio") revisit = { lesson: "studio", route: "studio/edit", origin };
   else if (["quiz", "write", "type", "build"].includes(origin))
-    revisit = { lesson: id, route: unitRoute(id, origin) };
+    revisit = { lesson: id, route: unitRoute(id, origin), origin };
   const lesson = allLessons.find((item) => item.id === id);
   const pathPage = id === "paths" || id === "";
   if (!pathPage) navFor(id);

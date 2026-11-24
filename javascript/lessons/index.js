@@ -20,8 +20,8 @@ const javascriptLessons = [
     },
   },
   {
-    id: "js-console", topic: "値の読み方", title: "数字と文字をコンソールで見分ける",
-    goal: "計算途中の値を表示し、数字に見える文字と、数・真偽の違いを読む。",
+    id: "js-console", topic: "値の読み方", title: "コンソールに表示し、数・文字・真偽値を見分ける",
+    goal: "計算途中の値を表示し、数字に見える文字、数、true・false の違いを確かめる。",
     slides: [
       { title: "途中の値を見たいとき", body: "console.log は丸かっこの中の値を、作る人が確認するための欄に出します。この欄をコンソールと呼びます。二行を上から実行すると、引用符のある「2」は文字、引用符のない 2 は数です。ここでは違いを読めるように種類も添えています。",
         code: 'console.log("2");\nconsole.log(2);' },
@@ -38,12 +38,12 @@ const javascriptLessons = [
     },
   },
   {
-    id: "js-constant", topic: "値に名前を付ける", title: "同じ値を名前で呼ぶ",
+    id: "js-constant", topic: "値に名前を付ける", title: "const で値に名前を付け、繰り返し使う",
     goal: "開始点を変数に保存し、その変数を使って同じ数を二度表示する。",
     slides: [
       { title: "同じ点数を二度使う", body: "const ticket = 2; と書くと、数の 2 に ticket という名前が付きます。= の右が値、左がその名前です。次の行で ticket を使うと 2 が出ます。const で付けた名前には、後から別の値を入れ直せません。",
         code: "const ticket = 2;\nconsole.log(ticket);\nconsole.log(ticket);" },
-      { title: "開始点を変えて試す", body: "この教材では、開始時の点数を initialScore という名前で用意しています。「開始点」で数を選び直して実行すると、ticket を使う二つの行が一緒に変わります。",
+      { title: "開始点を変えて試す", body: "この教材の「開始点」は、クイズを始める前の点数です。選んだ値をコードから initialScore という名前で読めます。「開始点」で数を選び直して実行すると、ticket を使う二つの行が一緒に変わります。",
         code: "const ticket = initialScore;\nconsole.log(ticket);\nconsole.log(ticket);", variableStart: true },
     ],
     quiz: { prompt: "const ticket = 4; の後で console.log(ticket); に出る値は？", options: ["ticket という文字", "true", "0", "数の4"], correct: 3,
@@ -57,7 +57,7 @@ const javascriptLessons = [
     },
   },
   {
-    id: "js-add", topic: "数の計算", title: "正解の分だけ得点を足す",
+    id: "js-add", topic: "数の計算", title: "＋で数を足す場合と文字をつなぐ場合を比べる",
     goal: "足した結果をコンソールで確認し、文字をつなぐ場合と比べる。",
     slides: [
       { title: "同じ + でも何が変わる？", body: "数どうしの + は足し算です。どちらかが文字のときはつなげます。見本を実行して、2 + 1 と引用符の付いた「2」に 1 を足したときの違いを見ましょう。",
@@ -74,7 +74,7 @@ const javascriptLessons = [
     },
   },
   {
-    id: "js-score", topic: "値の更新", title: "得点を覚え、前と後を表示する",
+    id: "js-score", topic: "値の更新", title: "let で得点を更新し、変更前後を比べる",
     goal: "最初の数を記録し、正解の後で同じ得点を更新する。",
     slides: [
       { title: "同じ名前の中身を入れ替える", body: "正解するたびに変わる得点には let で名前を付けます。score = score + 1 は、右側で今の点に1を足し、その結果を左の score に入れ直す一行です。上から実行し、更新する前と後を比べましょう。",

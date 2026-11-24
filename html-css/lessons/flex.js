@@ -46,7 +46,7 @@ const flexLessons = [
     },
   },
   {
-    id: "along-axis", title: "二つの項目を両端に配置する", topic: "Flexbox",
+    id: "along-axis", title: "横並びの要素を左右の端に寄せる", topic: "Flexbox",
     goal: "「入口」と「展示室」を横並びの両端に置く。",
     slides: [
       {
@@ -103,7 +103,7 @@ const flexLessons = [
     },
   },
   {
-    id: "wrap-works", title: "増えた作品を次の行へ送る", topic: "Flexbox",
+    id: "wrap-works", title: "横に収まらない要素を次の行に折り返す", topic: "Flexbox",
     goal: "間隔と一枚の基準幅を決め、入りきらない作品を自動で折り返す。",
     slides: [
       {
@@ -136,7 +136,7 @@ const flexLessons = [
     },
   },
   {
-    id: "flex-guide", title: "案内リンクと増やせる作品列を作る", topic: "HTML と CSS",
+    id: "flex-guide", title: "Flexboxでリンクを並べ、カードを折り返す", topic: "HTML と CSS",
     goal: "現在地のリンクを見分けられる案内と、作品を追加しても収まる列を作る。",
     slides: [
       {

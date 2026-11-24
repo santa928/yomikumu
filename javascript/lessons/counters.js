@@ -30,11 +30,11 @@ const javascriptCounterLessons = [
       expected: () => ["受付中","受付中"], hints: ["受け取った手順を呼ぶと「受付中」と返るようにしましょう。"] },
   },
   {
-    id: "js-kept-name", topic: "外側の値を読む", title: "関数を作ったときの値を後から読む",
+    id: "js-kept-name", topic: "外側の値を読む", title: "関数を作ったときの変数を後から読む",
     goal: "makeDesk に渡した名前を、そこから返された関数の中で読み取る。",
     slides: [
-      { title: "red() が「赤い受付」を返す理由", body: "makeDesk は受け取った name を使う関数を作って返します。red を後から呼ぶと、その関数を作ったときの「赤い受付」が返ります。外側の値を使い続けられるこの仕組みをクロージャと呼びます。", code: 'function makeDesk(name) {\n  return function () { return name; };\n}\nconst red = makeDesk("赤い受付");\nconsole.log(red());' },
-      { title: "red() と blue() を呼び分ける", body: "makeDesk に「赤」を渡して red を、「青」を渡して blue を作ります。二つのボタンを好きな順に押して、red() はいつも「赤」、blue() はいつも「青」を返すことを確かめましょう。", code: 'function makeDesk(name) {\n  return function () { return name; };\n}\nconst red = makeDesk("赤");\nconst blue = makeDesk("青");', actions: [{ label: "red() を呼ぶ", code: "console.log(red());" }, { label: "blue() を呼ぶ", code: "console.log(blue());" }] },
+      { title: "関数が作られたときの値を後から使う", body: "makeDesk は受け取った name を使う関数を作って返します。red を後から呼ぶと、その関数を作ったときの「赤い受付」が返ります。外側の値を使い続けられるこの仕組みをクロージャと呼びます。", code: 'function makeDesk(name) {\n  return function () { return name; };\n}\nconst red = makeDesk("赤い受付");\nconsole.log(red());' },
+      { title: "異なる値を覚えた二つの関数を呼び分ける", body: "makeDesk に「赤」を渡して red を、「青」を渡して blue を作ります。二つのボタンを好きな順に押して、red() はいつも「赤」、blue() はいつも「青」を返すことを確かめましょう。", code: 'function makeDesk(name) {\n  return function () { return name; };\n}\nconst red = makeDesk("赤");\nconst blue = makeDesk("青");', actions: [{ label: "red() を呼ぶ", code: "console.log(red());" }, { label: "blue() を呼ぶ", code: "console.log(blue());" }] },
     ],
     quiz: { prompt: 'const blue = makeDesk("青"); の後で blue() を呼ぶと、先ほどの見本では何が返る？', options: ["最後に画面に出た色", "赤", "青", "0"], correct: 2,
       reasons: ["画面の履歴を読み出す処理はありません。","「赤」は red を作るときに渡した値です。","blue の関数を作ったときの名前を読みます。","この例では文字を返しています。"] },
@@ -44,7 +44,7 @@ const javascriptCounterLessons = [
       build: { code: "function makeDesk(name) {\n  return function () { return ①; };\n}", slots: [["makeDesk が受け取った名前", '"朝"', "name"]] }, expected: () => ["夕方","朝","夕方"], hints: ["固定の文字を返すと、day() と late() が同じ値になります。受け取った name を返しましょう。"] },
   },
   {
-    id: "js-counter", topic: "値を保持する関数", title: "呼ぶたびに得点を増やす",
+    id: "js-counter", topic: "値を保持する関数", title: "関数を呼ぶたびに前回の値に足す",
     goal: "数える手順を一度作り、繰り返し呼んで前の得点に足す。",
     slides: [
       { title: "visit() を呼ぶたびに1を足す", body: "makeCounter(0, 1) は、0点から始めて1点ずつ増やす関数を返します。「visit() を呼ぶ」を二度押しましょう。一回目は1、二回目は前回の1に足して2が出ます。", code: counterFactory + "\nconst visit = makeCounter(0, 1);", actions: [visitorTap] },
@@ -57,7 +57,7 @@ const javascriptCounterLessons = [
       further: [["初期化を直す練習", "js-reset-counter"], ["二つのカウンターを使う", "js-two-counters"]] },
   },
   {
-    id: "js-reset-counter", topic: "変数の初期化", title: "得点が毎回同じになる原因を直す",
+    id: "js-reset-counter", topic: "変数の初期化", title: "変数が毎回初期値に戻る原因を直す",
     goal: "初期値を置く場所を選び、一回目だけ合うカウンターを直す。",
     slides: [
       { title: "二回目も1が返る理由", body: "「visit() を呼ぶ」を二度押すと、どちらも1が出ます。visit() の中に let score = start; があるため、呼ぶたびに score が0に戻ります。", code: resettingFactory + "\nconst visit = makeCounter(0, 1);", actions: [visitorTap] },
@@ -71,7 +71,7 @@ const javascriptCounterLessons = [
       expected: start => [start+2,start+4,start+6], hints: ["一回目は開始点から2増やします。","一回目は正解です。二回目が同じ点に戻っています。初期化する行を外の関数へ移しましょう。","次は三回目も前の値から2点加えましょう。"] },
   },
   {
-    id: "js-two-counters", topic: "独立したカウンター", title: "二つのカウンターで別々に数える",
+    id: "js-two-counters", topic: "独立したカウンター", title: "一つの作り方で、別々に数える関数を二つ作る",
     goal: "開始点と増える点が異なる関数を二つ作り、それぞれの得点を更新する。",
     slides: [
       { title: "red() と blue() を交互に呼ぶ", body: "makeCounter を二度呼んで red と blue を作ります。red() は選んだ開始点から2点ずつ、blue() は0から3点ずつ増やします。開始点が2なら、red()、blue()、red() の順に呼ぶと4、3、6が出ます。", code: counterFactory + "\n" + twoDesks, variableStart: true, actions: deskTaps },

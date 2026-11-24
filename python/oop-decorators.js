@@ -10,8 +10,8 @@
   const watch = (label, expr, value, before) => check(label, "", { observe: expr, value, before });
   const transfer = [watch("引数と名前付き引数", "[tracked(2), tracked(3, extra=4), len(calls)]", [4, 10, 2]), check("失敗も伝わる", "", { observe: "tracked(-1)", error: "ValueError" })];
   pythonChapters.push({
-    id: "66", engine: "cpython", title: "関数に実行記録を添える",
-    goal: "関数を呼ぶたびに、リスト calls に「実行」を1件追加します。料金を計算する関数にこの処理を加え、元の関数名や計算結果を引き継ぎます。",
+    id: "66", engine: "cpython", title: "デコレーターで元の関数に処理を加える",
+    goal: "デコレーターは、元の関数を書き換えずに、その前後へ処理を加える仕組みです。ここでは関数を呼ぶたびに、リスト calls に「実行」を1件追加します。料金を計算する関数にこの処理を加え、元の関数名や計算結果を引き継ぎます。",
     demo: { input: "3", prompt: "3枚で実行すると、料金の6、呼び出し回数の1、元の関数名 charge が順に表示されます。", code: decorate + "\nprint(charge(int(input())))\nprint(len(calls))\nprint(charge.__name__)" },
     lessons: [
       {
@@ -36,7 +36,7 @@
         write: exercise("logged(fn) を書き、呼ぶ直前に calls に一件記録し、渡された計算の引数・返り値・例外を保ちましょう。", "", wrapper, transfer.map(test => ({ ...test, before: "calls = []\n" + charge })), "記録後、渡された fn を引数付きで呼んで返します。例外は外へ届かせます。", { after: "tracked = logged(charge)" }),
       },
       {
-        engine: "skulpt", title: "@ で元の関数に適用する", text: "定義の直前の @logged は、定義した関数を logged に渡し、返ってきた関数を同じ名前にする書き方です。ここでは呼ぶたびに一件を記録し、元の計算結果も返します。",
+        engine: "skulpt", title: "@ で関数にデコレーターを付ける", text: "定義の直前の @logged は、定義した関数を logged に渡し、返ってきた関数を同じ名前にする書き方です。ここでは呼ぶたびに一件を記録し、元の計算結果も返します。",
         code: "calls = []\n" + wrapper + "\n@logged\n" + add + "\nprint(plus(2))\nprint(len(calls))", output: "3\n1",
         quiz: ["@logged を置くのと同じ適用は？", ["plus = logged(plus)", "plus = logged(plus())", "plus = 1", "logged = plus(3)"], 0, "plus を値のまま渡し、戻った関数を plus として使います。"],
         guide: exercise("用意された logged を plus に適用し、2回呼んだときだけ2件記録するようにします。", add, "@logged\n" + add, [watch("結果と記録", "[plus(2), plus(4), len(calls)]", [3, 5, 2], "calls = []\n" + wrapper)], "def plus のすぐ上に @logged を書きます。"),

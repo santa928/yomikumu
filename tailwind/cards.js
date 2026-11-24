@@ -1,8 +1,9 @@
 "use strict";
 
 const readingChapters = [{
-  title: "読書カードを短いクラス名で装飾する",
-  intro: "HTMLの class を変えて、カードの余白や文字の大きさを調整します。完成例では「しおりをはさむ」ボタンを押して、貸出中のカードとの違いを確かめられます。",
+  id: "style",
+  title: "短いクラス名で余白・色・ボタンの見た目を変える",
+  intro: "HTMLの class を変えて、カードの余白や文字の大きさを調整します。完成例では、押せる「しおりをはさむ」ボタンと、本が貸し出されていて押せないボタンの違いも確かめられます。",
   sample: "card.html"
 }];
 const partLabels = { card: "読書カード", shelf: "2枚のカードの親要素", action: "両方のボタン", other: "二冊目のカード" };
@@ -18,7 +19,7 @@ function cardUnit(id, title, why, part, before, after, result, prompt, solution,
   });
 }
 
-cardUnit("padding", "CSSの余白を短い名前で書く",
+cardUnit("padding", "カードの内側の余白を変える（padding）",
   "カードの端と文字の間を空けるには、内側の余白（padding）を指定します。Tailwind CSS では、用意された名前を HTML の class に書くと対応する CSS が適用されます。この見本では p-2 が上下左右 0.5rem（8px）、p-4 が 1rem（16px）です。",
   "card", "p-2", "p-4", "カードの端と文字の間の余白が広がります。",
   "「夜の庭」のカードの内側に、上下左右とも 0.5rem の余白を付けてください。1rem はこの見本では16pxです。", "p-2",
@@ -47,7 +48,7 @@ cardUnit("paper", "背景の色を選ぶ",
   ["text-lg", "bg-white", "bg-amber-100", "w-48"],
   ["bg-amber-100 にすると色が変わる場所は？", ["本文の文字", "カードの背景", "カードの外側の余白", "書名だけ"], 1, "bg- で始まるこのクラスは背景色を変えます。"]);
 
-cardUnit("layout", "二冊を横に並べる",
+cardUnit("layout", "親の要素に flex を付けてカードを横に並べる",
   "カードを横一列にしたいときは、二冊を包む親要素に flex を付けます。親の中の二冊が左から並びます。",
   "shelf", "", "flex", "二冊目が一冊目の右に移ります。",
   "2枚のカードを横一列に並べてください。両方を囲む要素の class を編集します。", "flex", ["display", "flexDirection"], "親要素の class に flex を加えます。",
@@ -82,8 +83,8 @@ cardUnit("focus", "Tabで選んだ場所に枠を出す",
   ["Tabで移動中の人に、今の操作場所を伝えるのは？", ["hover:", "gap-2", "focus-visible:", "bg-white"], 2, "focus-visible: でキーボード操作時の目印を付けます。"]);
 readingUnits.at(-1).checks[0].state = "focus-visible";
 
-cardUnit("disabled", "貸出中のボタンを見分ける",
-  "貸出中は HTML の disabled 属性で押せなくします。disabled:opacity-50 はそのボタンだけを半透明にする指定です。見た目と一緒に「貸出中」という文字でも伝えます。",
+cardUnit("disabled", "押せないボタンだけ見た目を変える",
+  "例では、誰かが借りている本のボタンを押せないようにします。押せなくするのは HTML の disabled 属性です。disabled:opacity-50 はそのボタンだけを半透明にする指定です。見た目と一緒に「貸出中」という文字でも伝えます。",
   "action", "disabled:opacity-100", "disabled:opacity-50", "二冊目の貸出中ボタンだけが薄くなり、Tabでも選ばれません。",
   "夜の選書で貸出中のボタンだけを半透明にします。押せる方はそのままにしましょう。", "disabled:opacity-50", ["opacity"], "貸出中の状態だけを半透明にします。",
   ["opacity-50", "disabled:opacity-100", "disabled:opacity-50", "hover:underline"],

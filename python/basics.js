@@ -1,9 +1,9 @@
 "use strict";
 
 pythonChapters.push({
-  id: "54", title: "名前を表示し、券の枚数を計算する",
-  goal: "入力した名前と、券を1枚足したあとの枚数を、順に表示します。",
-  demo: { code: 'name = input()\ncount = int(input())\nprint(name)\nprint(count + 1)', input: "つばき\n2", prompt: "1行目に名前、2行目に枚数を書いて実行してみましょう。「つばき」と「2」なら「つばき」と「3」が表示されます。" },
+  id: "54", title: "文字を表示し、入力した数で計算する",
+  goal: "イベントの受付を例に、1行目に入力した名前を表示し、2行目に入力したチケットの枚数に1を足します。",
+  demo: { code: 'name = input()\ncount = int(input())\nprint(name)\nprint(count + 1)', input: "つばき\n2", prompt: "1行目に名前、2行目にチケットの枚数を書いて実行してみましょう。「つばき」と「2」なら「つばき」と「3」が表示されます。" },
   lessons: [
     {
       title: "文字を表示する", text: 'print("入口") を実行すると、画面に「入口」と表示されます。表示したい文字を引用符で囲み、print の丸かっこに入れます。引用符は画面に出ません。',

@@ -11,7 +11,7 @@ const pathCourses = {
     feedback: ["そうです。最初のスライドでは文字を一か所だけ変えます。", "横幅を変えると写真の大きさが変わります。作品の名前は文字で書きます。"],
   },
   javascript: {
-    practical: ["JSONを使う画面操作へ", "dom/index.html#fetch-json"],
+    practical: ["ファイルから読み込んだデータを画面に表示する", "dom/index.html#fetch-json"],
     title: "JavaScript", catalog: "#javascript", start: "#js-sign/1",
     project: "クイズの答えを判定し、正解すると得点が増えるプログラムを作ります。",
     first: "最初はボタンを押して、見出しが「開館中」から「本日は閉館」に変わる様子を見ます。",
@@ -22,14 +22,14 @@ const pathCourses = {
   },
   python: {
     title: "Python基礎", page: "python/index.html", catalog: "python/index.html#54/demo/toc", start: "python/index.html#54/1/slide",
-    project: "名簿に「ゆき」「はる」「ゆき」とあったら、それぞれ何回出てくるでしょう？ 名前を一つずつ読み、「ゆき」は2回、「はる」は1回と数えるプログラムを作ります。",
+    project: "文字を表示するところから始め、同じ名前が何回出てきたかを数えるプログラムを作ります。たとえば入力が「ゆき」「はる」「ゆき」なら、「ゆき」は2回、「はる」は1回です。",
     first: "最初の練習では、1行のコードを書き換えて、表示を「入口」から「受付」に変えます。",
     question: "入力した名前をそのまま表示するプログラムに「ゆき」と入力しました。表示されるのは？",
     choices: ["ゆき", "名前"], correct: 0,
     feedback: ["そうです。「ゆき」と表示されます。「はる」と入力すれば、表示も「はる」に変わります。", "表示されるのは入力した文字です。今回は「ゆき」と入力しました。"],
   },
   tailwind: {
-    practical: ["生成されない色を調べる", "tailwind/index.html#status-colors/slide"],
+    practical: ["ボタンに指定した色がつかない原因を調べる", "tailwind/index.html#status-colors/slide"],
     title: "Tailwind CSS", page: "tailwind/index.html", catalog: "tailwind/index.html", start: "tailwind/index.html#padding/slide",
     project: "本の紹介カードを並べ、余白や文字の大きさをそろえます。貸出中の本はボタンを押せないことが見た目でも分かるようにします。",
     first: "CSSで余白を指定した経験があれば始められます。最初はカードの class を変え、端と文字の間を広げます。",
@@ -39,7 +39,7 @@ const pathCourses = {
     review: ["CSSの余白を試す", "#padding/1"],
   },
   typescript: {
-    practical: ["共有する型を変える", "typescript/index.html#practical"],
+    practical: ["複数のファイルで使う型を一か所で変更する", "typescript/index.html#practical"],
     title: "TypeScript", page: "typescript/index.html", catalog: "typescript/index.html", start: "typescript/index.html#infer/slide",
     project: "クイズの得点に数値を使うと決めておくと、文字を代入した行にエラーが表示されます。その行を直してから実行します。",
     first: "JavaScriptの変数を使ったことがあれば、まず得点に代入する値を、文字列から数値に変えてみましょう。",
@@ -51,7 +51,7 @@ const pathCourses = {
   "python-oop": {
     title: "Python OOP", page: "python/index.html", catalog: "python/index.html#63/demo/toc", start: "python/index.html#63/1/slide",
     project: "「どこまで読んだか」と「読んだページ数を増やす操作」を、1冊分の記録としてまとめます。こうしてデータと操作をひと組にして考える方法が、オブジェクト指向プログラミング（OOP）です。",
-    first: "実践と共通のクラス入門では、Book(4) で1冊分の記録を作り、ページ数の 4 を表示します。",
+    first: "実践と共通のクラス入門では、Book(4) と書いて「4ページ読んだ本」の記録を作り、その記録から 4 を取り出して表示します。",
     question: "別々の二冊を読むとき、本ごとに覚えておきたいのはどちら？",
     choices: ["読んだページ数", "ページ数を表示する手順"], correct: 0,
     feedback: ["そうです。一冊ごとに別の値を持たせる方法を試します。", "表示の手順は共通です。今どこまで読んだかは本ごとに違います。"],
@@ -61,7 +61,7 @@ const pathCourses = {
   "python-practice": {
     title: "Python実践", page: "python/index.html", catalog: "python/index.html#59/demo/toc", start: "python/index.html#63/1/slide/practice",
     project: "読書記録を1件ずつ調べ、条件に合う読書時間を合計します。最後は、本の題名と読書時間をカンマで区切って保存したファイル（CSV）を読み、記録を集計します。",
-    first: "共通のクラス入門で本ごとの記録と操作を作ります。実践では、リストの集計や with でファイルを閉じる書き方を学びます。",
+    first: "まず、本ごとに読んだページ数を記録し、あとから増やせるようにします。その後は複数の記録をまとめて計算し、ファイルからも記録を読み込みます。",
     question: "読書記録が2件あります。「30分」を「0.5時間」に、「60分」を「1時間」に書き換えました。書き換えた後、記録は何件ありますか。",
     choices: ["1件", "2件"], correct: 1,
     feedback: ["集計して一つにするのは別の操作です。今回は一件ずつ単位を変えます。", "二つとも残ります。実践の最初の練習でそれぞれを変換してみましょう。"],
@@ -69,7 +69,7 @@ const pathCourses = {
     afterIntro: ["クラスを学習済みなら実践へ", "python/index.html#59/1/slide"],
   },
   react: {
-    practical: ["並べ替えで移るメモを直す", "react/index.html#book-memos"],
+    practical: ["一覧を並べ替えてもメモが元の本に残るようにする", "react/index.html#book-memos"],
     title: "React", page: "react/index.html", catalog: "react/index.html", start: "react/index.html#components",
     project: "作品名と紹介文を変えるだけで、同じレイアウトのカードを何枚も表示できるようにします。",
     first: "関数を呼んで値を渡せるようになったら、最初のカードの作品名を一か所だけ変えます。",
@@ -89,10 +89,10 @@ const pathCourses = {
     review: ["Reactの作品カードを試す", "react/index.html#components"],
   },
   dom: {
-    practical: ["JSONの読み込みを直す", "dom/index.html#fetch-json"],
+    practical: ["データの読み込みに失敗したときの表示を直す", "dom/index.html#fetch-json"],
     title: "JavaScriptの画面操作", page: "dom/index.html", catalog: "dom/index.html", start: "dom/index.html#elements",
     project: "クイズに回答すると得点が変わり、間違えた問題にもう一度答えられる画面を作ります。",
-    first: "一覧と関数を試したら、見出しを一つ探して、その文字だけを書き換えます。",
+    first: "JavaScriptで配列と関数を使ったことがあれば、見出しを一つ探して、その文字だけを書き換えます。",
     question: "「作品クイズ」と「参考作品」の一覧には、どちらにも項目（li）があります。クイズの項目だけを探したいとき、探す範囲はどちら？",
     choices: ["ページ全体", "作品クイズの一覧"], correct: 1,
     feedback: ["ページ全体には参考作品の行もあります。", "そうです。「作品クイズ」の中だけで探せば、「参考作品」の項目は選ばれません。"],
@@ -156,7 +156,7 @@ function courseEntry(course, positions) {
   const resumingIntro = /^63\/[1-3]\//.test(positions[course] || "");
   if (introDone && !resumingIntro) section.append(pathLink("クラス入門を読み直す", entry.start, "review"));
   else if (entry.afterIntro) section.append(pathLink(entry.afterIntro[0], entry.afterIntro[1], "review"));
-  section.append(pathLink(entry.title + "の単元を選ぶ", entry.catalog, "review"));
+  section.append(pathLink(entry.title + "の目次", entry.catalog, "review"));
   if (entry.practical) section.append(pathLink(...entry.practical, "review"));
   return section;
 }
@@ -180,21 +180,21 @@ function learningPaths(part) {
   const python = part === "python";
   document.querySelector(".mast span").textContent = "学習パス";
   nav.classList.add("path-nav");
-  nav.replaceChildren(link("学習パス", "paths", "nav-home"), link("Web制作", "paths/web"), link("Python", "paths/python"));
+  nav.replaceChildren(link("全コース目次", "paths", "nav-home"), link("Web制作", "paths/web"), link("Python", "paths/python"));
   nav.children[web ? 1 : python ? 2 : 0].setAttribute("aria-current", "page");
   if (web) {
-    heading("Web制作", "自分の作品をページにしよう", "最初はHTMLで作品名を書きます。スマホではスライドを読んでタップで組み、PCではコードを書いて結果を見られます。");
+    heading("Web制作", "Web制作のコース一覧", "最初はHTMLで作品名を書きます。スマホではスライドを読んでタップで組み、PCではコードを書いて結果を見られます。");
     for (const course of ["html", "javascript", "dom", "typescript", "react", "next", "tailwind"]) {
       if (pathCourses[course]) content.append(courseEntry(course, saved.positions));
     }
     content.append(details("この先で作るもの", node("p", "クイズの得点にうっかり文字を入れたら？ TypeScriptでは実行する前にその間違いを見つけます。Reactでは同じ形のカードに違う本を表示し、Next.jsでは本の一覧から詳細ページを開けるようにします。Tailwind CSSはCSSの余白と色を試した後に選べます。")));
   } else if (python) {
-    heading("Python", "Pythonで文字を表示してみよう", "初めてコードを書く人は「Python基礎」から。リストや関数を使える人は、読書記録を集計したければ「Python実践」、本ごとにページ数と操作をまとめたければ「Python OOP」へ。どちらも同じクラス入門から始まります。");
+    heading("Python", "Pythonのコース一覧", "初めてコードを書く人は「Python基礎」から。リストや関数を使える人は、読書記録を集計したければ「Python実践」、本ごとにページ数と操作をまとめたければ「Python OOP」へ。どちらも同じクラス入門から始まります。");
     content.append(courseEntry("python", saved.positions));
     content.append(courseEntry("python-practice", saved.positions));
     content.append(courseEntry("python-oop", saved.positions));
   } else {
-    heading("学習パス", "作りたいものから始めよう", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");
+    heading("学習パス", "全コース目次", "一枚のスライドでコードと結果を見比べます。スマホでは選んで組み立て、PCでは自分で書いて試せます。");
     const href = pathHref(saved.last, saved.positions[saved.last]);
     if (href) content.append(pathLink("前回の続きへ　" + pathCourses[saved.last].title, href, "next"));
     const cards = node("div", undefined, "path-cards");

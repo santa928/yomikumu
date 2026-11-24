@@ -15,7 +15,7 @@ const auditCss = [focusStyle, statusStyle, motionBase, quietRule].join("\n");
 
 const keyboardLessons = [
   {
-    id: "tab-route", title: "Tabで案内の順番をたどる", topic: "操作しやすいHTML",
+    id: "tab-route", title: "Tabキーでリンクを移動する順番を確かめる", topic: "操作しやすいHTML",
     goal: "キーボードでリンクの順番を試し、読みたい順にHTMLを並べる。",
     slides: [
       {
@@ -43,11 +43,11 @@ const keyboardLessons = [
     },
   },
   {
-    id: "visible-focus", title: "今選んでいるリンクに枠を付ける", topic: "操作しやすいCSS",
+    id: "visible-focus", title: "キーボードで操作中のリンクを枠で示す", topic: "操作しやすいCSS",
     goal: "フォーカスを動かすと現在地にだけ付いてくる線を作る。",
     slides: [
       {
-        title: "線を消すと現在地が見えなくなる",
+        title: "枠を消すと操作中のリンクが分からなくなる",
         body: "この変更前の見本では、操作先の線を消してあります。「次の操作先を試す」で移動先の名前は変わっても、どこにいるか目で探しにくくなります。次のスライドで直しましょう。",
         html: routePage, css: "a:focus { outline: none; }", focusWalk: true,
       },
@@ -85,7 +85,7 @@ const keyboardLessons = [
         html: '<label for="note">訪問メモ</label>\n<input id="note">',
       },
       {
-        title: "絵を見られないときの案内",
+        title: "画像の代わりに読める説明を付ける",
         body: "矢印の役目は次に進む方向を伝えることです。「矢印の画像」より「受付は右です」と読めるほうが行動できます。img の alt にその案内を書きます。",
         html: '<img src="arrow.png" alt="受付は右です">',
       },
@@ -104,7 +104,7 @@ const keyboardLessons = [
     },
   },
   {
-    id: "ticket-state", title: "受付の状態を色と言葉で知らせる", topic: "操作しやすい表示",
+    id: "ticket-state", title: "申し込めるかどうかを色と文字で伝える", topic: "操作しやすい表示",
     goal: "色を区別しなくても申し込める回が分かる表示を作る。",
     slides: [
       {
@@ -133,7 +133,7 @@ const keyboardLessons = [
     },
   },
   {
-    id: "quiet-cue", title: "動きを減らす設定でも現在地を伝える", topic: "操作しやすいCSS",
+    id: "quiet-cue", title: "画面の動きを減らしても操作中のリンクが分かるようにする", topic: "操作しやすいCSS",
     goal: "操作先が動く見本を試し、動きを減らしたい人には線だけで伝える。",
     slides: [
       {
@@ -161,11 +161,11 @@ const keyboardLessons = [
     },
   },
   {
-    id: "keyboard-exhibit", title: "展示ページをキーボードで点検する", topic: "HTML と CSS",
+    id: "keyboard-exhibit", title: "リンクや入力欄をキーボードだけで操作して点検する", topic: "HTML と CSS",
     goal: "一つずつ直し、作品・受付・メモ欄をキーボードで順に使える展示を作る。",
     slides: [
       {
-        title: "作品を見て、受付を読み、メモを書く",
+        title: "Tabキーで作品へのリンクからメモ欄まで移動する",
         body: "「次の操作先を試す」かキーボードの Tab で、作品を見る、受付時間を読む、訪問メモの順にたどります。現在地を示す枠と、受付中の言葉を確かめましょう。動きを減らす設定でも作品リンクの枠は残ります。",
         html: auditPage, css: auditCss, focusWalk: true,
       },

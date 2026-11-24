@@ -115,8 +115,8 @@ export function MeetingDetail({ record }) {
 }`;
 
   nextChapters.push({
-    id: "guide-project", title: "旅の案内と読書会のサイトを作る",
-    goal: "旅の案内で一覧と詳細ページを作り、地区で絞り込めるようにします。PC の完成例 /travel/example で「港」「坂」「山」を順に検索してみましょう。最後に、同じ仕組みで読書会の一覧と残席を表示します。",
+    id: "guide-project", title: "一覧・詳細・検索のあるサイトを作り、保存してPCでも起動する",
+    goal: "旅の案内で一覧と詳細ページを作り、地区で絞り込めるようにします。PC の完成例 /travel/example で「港」「坂」「山」を順に検索してみましょう。最後に、同じ仕組みで読書会の一覧と、あと何人参加できるかを表示します。",
     examples: [
       ["/travel/example?town=港", "水辺の桟橋 → 詳細に「港の入口です。」"],
       ["/meetings?edition=spring&town=港", "川辺の読書会　残席 2\n橋の読書会　残席 1"],
@@ -146,7 +146,7 @@ export function MeetingDetail({ record }) {
     answer: hill.replace("<p>町を見おろせます。</p>", '<p>石段を上ります。</p>\n      <Link href="/travel">旅の一覧へ</Link>'),
     task: "/travel/hill に「夕方の丘」「石段を上ります。」を載せ、「旅の一覧へ」から一覧へ戻れるようにします。", hint: "直リンクで正しい丘が出たら、一覧へ戻るリンクを足します。",
   }, {
-    id: "travel-search", chapter: "guide-project", title: "GET で地区を送り、検索結果を表示する",
+    id: "travel-search", chapter: "guide-project", title: "検索フォームの条件をURLに残す（GET）",
     slides: [
       ["検索した地区を URL に残す", "GET のフォームは、入力欄の name と値をURL の ? の後ろに付けます。Next.js のページでは await searchParams で受け取ります。検索後の URL をコピーすると同じ地区の一覧を開けます。", '<form method="get"><input name="town" /><button>探す</button></form>\nconst { town = "" } = await searchParams;', "坂を送ると /travel/search?town=坂 です。"],
       ["条件なし・一致あり・該当なし", "filter は条件に合う記録だけで新しい一覧を作ります。!town は地区の指定が空という意味です。|| はどちらかが真なら残します。", 'const found = stops.filter(stop => !town || stop.town === town);', "空の地区なら両方、港なら桟橋だけ、山なら「該当する場所はありません。」です。"],
@@ -168,10 +168,10 @@ export function MeetingDetail({ record }) {
     answer: note.replace('{ title: "案内" }', '{\n  title: "港の道順",\n  description: "桟橋までの道順と目印を紹介します。",\n}'),
     task: "本文の「桟橋までの道」を残し、このページのタブ名を「港の道順」、説明を「桟橋までの道順と目印を紹介します。」にします。", hint: "タブ名まで変わったら、同じ metadata に説明の項目を足します。",
   }, {
-    id: "travel-image", chapter: "guide-project", title: "版画に大きさと代わりの説明を付ける",
+    id: "travel-image", chapter: "guide-project", title: "画像にサイズと、見えないときに使う説明を付ける",
     slides: [
-      ["手元の一枚を表示する", "public にある港の版画は /harbor.png で使えます。Next の Image に元の画像の幅・高さを渡すと、読込み前にも縦横の比率が分かります。この版画は幅144、高さ96です。", '<Image src="/harbor.png" width={144} height={96} alt="港の版画" />', "横長の版画が、元の3対2の比率で表示されます。"],
-      ["画像の目印を alt に書く", "案内の目印は、港に浮かぶ白い帆と赤い太陽です。alt にはファイル名の代わりに、画像に何が描かれているかを書きます。", 'alt="港の赤い太陽と白い帆"', "画像を見ずに読んでも、港を見分ける二つの目印が伝わります。"],
+      ["プロジェクトに入れた画像をページに表示する", "public にある港の版画は /harbor.png で使えます。Next の Image に元の画像の幅・高さを渡すと、読込み前にも縦横の比率が分かります。この版画は幅144、高さ96です。", '<Image src="/harbor.png" width={144} height={96} alt="港の版画" />', "横長の版画が、元の3対2の比率で表示されます。"],
+      ["画像の代わりとなる説明を alt に書く", "案内の目印は、港に浮かぶ白い帆と赤い太陽です。alt にはファイル名の代わりに、画像に何が描かれているかを書きます。", 'alt="港の赤い太陽と白い帆"', "画像を見ずに読んでも、港を見分ける二つの目印が伝わります。"],
     ],
     quiz: ["この版画の代替テキストとして読者の役に立つのは？", ["harbor.png", "画像", "港の赤い太陽と白い帆", "幅144"], 2, "赤い太陽と白い帆が、絵から読み取れる目印です。"],
     build: ['<Image src="①" width={144} height={96} alt="②" />', [["手元の版画", "/harbor.png", "/public/harbor.png"], ["読める目印", "港の赤い太陽と白い帆", "ファイル1"]]],
@@ -179,16 +179,16 @@ export function MeetingDetail({ record }) {
     answer: photo.replace('alt=""', 'alt="港の赤い太陽と白い帆"'),
     task: "画像の場所と大きさを使い、空の alt に「港の赤い太陽と白い帆」を入れます。ページを開いて画像が表示されることも確かめましょう。", hint: "画像が出たら、色と帆を読み取れる代替テキストを設定します。",
   }, {
-    id: "meeting-project", chapter: "guide-project", title: "読書会の一覧と詳細に残席を表示する",
+    id: "meeting-project", chapter: "guide-project", title: "データから一覧・詳細を作り、地区で絞り込む",
     slides: [
-      ["春と秋の読書会データを確認する", "library/meetings.js に春と秋の読書会データがあります。id は詳細ページの URL に使う識別子、title は会の名前、town は地区、seats は残席です。同じ id でも、春と秋で会の名前や残席が変わります。", '春 river 川辺の読書会・港・2席 ／ hill 丘の読書会・坂・0席 ／ bridge 橋の読書会・港・1席\n秋 river 夕方の詩の会・坂・0席 ／ lamp 灯りの会・港・4席', "春の /meetings/river は川辺の読書会、?edition=autumn を付けると夕方の詩の会です。"],
+      ["URLの条件で別のデータを選ぶ", "library/meetings.js に春と秋の読書会データがあります。id は詳細ページの URL に使う識別子、title は会の名前、town は地区、seats はあと何人参加できるかを表す、残りの席数です。同じ id でも、春と秋で会の名前や残席が変わります。", '春 river 川辺の読書会・港・2席 ／ hill 丘の読書会・坂・0席 ／ bridge 橋の読書会・港・1席\n秋 river 夕方の詩の会・坂・0席 ／ lamp 灯りの会・港・4席', "春の /meetings/river は川辺の読書会、?edition=autumn を付けると夕方の詩の会です。"],
       ["一覧に各回の詳細リンクを表示する", "ページから MeetingList に、選んだ季節の読書会データ records、地区 town、季節 edition を渡します。各回の id と edition から詳細 URL を作り、title をリンク名にします。", 'const href = "/meetings/" + item.id + "?edition=" + edition;\n<a href={href}>{item.title}</a>', "秋の灯りの会を押すと /meetings/lamp?edition=autumn へ進みます。"],
-      ["絞り込み、残席、見つからない時", "GETフォームで地区を選ぶときは、表示中の版を隠し入力で送れます。詳細には一件の record が渡ります。席が0なら満席、指定した id の読書会がなければ「読書会が見つかりません」と表示しましょう。", '<input type="hidden" name="edition" value={edition} />\nrecord.seats === 0 ? "満席" : "残席 " + record.seats', "秋の港は灯りの会の残席4。山で探すと「該当する回はありません。」。秋の /meetings/hill は見つかりません。"],
+      ["検索結果が空の場合と、個別のデータがない場合を分ける", "GETフォームで地区を選ぶときは、表示中の版を隠し入力で送れます。詳細には一件の record が渡ります。席が0なら満席、指定した id の読書会がなければ「読書会が見つかりません」と表示しましょう。", '<input type="hidden" name="edition" value={edition} />\nrecord.seats === 0 ? "満席" : "残席 " + record.seats', "秋の港は灯りの会の残席4。山で探すと「該当する回はありません。」。秋の /meetings/hill は見つかりません。"],
     ],
     quiz: ["秋の港で空席のある読書会を探すと、どの詳細ページを開けますか。", ["川辺の読書会", "灯りの会", "夕方の詩の会", "丘の読書会"], 1, "秋の港に該当するのは残席 4 の「灯りの会」です。その id と edition をリンクに含めます。"],
     build: ['① → 灯りの会を押す → ②', [["秋の港だけを開く", "/meetings?edition=autumn&town=港", "/meetings?edition=spring"], ["選んだ回へ進む", "/meetings/lamp?edition=autumn", "/meetings/river?edition=spring"]]],
     right: ["/meetings?edition=autumn&town=港", "/meetings/lamp?edition=autumn"], file: "library/guide.jsx", source: guide, answer: project,
-    task: "読書会データを使って一覧と詳細を作ります。見出し「読書会の一覧」、各回へのリンクと残席、地区のGETフォームを作ります。詳細には回の見出し、地区、残席を表示します。0席は「満席」、地区の0件は「該当する回はありません。」、存在しない回は「読書会が見つかりません」と案内します。春の読書会を一つ開いたら、秋への切替、地区が空欄の場合、該当する回がない場合も試しましょう。", hint: "records から表示した回と、リンクの id・edition をそろえます。一覧が動いたら、record の有無と seats の0を分けて詳細を仕上げます。",
+    task: "読書会データを使って一覧と詳細を作ります。見出し「読書会の一覧」、各回の詳細へのリンクと残りの席数、地区で絞り込むフォーム（GET）を作ります。詳細には回の見出し、地区、残席を表示します。0席は「満席」、地区の0件は「該当する回はありません。」、存在しない回は「読書会が見つかりません」と案内します。春の読書会を一つ開いたら、秋への切替、地区が空欄の場合、該当する回がない場合も試しましょう。", hint: "records から表示した回と、リンクの id・edition をそろえます。一覧が動いたら、record の有無と seats の0を分けて詳細を仕上げます。",
   }, {
     id: "meeting-export", chapter: "guide-project", title: "完成したコードを ZIP に保存して別のフォルダーで起動する",
     slides: [

@@ -43,7 +43,7 @@ const profileProjectLessons = [
     goal: "作者名と短い紹介文を読み、先頭のリンクから作品へ移動できるページを作る。",
     slides: [
       { title: "作者名と紹介文をページの先頭に置く", body: "header に作者名と短い紹介文を置きます。h1 を読めば名前、続く p を読めばどんな作品を作る人か分かります。", html: '<header><h1>栞を刷る小野</h1>\n<p>古い紙に版画を刷っています。</p></header>' },
-      { title: "作品を先に見たい人へ", body: "ページ先頭の「作品を見る」を押すと作品の見出しに移ります。リンクの href と見出しの id の組を確かめましょう。", html: profileHead + "\n" + profileWorks, previewHeight: 186 },
+      { title: "作品一覧へ移動するリンクを置く", body: "ページ先頭の「作品を見る」を押すと作品の見出しに移ります。リンクの href と見出しの id の組を確かめましょう。", html: profileHead + "\n" + profileWorks, previewHeight: 186 },
     ],
     quiz: { prompt: "作者名を知った読者が作品まで一回で移るために必要なものは？",
       options: ["作者名をもう一つ", "太字の作品名だけ", "作品の見出しを指すリンク", "大きな余白"], correct: 2,
@@ -58,7 +58,7 @@ const profileProjectLessons = [
     },
   },
   {
-    id: "profile-stories", title: "原稿を自己紹介・得意なこと・作品に分ける", topic: "プロフィール制作",
+    id: "profile-stories", title: "原稿を話題ごとに分けて見出しを付ける", topic: "プロフィール制作",
     goal: "作者の話、頼める仕事、作品の説明をそれぞれ見つけられる本文にする。",
     slides: [
       { title: "文章と箇条書きを使い分ける", body: "「どんな人？」には一文で答えます。「頼める仕事は？」には二色刷りと手製本を一項目ずつ並べます。読みたい見出しのすぐ下に答えがあります。", html: profileAbout + "\n" + profileSkills },
@@ -77,10 +77,10 @@ const profileProjectLessons = [
     },
   },
   {
-    id: "profile-visit", title: "日時と場所を書き、完成したページを保存する", topic: "プロフィール制作",
+    id: "profile-visit", title: "連絡先と作品へのリンクを載せ、ページをHTMLファイルで保存する", topic: "プロフィール制作",
     goal: "作品へのリンクと連絡先を載せたプロフィールを作り、スマホとPCで読みやすく整える。",
     slides: [
-      { title: "読み終えた人が実際に訪ねられる案内", body: "「受付へ」だけでは、いつ、どこへ行くか迷います。最後の footer に「土曜の午後、図書室の受付で声をかけてください。」と書くと、次の行動が決まります。", html: profileFooter },
+      { title: "場所と連絡先を載せる", body: "「受付へ」だけでは、いつ、どこへ行くか迷います。最後の footer に「土曜の午後、図書室の受付で声をかけてください。」と書くと、次の行動が決まります。", html: profileFooter },
       { title: "同じ二作品を異なる幅で確かめる", body: "狭いときは一作品ずつ下へ読み、幅600pxから二作品を横に並べます。ページ先頭のリンクをTabで選んだときは紺色の枠が見えます。練習画面で完成したHTMLを書き出し、ブラウザで開けます。", html: guidedPage, css: guidedStyle + "\n" + guidedWide, widths: [360, 720], previewHeight: 310 },
     ],
     quiz: { prompt: "読者がスマホで作品を読んで、実物を見に行ける状態は？",

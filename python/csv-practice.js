@@ -79,8 +79,8 @@ def total_minutes(path):
   pythonChapters.push({
     id: "csv",
     engine: "cpython",
-    title: "CSVの読書記録を集計する",
-    goal: "読書記録のファイルから0以上の整数の分を集めます。分に誤りがあるときは行番号を知らせ、別の記録でも同じ処理を確かめます。",
+    title: "表のファイル（CSV）を読み、数値を集計する",
+    goal: "CSVは表の項目をカンマで区切って保存するファイルです。本の題名と読んだ時間（分）が入ったCSVを読み、分を合計します。分の値が不正なら行番号を知らせます。",
     demo: {
       prompt: "実行すると15分と20分が合計されます。入力欄のファイル名を reading_with_comma.csv、reading_empty.csv、reading_invalid.csv に変え、同じコードで何が表示されるか比べましょう。すべてのCSVは教材に用意してあります。",
       input: "reading.csv",
@@ -95,7 +95,7 @@ except ValueError as error:
     },
     lessons: [
       {
-        title: "実際のCSVファイルを開く",
+        title: "CSVファイルを開いて先頭の行を読む",
         text: "CSVは、カンマで項目を区切って表を保存できる文字のファイルです。この例では、1行目が列の名前で、その次の行から読書記録が入っています。with open で読み、encoding に「utf-8」を指定すると、日本語の題名を読めます。file.readline() は改行までの1行を取り出します。print に end=\"\" を指定すると、読んだ行をそのまま表示できます。",
         files: { "reading.csv": files["reading.csv"] },
         code: readLine('    print(file.readline(), end="")', '"reading.csv"'),
@@ -190,7 +190,7 @@ except ValueError as error:
         ),
       },
       {
-        title: "分の文字を整数に変える",
+        title: "読書時間を文字から整数に変える",
         text: "DictReader で読んだ値は文字です。15を読み取っても、文字のまま2倍すると「1515」になります。int に渡して整数に変えると、掛け算や足し算ができます。",
         files: { "reading.csv": files["reading.csv"] },
         code: read(`    row = next(reader)
@@ -231,7 +231,7 @@ except ValueError as error:
         ),
       },
       {
-        title: "全部の記録の分を合計する",
+        title: "すべての行の読書時間を合計する",
         text: "for row in reader: と書くと、1件ずつ読み終わるまで処理できます。合計を0から始め、毎回、整数にした分を足しましょう。見出しだけのファイルでは繰り返しが一度も行われず、合計は0のままです。",
         files: { "reading.csv": files["reading.csv"] },
         code: summary + '\n\nprint(total_minutes("reading.csv"))',
@@ -264,7 +264,7 @@ except ValueError as error:
         ),
       },
       {
-        title: "分を直す行の番号を知らせる",
+        title: "読書時間が不正な行の番号を知らせる",
         text: "int で分を整数にできないと ValueError が起きます。空欄も変換できないので、空の文字として int に渡します。負の分は、自分で ValueError を起こして同じ案内に進めます。reader.line_num は、ファイルからここまで読んだ行の数です。この例では1件の記録が1行なので、見出しを数に含めて、2件目の誤りを3行目と知らせます。",
         files: { "reading_invalid.csv": files["reading_invalid.csv"] },
         code: checkedSummary + `

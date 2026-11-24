@@ -85,12 +85,12 @@ const finishChecks=[
   [async t=>{t.q("#pack").value="night";t.click("#retry");await t.wait(15);t.type("#entry","星");t.click("#play");return t.q("#score").textContent==="3" && t.q("#status").textContent==="正解";},"読み込みに失敗した後も問題集を選び直し、その問題の配点で採点できます。"]
 ];
 tsChapters.push({
-  title:"型付きの問題・回答・結果でクイズを仕上げる",
-  intro:"完成例で問題集を開き、正解と不正解を一回ずつ試しましょう。問題集を「夜空の号」から「天気の号」に変えると、問題文と配点も変わります。",
+  title:"練習：問題・回答・結果に型を付けてクイズを作る",
+  intro:"完成例では、夜空と天気の二つのテーマから問題集を選べます。「問題集を開く」を押し、正解と不正解を一回ずつ試しましょう。別のテーマを選ぶと、問題文と配点も変わります。",
   demo:["完成したクイズを操作する"], code:()=>finishQuiz,dom:{html:quizHtml,setup:quizSetup,tests:[]}
 });
 tsLessons.push({
-  id:"typed-pack",chapter:4,title:"クイズの問題に Puzzle 型を付ける",
+  id:"typed-pack",chapter:4,title:"一問に必要な項目をまとめて型を作る",
   why:"採点には問題文に加えて、答えと配点が必要です。既存のJavaScriptの一問を Puzzle 型で受け、三つの項目の組み合わせを確認します。",
   before:puzzleType+'\nconst first:Puzzle={title:"夜空",answer:"星",points:3};\nconsole.log(first.points);',
   after:puzzleType+'\nconst first:Puzzle={title:"夜空",answer:"星",points:5};\nconsole.log(first.points);',change:"配点だけを5に変える",
@@ -101,7 +101,7 @@ tsLessons.push({
   contract:'const __p:Puzzle=first; const __v:{title:string;answer:string;points:number}=first;',contractHint:"first に Puzzle の三項目をそろえます。",
   probes:[trial("first.title","森の道","first.title を「森の道」にします。"),trial("first.answer","苔","正解にする文字を合わせます。"),trial("first.points",4,"配点を数の4にします。")]
 },{
-  id:"typed-round",chapter:4,title:"回答の前後で使える情報を変える",
+  id:"typed-round",chapter:4,title:"回答前と採点後で、使える項目を分ける",
   why:"回答前に正誤や得点を読まないよう、三つの状態を分けます。ready は回答前、answered は正誤とその点、end は全問の合計です。回答と正解の文字列を比べ、kind が answered のオブジェクトを返します。",
   before:puzzleType+'\n'+roundType+'\n'+scoreEntry+'\nconsole.log(judgeAnswer({title:"星",answer:"北",points:2},"南"));',
   after:puzzleType+'\n'+roundType+'\n'+scoreEntry+'\nconsole.log(judgeAnswer({title:"星",answer:"北",points:2},"北"));',change:"回答だけを正答に変える",
@@ -113,7 +113,7 @@ tsLessons.push({
   contract:"const __judge:(q:Puzzle,a:string)=>Round=judgeAnswer;",contractHint:"Puzzle 型の問題と回答の文字列を受け取り、Round 型の値を返します。",
   probes:[trial('judgeAnswer({title:"森",answer:"苔",points:4},"苔")',{kind:"answered",correct:true,points:4},"正解なら correct を true にし、points に今回の問題の配点を入れます。"),trial('judgeAnswer({title:"森",answer:"苔",points:4},"花")',{kind:"answered",correct:false,points:0},"不正解には0点を付けます。")]
 },{
-  id:"typed-boundary",chapter:4,title:"読み込んだ問題集を開始前に確かめる",
+  id:"typed-boundary",chapter:4,title:"全件のデータを検査してからクイズを始める",
   why:"一問だけ正しくても、次の一問が壊れていると途中で止まります。Array.isArray で配列を確かめ、every(isPuzzle) で全件を調べます。長さが0なら開始する問題がありません。",
   before:puzzleType+'\n'+isBook+'\nconst data:unknown=[{title:"星",answer:"北",points:2}];\nconsole.log(Array.isArray(data) && data.every(isPuzzle));',
   after:puzzleType+'\n'+isBook+'\nconst data:unknown=[{title:"星",answer:"北",points:"二"}];\nconsole.log(Array.isArray(data) && data.every(isPuzzle));',change:"届いた一問の配点を文字に変える",
@@ -125,8 +125,8 @@ tsLessons.push({
   contract:"const __start:(data:unknown)=>boolean=canStart;",contractHint:"どんな入力も受け、真偽を返す canStart にします。",
   probes:[trial('canStart([{title:"森",answer:"苔",points:4}])',true,"正常な一件で開始できます。"),trial('canStart([])',false,"空の問題集を開始しないようにします。"),trial('canStart(null)',false,"配列以外は false です。"),trial('canStart([{title:"森",answer:"苔",points:4},{title:"庭",points:2}])',false,"二問目も含めて全件の形を確認します。")]
 },{
-  id:"quiz-edition",chapter:4,title:"天気の号で型付きクイズを仕上げる",
-  why:"二冊目は「天気の号」です。問題ごとの配点を読み、前後の空白を取り除いた回答を比較します。trim() は文字の両端の空白を除いた新しい文字を返します。画面に表示する drawQuiz と読込の requestEdition は教材が用意しています。",
+  id:"quiz-edition",chapter:4,title:"総合練習：問題の取得・回答・結果表示をつなぐ",
+  why:"夜空の問題集は星や太陽、天気の問題集は雨や虹について出題します。どちらを選んでも使える採点を作ります。正解ならその問題で決まった点数（配点）を加え、回答の前後に空白があれば取り除いてから正解と比べます。trim() は文字の両端の空白を除いた新しい文字を返します。画面に表示する drawQuiz と読込の requestEdition は教材が用意しています。",
   before:finishQuiz.replace("judgeAnswer(books[at],text.trim())","judgeAnswer(books[at],text)"),after:finishQuiz,change:"照合前に回答両端の空白を除く",
   question:["kind が end のとき、合計点はどこから読みますか。",["次の問題の配点","未回答欄の値","end の total","必ず0点"],2,"終了では全問の合計を持つ total が使えます。"],
   prompt:"夜空と天気のどちらの問題集でも遊べるようにします。回答の前後の空白を除き、空なら再入力を促します。各問を一度だけ採点し、正解ならその問題の配点を加えます。最後に合計点を表示し、再挑戦すると 0 点から始めます。問題データに不備がある場合と、読み込みに失敗した場合の案内も分けてください。",

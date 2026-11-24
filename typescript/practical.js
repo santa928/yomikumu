@@ -29,17 +29,14 @@ for (const { label, actual } of require("./check.js").runChecks()) console.log(l
 }
 
 function renderPracticalTS() {
-  main.innerHTML = `<p class="kind">TypeScript · 実践</p>
-    <h1>複数ファイルで採点を改修する</h1>
-    <p>観察クイズの採点を直します。問題に書いてある配点を使い、正解・不正解・入力データの不備を区別できるようにします。</p>
+  document.title = tsChapters[practicalChapter].title + "｜よみくむ";
+  main.innerHTML = `<nav class="toc-breadcrumb" aria-label="現在地"><a href="#contents">TypeScriptの目次</a></nav>
+    <h1>${escTS(tsChapters[practicalChapter].title)}</h1>
+    <p>自然について出題するクイズの採点を直します。問題ごとの点数（配点）を使い、正解・不正解・入力データの不備を区別します。まず見本で、型を共有する方法、外部データの確かめ方、問題と採点処理をクラスにまとめる方法を練習します。</p>
     <section aria-labelledby="practical-slides">
       <h2 id="practical-slides">見本と短い練習</h2>
       <p>スマートフォンでは、見本から四択に進み、候補をタップしてコードを組めます。</p>
-      <ol class="catalog">
-        <li><a href="#shared-result/slide">採点結果の型を共有する</a></li>
-        <li><a href="#points-input/slide">届いた配点を読めるか確かめる</a></li>
-        <li><a href="#round-class/slide">問題と採点のクラスを作る</a></li>
-      </ol>
+      ${lessonLinksTS(practicalChapter)}
     </section>
     <section class="ts-practical" aria-labelledby="practical-editor-heading">
       <h2 id="practical-editor-heading">PC実習 · 4つのファイルをつなぐ</h2>
@@ -87,7 +84,7 @@ function renderPracticalTS() {
       <button type="button" id="practical-download">現在のプロジェクトをZIPで保存</button>
       <p id="practical-download-note" role="status"></p>
     </section>
-    <a class="review" href="#contents">型付きクイズの目次へ</a>`;
+    <a class="review" href="#contents">TypeScriptの目次へ</a>`;
 
   const sources = { ...practicalStarterTS, ...stateTS.practical };
   const file = main.querySelector("#practical-file");

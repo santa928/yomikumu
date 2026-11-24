@@ -466,6 +466,10 @@ async function run() {
     await confirm.click();
     await says("上下の8pxは合っています");
     await page.getByRole("link", { name: "この問題のスライドを見直す" }).click();
+    const slideNav = page.getByRole("navigation", { name: "この単元の教材" });
+    // The review marker must survive both a sibling slide link and sequential navigation.
+    await slideNav.locator('a[href^="#padding/1"]').click();
+    await page.getByRole("link", { name: "次のスライドへ →" }).click();
     await page.getByRole("link", { name: /解きかけの問題へ戻る/ }).waitFor();
     await page.reload();
     const back = page.getByRole("link", { name: /解きかけの問題へ戻る/ });

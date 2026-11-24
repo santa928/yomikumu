@@ -4,8 +4,8 @@
   const returnChecks = (call, values, amounts = [2, 7]) => amounts.map((n, i) =>
     check(n + "枚で呼ぶ", "", { observe: call + "(" + n + ")", value: values[i] }));
   pythonChapters.push({
-    id: "57", title: "料金の計算を関数にする",
-    goal: "一度書いた計算に別の枚数を渡し、返った金額を次の計算に使います。",
+    id: "57", title: "関数に値を渡し、計算結果を受け取る",
+    goal: "チケットの料金を計算する手順を関数にします。チケットの枚数を渡すたびに金額が返り、その金額を次の計算に使えます。",
     demo: {
       prompt: "券の枚数を一行入力しましょう。1枚100円で計算し、会員特典の20円を引いて表示します。",
       code: "def price(count):\n    return count * 100\ncount = int(input())\nprint(price(count) - 20)", input: "3",
@@ -40,7 +40,7 @@
         write: exercise("金額 amount から3円引いた値を返す関数 sale を書きましょう。この課題では関数の定義だけを書きます。", "", "def sale(amount):\n    return amount - 3", returnChecks("sale", [9, 14], [12, 17]), "呼んだ側が使えるように、割引後の値を return します。"),
       },
       {
-        title: "関数の内側と外側の名前", text: "引数の名前は呼び出すたびに、その関数の中で使われます。外に同じ名前があっても別の変数です。外に計算結果を渡したいときは return を使います。",
+        title: "関数の中だけで使える変数を見分ける", text: "引数の名前は呼び出すたびに、その関数の中で使われます。外に同じ名前があっても別の変数です。外に計算結果を渡したいときは return を使います。",
         code: "amount = 100\ndef discount(amount):\n    amount = amount - 10\n    return amount\nprint(discount(40))\nprint(amount)", output: "30\n100",
         quiz: ["discount(40) のあと、外の amount は？", ["30", "40", "90", "100"], 3, "関数の中だけで使う amount を変更しても、外の100は変わりません。"],
         guide: exercise("外の100を保ち、関数の中だけで5円引きにしましょう。discount(40) の結果と、外の amount を表示します。", "amount = 100\ndef discount(amount):\n    return amount - 10\nprint(discount(40))\nprint(amount)", "amount = 100\ndef discount(amount):\n    return amount - 5\nprint(discount(40))\nprint(amount)", [check("内35と外100", "35\n100\n", { observe: "discount(20)", value: 15 })], "関数の中の引く金額だけを5にします。"),

@@ -10,8 +10,8 @@ const longWork = '<article class="piece">\n  <h2>RiverAndMoonlightPaperCollectio
 
 const boxLessons = [
   {
-    id: "outer-space", title: "札の外側を空ける", topic: "CSS",
-    goal: "枠の内側にある文字との距離と、隣の札までの距離を別々に変える。",
+    id: "outer-space", title: "CSSで枠の外側に余白をつくる", topic: "CSS",
+    goal: "枠と文字の間の余白と、枠の外側の余白を別々に変える。",
     slides: [
       {
         title: "二つの枠の間だけを広げる",
@@ -33,14 +33,14 @@ const boxLessons = [
     },
     exercise: {
       field: "css", html: shelfLabels, css: labelStyles,
-      task: "札の文字と枠の間を四方6pxにし、二つの札の枠と枠の間を12pxにしてください。2pxの枠は残します。",
+      task: "文字と枠の間を上下左右とも6pxにし、二つの枠の間を12pxにしてください。枠線の太さは2pxのままにします。",
       hint: "内側の四方は padding。一方の札の右側に margin-right を付けると次の札との間が空きます。",
       answer: labelStyles + "\n.tag { padding: 6px; margin-right: 12px; }",
       build: { code: labelStyles + "\n.tag { ①: 6px; ②: 12px; }", slots: [["枠の内側", "padding", "margin"], ["右の枠との間", "padding-right", "margin-right"]] }, review: 1,
     },
   },
   {
-    id: "border-width", title: "枠まで含めて札の幅を決める", topic: "CSS",
+    id: "border-width", title: "余白と枠を含めた幅を指定する", topic: "CSS",
     goal: "同じ幅を指定したとき、内側の余白と枠をどこに数えるかを選ぶ。",
     slides: [
       {
@@ -96,7 +96,7 @@ const boxLessons = [
     },
   },
   {
-    id: "narrow-card", title: "長い作品名を狭い画面に収める", topic: "CSS",
+    id: "narrow-card", title: "長い英単語を折り返して横スクロールを防ぐ", topic: "CSS",
     goal: "長い英字の作品名を最後まで読み、横スクロールせずに下のリンクを押せるようにする。",
     slides: [
       {
@@ -105,7 +105,7 @@ const boxLessons = [
         html: longWork, css: ".piece { padding: 8px; border: 1px solid; }", widths: [240],
       },
       {
-        title: "入りきらないときだけ途中で折る",
+        title: "入りきらない単語だけ途中で改行する",
         body: "overflow-wrap: anywhere は、一語が収まらないときに途中でも折り返せる指定です。作品名を消さずに最後まで表示し、下のリンクを押してメモにも進めます。",
         html: longWork, css: ".piece { padding: 8px; border: 1px solid; overflow-wrap: anywhere; }\n.piece a { display: block; }", widths: [240],
       },

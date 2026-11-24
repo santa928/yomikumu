@@ -11,7 +11,7 @@ async function openPaper() {
   } catch {say("もう一度");}
 }`;
 tsLessons.push({
-  id:"linked-desk",chapter:3,title:"入力した回答と問題データを照合する",
+  id:"linked-desk",chapter:3,title:"練習：読み込んだデータを確認して回答を採点する",
   why:"回答欄があるか、回答が入力されているかを先に調べます。その後で問題データを読み込み、text が文字列、points が数値なら採点します。",
   before:linkedDesk.replace('"正解 "+book.points+"点"','"正解"'),after:linkedDesk,change:"正解時に問題の配点も表示する",
   question:["空の回答欄で「問題を読む」を押したとき、一番先に出す案内は？",["取得失敗","正解3点","原稿を確認","回答を入力"],3,"この関数では loadPaper を呼ぶ前に回答欄を確認します。"],

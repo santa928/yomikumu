@@ -21,7 +21,7 @@ const { chromium } = require("playwright");
     await pc.getByRole("link", { name: /Webで作品を紹介する/ }).click();
     const dom = pc.locator("section").filter({ has: pc.getByRole("heading", { name: "JavaScriptの画面操作", exact: true }) });
     await dom.getByRole("link", { name: "最初の一課題を開く" }).click();
-    await pc.getByRole("link", { name: "一つの見出しを探す" }).click();
+    await pc.locator('main a[href="#elements/1"]').click();
     const draft = 'const title = document.getElementById("heading");';
     await pc.getByRole("textbox", { name: "JavaScript", exact: true }).fill(draft);
     await pc.getByRole("link", { name: "よみくむ", exact: true }).click();

@@ -52,11 +52,11 @@ const viewportLesson = {
 
 const responsiveLessons = [
   {
-    id: "content-break", title: "説明文が読める幅で二列にする", topic: "画面幅",
+    id: "content-break", title: "内容が収まる幅を境に一列から二列へ切り替える", topic: "画面幅",
     goal: "必要な中身の幅を足し、切り替わる直前と直後を比べる。",
     slides: [
       {
-        title: "二枚置くには何px必要？",
+        title: "二列に必要な幅を計算する",
         body: "この作品展では説明文を読むため、一枚に228pxほしいと決めました。二枚で456px、間に8px、ページの左右に8pxずつで合計480px。それより狭いときは縦に並べます。境目は紹介する内容によって変えられます。",
         html: longShelf, css: fluidShelf, widths: [320],
       },
@@ -80,7 +80,7 @@ const responsiveLessons = [
     },
   },
   {
-    id: "reading-width", title: "広い画面では文章を中央に止める", topic: "画面幅",
+    id: "reading-width", title: "本文が広がりすぎないように幅の上限を決める", topic: "画面幅",
     goal: "狭いときは縮み、広いときは読みやすい幅で中央に置かれる本文を作る。",
     slides: [
       {
@@ -89,7 +89,7 @@ const responsiveLessons = [
         html: '<main class="page">' + widthPage + '</main>', css: ".page { max-width: 560px; border-bottom: 1px solid; }", widths: [320, 720],
       },
       {
-        title: "左右に同じ余りを渡す",
+        title: "左右の余白を等しくして本文を中央に置く",
         body: "margin-inline は横書きの本文の左右の外側余白です。auto にすると、幅の上限で余った場所を左右に分けます。下の広い画面では本文の下の線も中央に置かれます。",
         html: '<main class="page">' + widthPage + '</main>', css: centeredPage + "\n.page { border-bottom: 1px solid; }", widths: [320, 720],
       },
@@ -108,7 +108,7 @@ const responsiveLessons = [
     },
   },
   {
-    id: "photo-fit", title: "同じ版画を額に収める・切り抜く", topic: "画像",
+    id: "photo-fit", title: "画像の全体を見せるか、枠いっぱいに表示するかを選ぶ", topic: "画像",
     goal: "画像の縦横比を保ち、全体を見せるか、額いっぱいに見せるかを選ぶ。",
     slides: [
       {
@@ -137,7 +137,7 @@ const responsiveLessons = [
     },
   },
   {
-    id: "four-widths", title: "二つの版画を四つの幅で展示する", topic: "HTML と CSS",
+    id: "four-widths", title: "画面幅を変えて画像と文章の表示を確かめる", topic: "HTML と CSS",
     goal: "違う形の絵と長い説明を、狭い幅・切り替え前後・広い幅で仕上げる。",
     slides: [
       {

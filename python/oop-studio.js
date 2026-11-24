@@ -12,20 +12,20 @@
   const retry = "try:\n    a(-1)\nexcept ValueError:\n    problem = True\nelse:\n    problem = False\nnext_value = a(3, extra=2)";
   const obs = (name, expr, value, before) => check(name, "", { observe: expr, value, before });
   pythonChapters.push({
-    id: "67", engine: "cpython", title: "読書記録の成功と失敗を履歴に残す",
+    id: "67", engine: "cpython", title: "設定付きのデコレーターで成功と失敗を記録する",
     goal: "読書記録の関数を呼ぶたびに、成功か失敗かを履歴に残します。同じ設定を使う関数は一つの履歴を共有します。",
     demo: { input: "-1", prompt: "最初のページ数に -1 を入力すると「もう一度」と表示されます。そのあと4ページと2ページの記録が続き、最後に青と赤それぞれの履歴が表示されます。",
       code: record + "\n" + twoJobs + "\n" + arrange + "\ntry:\n    print(a(int(input())))\nexcept ValueError:\n    print('もう一度')\nprint(a(4))\nprint(c(2))\nprint(a.history)\nprint(c.history)" },
     lessons: [
       {
-        engine: "skulpt", title: "設定を渡す時点を見る", text: "mark('青') を呼ぶと、events に「設定青」が追加され、関数 decorate が返ります。この時点で選んだのはラベルだけです。どの関数に適用するかは次の手順で指定します。",
+        engine: "skulpt", title: "デコレーターに設定をいつ渡すか確かめる", text: "mark('青') を呼ぶと、events に「設定青」が追加され、関数 decorate が返ります。この時点で選んだのはラベルだけです。どの関数に適用するかは次の手順で指定します。",
         code: "events = []\n" + setting + "\nblue = mark('青')\nprint(events)", output: "['設定青']",
         quiz: ["mark('青') を呼んだ直後に終わっていることは？", ["元の関数の実行", "設定の選択", "すべての読書記録", "料金計算"], 1, "まだどの関数に付けるかも、いつ呼ぶかも決まっていません。"],
         guide: exercise("設定の「青」を「赤」に変え、設定時点の記録を一件だけ表示しましょう。mark と events は用意されています。", "plan = mark('青')\nprint(events)", "plan = mark('赤')\nprint(events)", [check("設定だけ記録", "['設定赤']\n", { before: "events = []\n" + setting, observe: "callable(plan)", value: true })], "mark に渡すラベルを変え、返った関数はまだ呼びません。"),
         write: exercise("mark に「朝」、「夜」を順に渡し、返ってきた関数を morning と night に代入しましょう。ここでは代入までを書きます。", "", "morning = mark('朝')\nnight = mark('夜')", [obs("設定が二回", "[events, callable(morning), callable(night)]", [["設定朝", "設定夜"], true, true], "events = []\n" + setting)], "異なるラベルで mark を二度呼び、それぞれの返り値を保管します。"),
       },
       {
-        engine: "skulpt", title: "関数に適用する時点を見る", text: "plan = mark('青') の次に plan(pages) とすると、内側の decorate が一度動きます。ここで初めてどの関数を扱うかが決まります。まだページ数を渡してはいません。",
+        engine: "skulpt", title: "デコレーターを付ける時点を確かめる", text: "plan = mark('青') の次に plan(pages) とすると、内側の decorate が一度動きます。ここで初めてどの関数を扱うかが決まります。まだページ数を渡してはいません。",
         code: "events = []\n" + apply + "\n" + job + "\nplan = mark('青')\ntracked = plan(pages)\nprint(events)", output: "['設定青', '適用青']",
         quiz: ["適用はどの行？", ["def pages の説明文", "plan = mark('青')", "tracked = plan(pages)", "tracked(4)"], 2, "受け取った設定に、関数そのものを渡す行です。"],
         guide: exercise("plan に pages(3) の計算結果を渡すと、そのあと tracked(4) を呼べません。関数 pages を plan に渡すように直しましょう。", "plan = mark('青')\ntracked = plan(pages(3))", "plan = mark('青')\ntracked = plan(pages)", [obs("関数へ適用", "[events, tracked(4)]", [["設定青", "適用青"], 4], "events = []\n" + apply + "\n" + job)], "plan に渡すときは pages の後ろの丸かっこを外します。"),
@@ -39,7 +39,7 @@
         write: exercise("「朝」の設定を title に一度だけ適用し、「月」「海」の順に二度呼んで、二つの結果を表示しましょう。", "", "tracked = mark('朝')(title)\nprint(tracked('月'))\nprint(tracked('海'))", [check("記録と表示", "本:月\n本:海\n", { before: "events = []\n" + call + "\n" + twoJobs, observe: "events", value: ["設定朝", "適用朝", "呼出朝", "呼出朝"] })], "一つの tracked を使い続けると、設定と適用は一回、呼出は二回になります。"),
       },
       {
-        engine: "skulpt", title: "どの設定で状態を共有するか", text: "history = [] を counter(label) の中、decorate の外に置きます。設定を作るたびに一つのリストができ、同じ設定を付けた関数が共有します。wrapper.history は、呼び出し後に一覧を読むための属性です。",
+        engine: "skulpt", title: "同じ設定の関数で履歴を共有する", text: "history = [] を counter(label) の中、decorate の外に置きます。設定を作るたびに一つのリストができ、同じ設定を付けた関数が共有します。wrapper.history は、呼び出し後に一覧を読むための属性です。",
         code: counts + "\n" + twoJobs + "\nblue = counter('青')\nred = counter('赤')\na = blue(pages)\nb = blue(title)\nc = red(pages)\na(3)\nb('月')\nprint(a.history)\nprint(c.history)", output: "['青', '青']\n[]",
         quiz: ["青の二関数を一回ずつ、赤の一関数を一回呼んだ件数は？", ["青1・赤2", "両方3", "青2・赤1", "どちらも0"], 2, "history は同じ設定の間で共有し、別設定には別リストがあります。"],
         guide: exercise("赤の関数にも青の設定を付けた誤りを直し、a と b の記録を別々にします。両方を一回ずつ呼びます。", "blue = counter('青')\nred = counter('赤')\na = blue(pages)\nb = blue(pages)\na(1)\nb(3)", "blue = counter('青')\nred = counter('赤')\na = blue(pages)\nb = red(pages)\na(1)\nb(3)", [obs("設定別の記録", "[a.history, b.history]", [["青"], ["赤"]], counts + "\n" + job)], "二つ目の関数には red の設定を使います。"),

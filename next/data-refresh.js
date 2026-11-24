@@ -2,7 +2,7 @@
 
 nextChapters.push({
   "id": "refresh",
-  "title": "データの読み込みと更新を確かめる",
+  "title": "データをいつ取り直すか、待ち時間やエラーをどう表示するか",
   "goal": "/data-lab で本の版と時刻を変え、同じ URL をもう一度開いて表示を比べます。応答に時間がかかる場合や、読み込みに失敗した場合も試せます。",
   "examples": [
     [
@@ -23,10 +23,10 @@ nextChapters.push({
 nextLessons.push({
   "id": "two-reads",
   "chapter": "refresh",
-  "title": "同じ URL で更新前後の値を読む",
+  "title": "同じURLを開き直し、古いデータと新しいデータを見分ける",
   "slides": [
     [
-      "版と時刻を変えて応答を比べる",
+      "元データを変え、同じURLから届く値を比べる",
       "/data-lab の「原稿を設定」で版と時刻を書き替えられます。「二度取得」を開いて、返された edition と publishedAt を見ましょう。設定を変えて同じ URL を開き直すと、値の変化が分かります。",
       "const paper = await response.json();\nreturn Response.json({ edition: paper.edition, publishedAt: paper.publishedAt });",
       "第1版 09:00 から第2版 09:15 に設定した後は、同じ URL の応答に 2 と 09:15 が含まれます。"
@@ -117,10 +117,10 @@ nextLessons.push({
 }, {
   "id": "expire",
   "chapter": "refresh",
-  "title": "キャッシュした応答を期限後に更新する",
+  "title": "保存したデータ（キャッシュ）を期限が過ぎたら取り直す",
   "slides": [
     [
-      "短い間だけ同じ版を使う",
+      "指定した秒数だけ保存したデータを使う",
       "next.revalidate の数は再検証までの秒数です。期限を過ぎた最初の要求には旧版が返り、サーバーがバックグラウンドでデータを取り直すことがあります。更新が終わると、同じ URL で新版を読めます。",
       "await requestPaper(request, { next: { revalidate: 2 } });",
       "初版取得の直後は同じ版が届きます。2秒を超えてから読み直し、再検証完了後に新版へ変わります。"
@@ -211,7 +211,7 @@ nextLessons.push({
 }, {
   "id": "paper-fail",
   "chapter": "refresh",
-  "title": "一時的な失敗を知らせる",
+  "title": "データを取得できないときにエラーを表示する",
   "slides": [
     [
       "届いたHTTP応答の成否を読む",
@@ -258,7 +258,7 @@ nextLessons.push({
 }, {
   "id": "paper-missing",
   "chapter": "refresh",
-  "title": "存在しない本に合う案内を出す",
+  "title": "データが見つからないときに専用の案内を出す",
   "slides": [
     [
       "指定した本がないときは 404 が返る",
