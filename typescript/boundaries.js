@@ -55,7 +55,7 @@ tsLessons.push({
     [t=>{t.click("#other");return t.q("#note").textContent==="回答欄以外";},"ボタンから届いたときは「回答欄以外」にします。"]]}
 },{
   id:"unknown",chapter:3,title:"型が不明な値から、確認して文字を取り出す",
-  why:"外から受け取った値の型が分からないときは unknown とします。たとえば { text: 3 } も届くので、いきなり text を文字列として使いません。値が null ではないオブジェクトか、in で text があるか、typeof で text が文字列か。この順で確かめてから返します。",
+  why:"型を書いても、外から実際に届いたデータは書き換わりません。たとえば { text: 3 } も来ます。unknown は「まだ型が分からないので、確かめるまで項目を使わない」という指定です。値が null ではないオブジェクトか、in で text があるか、typeof で text が文字列か。この順で確かめてから返します。",
   before:'function titleOf(v:unknown):string {return v.text;}\nconsole.log(titleOf({text:"星"}));',
   after:'function titleOf(v:unknown):string {\n  if(typeof v==="object" && v!==null && "text" in v && typeof v.text==="string") return v.text;\n  return "形を確認";\n}\nconsole.log(titleOf({text:"星"}));',change:"読む前に形の確認を置く",
   question:["unknown が null の可能性もある。項目を探す前にすることは？",["すぐに value.text を読む","まず text の長さを調べる","value の型を string と決める","object かつ null 以外と確かめる"],3,"null を除いてから in で項目を調べます。"],

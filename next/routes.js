@@ -10,7 +10,7 @@ const nextLessons = [{
   id: "request", chapter: "routes", title: "フォルダー名でページのURLを決める",
   slides: [
     ["URLを開くと何が届く？", "ブラウザのアドレス欄から /notice を開くと、ブラウザはサーバー（ページやデータを返す側）に「/notice のページをください」と頼みます。この読み取りの要求が GET です。届いた HTML をブラウザが読み取ると、見出しが表示されます。", "GET /notice", "画面に「本日の案内」という見出しが出ます。"],
-    ["/notice の表示を変えるファイル", "app の中で notice フォルダーに置いた page.jsx が /notice のページになります。見出しの文字を変更し、同じページを再読み込みすると、新しい文字が表示されます。", 'export default function Notice() {\n  return <h1>本日の案内</h1>;\n}', "この例で届く見出しは「本日の案内」です。"],
+    ["/notice の表示を変えるファイル", "見出しの表示を返す関数はReactの書き方です。Next.jsではその関数を app/notice/page.jsx に置くと、フォルダー名から /notice というURLが決まります。見出しの文字を変えて再読み込みしても、フォルダー名を変えていないのでURLは同じです。", 'export default function Notice() {\n  return <h1>本日の案内</h1>;\n}', "この例で届く見出しは「本日の案内」です。"],
   ],
   quiz: ["/notice を開いた時、ブラウザに送られるのは？", ["page.jsx のソースコード", "ページとして読み取れるHTML", "compose.yaml の内容", "サーバーの起動ログ"], 1, "取ってきたHTMLをブラウザが見出しとして表示します。"],
   build: ['app/①/page.jsx → GET /notice → <h1>②</h1>', [["フォルダー名", "notice", "notices"], ["新しい見出し", "夜の読書室", "本日の案内"]]],

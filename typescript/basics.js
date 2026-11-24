@@ -14,7 +14,7 @@ const trial = (expr, want, hint) => ({ expr, want, hint });
 tsLessons.push(
   {
     id: "infer", chapter: 0, title: "最初に入れた値から変数の型が決まる（型推論）",
-    why: "let points = 0 と書くと、TypeScript は初期値の 0 から points の型を number（数値）と判断します。これを型推論と呼びます。引用符で囲んだ数字は文字列なので、points に代入すると型エラーになります。",
+    why: "let points = 0 と書くと、TypeScript は初期値の 0 から points の型を number（数値）と判断します。これを型推論と呼びます。引用符で囲んだ \"2\" は文字列なので、TypeScriptの型検査ではエラーです。同じ代入をJavaScriptとして実行すると文字列が入ります。TypeScriptは値を自動で数に変えるのではなく、実行前にその取り違えを知らせます。",
     before: 'let points = 0;\npoints = "2";\nconsole.log(points);',
     after: 'let points = 0;\npoints = 2;\nconsole.log(points);', change: "2行目の引用符を外す",
     question: ["let points = 0 の後、points に代入できる値は？", ["数の 4", '文字の "4"', "本の題名", "真偽値"], 0, "初期値が数なので points は number と推論されます。"],

@@ -15,21 +15,21 @@
     demo: { code: demo, input: "6", prompt: "6ページ、1ページ2円なら、三つの計算結果はいずれも12です。入力欄のページ数を変えてみましょう。" },
     lessons: [
       {
-        title: "Book クラスで1冊分の記録を作る", text: "first = Book(4) で、4ページ読んだ本の記録を一つ作ります。Book は記録の項目や操作を決めるクラスです。そこから作った1冊分の記録をインスタンスと呼び、first はその記録に付けた名前です。作成時に __init__ が呼ばれ、self（作ったばかりの記録）の pages に 4 を保存します。",
+        title: "Book クラスで1冊分の記録を作る", text: "1冊だけなら、読んだページ数を変数ひとつに入れておけます。複数の本を扱うときは、同じ記録の形をクラス Book に書いておくと、1冊ずつ別の記録を作れます。Book(4) はその1冊分（インスタンス）を作り、__init__ が受け取った 4 を self.pages に保存します。first.pages で first のページ数を読みます。",
         code: book + "\nfirst = Book(4)\nprint(first.pages)", output: "4",
         quiz: ["Book(4) の結果を入れた first は？", ["クラスの定義そのもの", "4ページの一冊", "全冊のリスト", "ページ番号だけ"], 1, "Book はクラス、first はそこから作った一冊です。"],
         guide: exercise("初期値を4から9に変え、first のページを表示しましょう。", book + "\nfirst = Book(4)\nprint(first.pages)", book + "\nfirst = Book(9)\nprint(first.pages)", [check("一冊の状態", "9\n", { observe: "isinstance(first, Book)", value: true })], "一冊を作る Book(…) に渡す値を変えます。"),
         write: exercise("準備済みの Book を使い、12ページの一冊を entry に作り、そのページ数を表示しましょう。", "", "entry = Book(12)\nprint(entry.pages)", [check("12ページの本", "12\n", { before: book, observe: "isinstance(entry, Book)", value: true })], "Book(12) の結果に entry と名前を付けます。"),
       },
       {
-        title: "別々の本のページ数を記録する", text: "second = first は同じ本を二つの名前で見る書き方です。もう一冊に別の状態を持たせるには Book をもう一度呼びます。is は同じ実体を指すかを比べます。",
+        title: "別々の本のページ数を記録する", text: "b = a と書いても記録はコピーされず、同じ1冊を二つの名前で参照します。見本では Book(4) を2回呼ぶので、最初のページ数が同じでも別々の記録です。a.pages を変えても b.pages は4のままです。a is b はページ数の一致ではなく、同じ記録かどうかを調べます。",
         code: book + "\na = Book(4)\nb = Book(4)\na.pages = 8\nprint(a.pages)\nprint(b.pages)\nprint(a is b)", output: "8\n4\nFalse",
         quiz: ["b = a に変えたあと a.pages = 8 とすると b.pages は？", ["4", "8", "0", "不明"], 1, "別名が同じ一冊を指すので、b からも8が見えます。"],
         guide: exercise("二冊目を独立して作り、first だけを8ページにしましょう。最初は両方4ページです。", "first = Book(4)\nsecond = first\nfirst.pages = 8", "first = Book(4)\nsecond = Book(4)\nfirst.pages = 8", independent.map(test => ({ ...test, before: book })), "second に Book(4) をもう一度呼んだ結果を入れます。"),
         write: exercise("Book を使い、最初は2ページと5ページの二冊を a、b に作ります。b だけを7ページに直し、二冊のページを順に表示しましょう。", "", "a = Book(2)\nb = Book(5)\nb.pages = 7\nprint(a.pages)\nprint(b.pages)", [check("一冊だけ更新", "2\n7\n", { before: book, observe: "a is b", value: false })], "一冊ずつ作り、b の属性だけを書き換えます。"),
       },
       {
-        title: "self で呼ばれた本だけ更新する", text: "クラスの中の関数をメソッドといいます。a.read(3) では a が self に、3 が amount に渡ります。+= は、元の値に足して戻す書き方です。",
+        title: "self で呼ばれた本だけ更新する", text: "前の例は a.pages を直接書き換えました。毎回「今のページ数に足す」と書く代わりに、その手順をクラスの関数（メソッド）にまとめます。a.read(3) では、ドットの左の a が self に、かっこの中の 3 が amount に渡ります。self.pages += amount は a のページ数だけを3増やします。",
         code: turn + "\na = Book(2)\nb = Book(5)\na.read(3)\nprint(a.pages)\nprint(b.pages)", output: "5\n5",
         quiz: ["b.read(3) を呼ぶと self は？", ["3", "Book クラス", "b の一冊", "すべての本"], 2, "ドットの左にいる b が self に渡ります。"],
         guide: exercise("read を呼ぶたびに、読んだページ数を self.pages に足しましょう。4ページの記録に2ページ、1ページと足すと、7ページになります。", turn.replace("+=", "="), turn, [inspect("更新と独立", "(a.read(2), a.read(1), a.pages, b.pages)", [null, null, 7, 5], ""),], "self.pages に amount を加えます。", { after: "a = Book(4)\nb = Book(5)" }),

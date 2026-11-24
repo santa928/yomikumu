@@ -88,7 +88,7 @@ const reactWorks = {
  steps:[
   {
    title:"ボタンを押すたびに票数を増やす（useState）",
-   explain:"React の部品が次の表示にも引き継ぐ値を state と呼びます。useState(0) は、現在の値と、その値を更新する関数を返します。onClickに関数を渡すと、押すたびにReactが新しい票数を描きます。この教材ではuseStateをすぐ使えます。",
+   explain:"React の部品が次の表示にも引き継ぐ値を state と呼びます。useState(0) は、現在の値と、その値を更新する関数を返します。ボタンを押したときは setCount で票数の更新を頼みます。DOMの文字を直接書き換えず、Reactが新しい票数をもとに表示を更新します。この教材ではuseStateをすぐ使えます。",
    example:voteApp.replace("n + 1","n + 2"),
    question:"現在値を使って一票増やす指定はどれですか。",options:["countを表示するだけ","setCount(n => n + 1)","useStateを押すたびに呼ぶ","戻り値を捨てる"],correct:1,feedback:"更新関数に前の値から次の値を作る関数を渡します。",
    task:"一回で2票の見本を、押すたびに一票ずつ増えるよう変えます。",

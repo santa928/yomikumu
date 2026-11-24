@@ -36,7 +36,7 @@ function App() {
     {
       title:"同じ表示をHTMLとJSXで比べる",
       referenceHtml:'<h2>森の入口</h2>',
-      explain:"見本のコードで return が返すのは、部品が画面に表示する見出しです。JavaScriptの中でタグの形で書ける記法がJSXです。続くHTML単独の表示とReactの表示を見比べてください。",
+      explain:"どちらも画面には同じ見出しが出ます。HTMLはブラウザがそのまま読めます。一方、JSXはJavaScriptの中にタグの形で表示を書ける記法です。この見本では App が JSX を返し、React が表示を組み立てます。次からはその関数を使い回して、作品名の違うカードを並べます。",
       example:simpleApp("<h2>森の入口</h2>"),
       question:"JSXの<h2>森の入口</h2>をReactで表示した結果はどれですか。",options:["タグが文字で表示される","森の入口という見出し","何も出ない","空のボタン"],correct:1,feedback:"JSXからブラウザのh2要素が作られるので、HTMLで書いた時と同じ見出しになります。",
       task:"見本の作品名だけを書き換え、同じh2に「雨の小道」を表示します。",
