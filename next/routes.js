@@ -9,7 +9,7 @@ const nextChapters = [{
 const nextLessons = [{
   id: "request", chapter: "routes", title: "ページを開いて見出しを表示する",
   slides: [
-    ["URLを開くと何が届く？", "ブラウザで /notice を開くと、ブラウザはサーバーにそのページを要求します。サーバーから見出しを含む HTML が届き、画面に表示されます。", "GET /notice", "画面に「本日の案内」という見出しが出ます。"],
+    ["URLを開くと何が届く？", "ブラウザのアドレス欄から /notice を開くと、ブラウザはサーバー（ページやデータを返す側）に「/notice のページをください」と頼みます。この読み取りの要求が GET です。届いた HTML をブラウザが読み取ると、見出しが表示されます。", "GET /notice", "画面に「本日の案内」という見出しが出ます。"],
     ["/notice の表示を変えるファイル", "app の中で notice フォルダーに置いた page.jsx が /notice のページになります。見出しの文字を変更し、同じページを再読み込みすると、新しい文字が表示されます。", 'export default function Notice() {\n  return <h1>本日の案内</h1>;\n}', "この例で届く見出しは「本日の案内」です。"],
   ],
   quiz: ["/notice を開いた時、ブラウザに送られるのは？", ["page.jsx のソースコード", "ページとして読み取れるHTML", "compose.yaml の内容", "サーバーの起動ログ"], 1, "取ってきたHTMLをブラウザが見出しとして表示します。"],
@@ -31,7 +31,7 @@ const nextLessons = [{
 }, {
   id: "format", chapter: "routes", title: "棚の名前と冊数を JSON で返す",
   slides: [
-    ["棚の名前を項目として受け取る", "/api/shelf は棚のデータを JSON で返します。この例には shelf と count の二つの項目があり、プログラムは項目名を指定して値を読み取れます。", '{"shelf":"南の棚","count":2}', "shelfから棚の名前を読み、countから数の2を読めます。"],
+    ["棚の名前を項目として受け取る", "/notice が画面用の HTML を返すのに対し、/api/shelf はプログラムが読める形のデータを返します。その形式が JSON です。この例では shelf から棚の名前を、count から冊数を取り出せます。", '{"shelf":"南の棚","count":2}', "shelfから棚の名前を読み、countから数の2を読めます。"],
     ["GETに応える関数を用意する", "app/api/shelf/route.js に GET を置くと、/api/shelf への要求をこの関数で扱えます。Response.json は渡した値をJSONの応答にします。", 'export function GET() {\n  return Response.json({ shelf: "南の棚", count: 2 });\n}', "/api/shelf では棚のデータを読み、/notice では見出しを読みます。"],
   ],
   quiz: ["棚の冊数を足し算に使うとき、JSONのどれを読みますか。", ["shelf の文字列", "shelf の文字数", "count の数", "JSON の項目数"], 2, "countを数で渡すと、受け取った側でそのまま足せます。"],

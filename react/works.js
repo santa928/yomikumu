@@ -97,7 +97,7 @@ const reactWorks = {
   },
   {
    title:"同じ操作で続けて更新する",
-   explain:"一回のクリックの中では、countは描画した時の値です。setCount(count + 1)を二度呼んでも同じ値を指定します。n => n + 1なら、一つ前の更新結果にさらに足せます。",
+   explain:"押す前の count が 0 なら、そのクリックを処理している間は count を読んでも 0 です。setCount(count + 1) を二度呼ぶと、どちらも「1にする」という指定です。setCount(n => n + 1) なら「直前の更新結果に1を足す」を二度予約するので、0 → 1 → 2 になります。",
    example:twiceApp.replaceAll("setCount(n => n + 1);","setCount(count + 1);"),
    question:"0票から更新関数で1ずつ二度足すと、画面には何票と出ますか。",options:["0票","1票","2票","4票"],correct:2,feedback:"二つ目の更新は一つ目が作った1を受け取り、2になります。",
    task:"一回のクリックで票数を1ずつ二度増やしてください。最初のクリックで2票、次のクリックで4票と表示されます。",

@@ -45,7 +45,7 @@ function App() {
     },
     {
       title:"一枚の部品を関数で作る",
-      explain:"部品は大文字で始まる名前の関数で作れます。WorkCardは一枚分の紹介を返し、Appは<WorkCard />と書いてその部品を使います。小文字のarticleやpはHTMLの要素です。",
+      explain:"React では、画面に置く部品をコンポーネントと呼びます。WorkCard はカード一枚分の表示を返す関数です。App は <WorkCard /> と書いてその部品を使います。自作の部品名は大文字で始め、article や p などの HTML 要素と区別します。",
       example:`function WorkCard() {
   return <article><p>紙の星</p></article>;
 }

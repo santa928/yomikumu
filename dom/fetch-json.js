@@ -122,7 +122,7 @@ function readingLocalGuide() {
 const readingUnit = {
   id: "fetch-json",
   title: "JSONで読書棚を更新する",
-  intro: "サーバーに置いたJSONを読み、届いた本で読書棚を更新します。この単元はHTTPで配信されたページで開いてください。手元でデータを変える手順は「PCでJSONを書き換える」にあります。",
+  intro: "サーバーに置いたJSONを読み、届いた本で読書棚を更新します。公開教材から開けばそのまま試せます。手元の index.html をダブルクリックして開くと、ブラウザの制限で JSON を取得できないため、手元ではウェブサーバー経由で開いてください。手元でデータを変える手順は「PCでJSONを書き換える」にあります。",
   guide: readingLocalGuide,
   setup: readingSetup,
   frame: readingFrame,
@@ -154,7 +154,7 @@ const readingUnit = {
     {
       title: "response.okで読み進めるか決める",
       html: readingHtml,
-      explain: "ファイルが見つからないと、サーバーは404という応答を返します。この場合、fetchのawaitは終わって次の行へ進みます。response.okは200番台ならtrue、404ならfalseです。応答が届かない通信の失敗では、fetch自体がエラーになります。",
+      explain: "ファイルが見つからないと、サーバーから 404（見つからない）という返事が届きます。返事は届いたので await fetch(...) の次の行へ進みますが、response.ok は false です。200番台なら true です。通信が切れて返事が届かなかった場合は、await fetch(...) がエラーになります。",
       example: readingClick + `
   result.textContent = response.ok;
 };`,

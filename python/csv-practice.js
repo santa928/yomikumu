@@ -96,7 +96,7 @@ except ValueError as error:
     lessons: [
       {
         title: "実際のCSVファイルを開く",
-        text: "このCSVには、1行目の見出しと、続く読書記録が入っています。with open で読み、encoding に「utf-8」を指定すると、日本語の題名を読めます。file.readline() は改行までの1行を取り出します。print に end=\"\" を指定すると、読んだ行をそのまま表示できます。",
+        text: "CSVは、カンマで項目を区切って表を保存できる文字のファイルです。この例では、1行目が列の名前で、その次の行から読書記録が入っています。with open で読み、encoding に「utf-8」を指定すると、日本語の題名を読めます。file.readline() は改行までの1行を取り出します。print に end=\"\" を指定すると、読んだ行をそのまま表示できます。",
         files: { "reading.csv": files["reading.csv"] },
         code: readLine('    print(file.readline(), end="")', '"reading.csv"'),
         output: "title,minutes",
@@ -265,7 +265,7 @@ except ValueError as error:
       },
       {
         title: "分を直す行の番号を知らせる",
-        text: "int で分を整数にできないと ValueError が起きます。空欄も変換できないので、空の文字として int に渡します。負の分は、自分で ValueError を起こして同じ案内に進めます。reader.line_num は読み取ったファイルの行番号です。この例では見出しを1行目に数えるので、2件目の誤りは3行目と知らせます。",
+        text: "int で分を整数にできないと ValueError が起きます。空欄も変換できないので、空の文字として int に渡します。負の分は、自分で ValueError を起こして同じ案内に進めます。reader.line_num は、ファイルからここまで読んだ行の数です。この例では1件の記録が1行なので、見出しを数に含めて、2件目の誤りを3行目と知らせます。",
         files: { "reading_invalid.csv": files["reading_invalid.csv"] },
         code: checkedSummary + `
 

@@ -27,12 +27,12 @@ const javascriptFunctionLessons = [
     id: "js-parameter", topic: "関数に値を渡す", title: "同じ関数に違う点数を渡す",
     goal: "丸かっこの中の値が、呼ぶたびに関数の中で使えることを確かめる。",
     slides: [
-      { title: "呼ぶたび違う点を受け取る", body: "stamp(2) の 2 は、手順に渡す値です。これを引数と呼びます。function stamp(points) の points がその回の値を受け取り、関数の中の表示に使えます。", code: "function stamp(points) {\n  console.log(points);\n}\nstamp(2);\nstamp(5);" },
+      { title: "呼ぶたび違う点を受け取る", body: "stamp(2) の 2 は、関数に渡す値（引数）です。function stamp(points) の points は、値を受け取る名前（仮引数）です。stamp(2) の回は points が2、stamp(5) の回は5になります。", code: "function stamp(points) {\n  console.log(points);\n}\nstamp(2);\nstamp(5);" },
       { title: "受け取った値を計算に使う", body: "渡された点に1を足してから表示します。二回目の stamp は新しく5を受け取るので、最初の計算とは別に6を表示します。", code: "function stamp(points) {\n  console.log(points + 1);\n}\nstamp(2);\nstamp(5);" },
     ],
     quiz: { prompt: "stamp(7) と呼ぶと、その回の points はどの値？", options: ["いつも2", "前回の最後の点", "7", "文字のpoints"], correct: 2,
       reasons: ["呼ぶときに渡す値によって変わります。","呼び出すたびに渡された値を受け取ります。","今回は丸かっこの中の7を渡しました。","points は関数の中で値を読む名前です。"] },
-    exercise: { field: "javascript", variableStart: true, task: "stamp が、引数 points に2を足した数を一行表示するように直してください。開始点が2なら、確認用コードは stamp(2) と stamp(4) を呼び、4と6が表示されます。",
+    exercise: { field: "javascript", variableStart: true, task: "stamp が、points で受け取った点に2を足し、その結果を一行表示するように直してください。開始点が2なら、確認用コードは stamp(2) と stamp(4) を呼び、4と6が表示されます。",
       code: "function stamp(points) {\n  console.log(2);\n}", calls: stampCall, answer: "function stamp(points) {\n  console.log(points + 2);\n}", review: 1,
       hint: "渡された points から始めます。固定した点を表示すると、別の引数でも結果が変わりません。",
       build: { code: "function stamp(points) {\n  console.log(① + ②);\n}", slots: [["受け取った値", "points", '"points"'], ["加える点", '"2"', "2"]] },
@@ -42,7 +42,7 @@ const javascriptFunctionLessons = [
     id: "js-return", topic: "関数から値を返す", title: "返ってきた点を次の計算に使う",
     goal: "コンソールに表示する操作と、呼び出し元が使える値を返す操作を見分ける。",
     slides: [
-      { title: "表示した数が total に入らない理由", body: "関数の中で console.log すると、その場で見えるだけです。呼んだ結果を外で受け取ると undefined と表示されます。これは、この関数が値を返していないという手がかりです。", code: "function bonus(n) {\n  console.log(n + 2);\n}\nconst total = bonus(3);\nconsole.log(total);" },
+      { title: "表示した数が total に入らない理由", body: "最初に出る 5 は、関数の中の console.log が表示した数です。ただし return がないので、呼び出し元の total に 5 は入りません。最後の console.log(total) には、値が返されなかったことを示す undefined が出ます。", code: "function bonus(n) {\n  console.log(n + 2);\n}\nconst total = bonus(3);\nconsole.log(total);" },
       { title: "return で呼び出した場所に渡す", body: "return は結果を呼んだ場所に返して関数を終えます。bonus(3) の結果を total に入れると、別の行でさらに1点を足せます。", code: "function bonus(n) {\n  return n + 2;\n}\nconst total = bonus(3);\nconsole.log(total + 1);" },
     ],
     quiz: { prompt: "関数の外で点を受け取り、さらに1を足すには、中で何を書く？", options: ["console.log で表示するだけ", '"total" と書く', "同じ関数を呼び続ける", "return で数を返す"], correct: 3,
