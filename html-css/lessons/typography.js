@@ -35,7 +35,7 @@ const typeLessons = [
     },
   },
   {
-    id: "rule-order", title: "同じ指定を入れ替えて色を確かめる", topic: "CSS",
+    id: "rule-order", title: "同じ強さのCSS指定では書いた順が効く", topic: "CSS",
     goal: "同じ文字に同じ強さで指定したとき、どの色が表示されるかを予測する。",
     slides: [
       {
@@ -63,7 +63,7 @@ const typeLessons = [
     },
   },
   {
-    id: "specific-rule", title: "段落と作者名が重なったときの色を読む", topic: "CSS",
+    id: "specific-rule", title: "CSSの指定が重なったとき、優先される色を読む", topic: "CSS",
     goal: "段落すべてへの指定と、作者名への指定が重なる箇所を見つける。",
     slides: [
       {
@@ -91,7 +91,7 @@ const typeLessons = [
     },
   },
   {
-    id: "inherited-size", title: "囲みの文字サイズを中に受け渡す", topic: "CSS",
+    id: "inherited-size", title: "外側の文字サイズを内側に引き継ぐ", topic: "CSS",
     goal: "外側の文字サイズだけを変え、中の撮影者の文字が何pxになるか実測する。",
     slides: [
       {
@@ -119,7 +119,7 @@ const typeLessons = [
     },
   },
   {
-    id: "root-size", title: "remが何pxになるか確かめる", topic: "CSS",
+    id: "root-size", title: "ページの基準サイズから rem の大きさを求める", topic: "CSS",
     goal: "ページ全体の基準とすぐ外側の囲みを区別し、remから表示サイズを求める。",
     slides: [
       {

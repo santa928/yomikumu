@@ -45,22 +45,22 @@ const failedThenSuccess = [
   [async t=>{t.click("#load");await t.wait(430);return t.q("#notice").textContent==="白い帆" && !t.q("#load").disabled;},"二度目の成功時に届いた先頭の問題名を表示します。"],
 ];
 const loadingUnit = {
-  id:"loading",title:"問題の読み込みを待ち、失敗後に再試行する",
-  intro:"すぐに結果が出ない操作は、待つ間・成功・失敗で画面を変えます。手元のサンプルで遅い読込と一度だけの失敗を試します。",
+  id:"loading",title:"読み込みを待ち、失敗したらやり直せるようにする",
+  intro:"データは、ボタンを押してから少し遅れて届くことがあります。クイズの問題を読み込む見本で、待っている間・成功・失敗の表示を比べます。「最初の一回だけ失敗」を選ぶと、同じボタンでもう一度試せます。",
   setup:sampleLoader,
   demo:{html:loadHtml,code:safeLoad,tip:"「最初の一回だけ失敗」を選び、下書きを変えてから「問題を読む」を二度試します。下書きと登録済みの回答が残ることも確かめてください。"},
   steps:[
     {
-      title:"あとで届く結果をthenで受け取る",html:loadHtml,
+      title:"データが届いたら処理する（then）",html:loadHtml,
       explain:"loadQuestions()は教材に用意した関数です。少し待つと問題名の配列が届きます。loadQuestions() がすぐに返す Promise は、まだ届いていない結果を後で受け取るためのものです。読み込みに成功すると、then に渡した関数へ問題名の配列が届きます。見本は「遅い成功」で試しましょう。",
       example:loadBindings+'\nbutton.onclick = () => {\n  loadQuestions().then(names => {\n    notice.textContent = names.length;\n  });\n};',
       question:"thenの中のnamesに入るものはどれですか。",options:["待ち時間","読込ボタン","届いた問題名の配列","空の画面"],correct:2,feedback:"サンプルの読込が成功したときに、問題名の配列が渡されます。",
-      task:"遅い成功で、件数の代わりに先頭の問題名「白い帆」を表示します。",
+      task:"「読込条件」で「遅い成功」を選んで試します。読み込みが終わったら、件数の代わりに問題一覧の先頭にある「白い帆」を表示してください。",
       build:[loadBindings+'\nbutton.onclick = () => {\n  loadQuestions().then(names => {\n    《1》.textContent = 《2》;\n  });\n};',["notice","button"],["names[0]","names.length"]],
       tests:[[async t=>{t.click("#load");await t.wait(430);return t.q("#notice").textContent==="白い帆";},"thenの中で受け取った配列の先頭をnoticeに表示します。"]],
     },
     {
-      title:"awaitで届く値を順に読む",html:loadHtml,
+      title:"データが届くまで待ってから使う（await）",html:loadHtml,
       explain:"asyncと付けた関数の中でawaitを使うと、その関数の続きは結果が届いてから進みます。待っている間も回答欄を操作できます。見本は先頭の問題名を表示します。",
       example:loadBindings+'\nbutton.onclick = async () => {\n  const names = await loadQuestions();\n  notice.textContent = names[0];\n};',
       question:"awaitの次の行で使えるnamesはどれですか。",options:["タイマーの番号","届いた配列","ボタン","未入力の欄"],correct:1,feedback:"成功して待ち終わった後では、約束を表すPromiseから配列を受け取れます。",
@@ -86,7 +86,7 @@ button.onclick = async () => {
       tests:failedThenSuccess,
     },
     {
-      title:"待機中は一回だけ受け付け、終了時に戻す",html:loadHtml,
+      title:"読み込み中は連打を防ぎ、完了後にボタンを戻す",html:loadHtml,
       explain:"disabledをtrueにするとボタンを続けて押せません。finallyに書いた処理は成功しても失敗しても通るので、必ずボタンを戻せます。",
       example:loadBindings+`
 button.onclick = async () => {
@@ -111,7 +111,7 @@ button.onclick = async () => {
       ],
     },
     {
-      title:"下書きを残して問題を読み直す",html:loadHtml,
+      title:"練習：入力した内容を残してデータを読み直す",html:loadHtml,
       explain:"問題を入れる一覧だけを描き直せば、別の回答一覧や入力途中の値は残ります。見本は固定の一件を問題の一覧へ描きます。",
       example:'const list = document.querySelector("#questions");\nlist.replaceChildren();\nconst row = document.createElement("li");\nrow.textContent = "帆の色";\nlist.append(row);',
       question:"失敗後も残したいものはどれですか。",options:["disabledの状態","待機表示だけ","回答と書きかけの文字","二重に追加した行"],correct:2,feedback:"再試行に必要なのは問題の読込なので、登録済みの回答と下書きはそのまま使います。",

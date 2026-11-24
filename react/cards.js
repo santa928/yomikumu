@@ -21,7 +21,7 @@ function App() {
 }`,
 });
 const reactCards = {
-  id:"components",title:"作品を表示する部品を二か所で使う",
+  id:"components",title:"同じ画面部品に別々のデータを渡す",
   intro:"似た作品カードを一つずつ書く代わりに、一枚分の部品を作り、それぞれの作品名と紹介を渡します。",
   demo:{tip:"「次の作品へ」を押すと、同じ形のカードに別の作品名と紹介が入ります。",
     code:cardFunction+`
@@ -44,7 +44,7 @@ function App() {
       tests:[[t=>t.q("#root h2")?.textContent==="雨の小道","h2の開始タグと終了タグの間に新しい作品名を入れます。"]],
     },
     {
-      title:"一枚の部品を関数で作る",
+      title:"カードを表示する関数を作る（コンポーネント）",
       explain:"React では、画面に置く部品をコンポーネントと呼びます。WorkCard はカード一枚分の表示を返す関数です。App は <WorkCard /> と書いてその部品を使います。自作の部品名は大文字で始め、article や p などの HTML 要素と区別します。",
       example:`function WorkCard() {
   return <article><p>紙の星</p></article>;
@@ -56,7 +56,7 @@ function App() { return <WorkCard />; }`,
       tests:[[t=>t.all("#root article").length===1 && training.elements.length>0,"Appから自作したカード部品を一枚表示します。"],[t=>t.q("#root article h2")?.textContent==="紙の星","カードの中で作品名をh2にします。"]],
     },
     {
-      title:"propsで一つの作品名を渡す",
+      title:"親から部品に表示する文字を渡す（props）",
       explain:"props は、親が部品に渡した値をまとめたものです。<WorkCard title=\"月面\" />から来た文字はprops.titleで読めます。JSXの中でJavaScriptの値を表示する場所を{ }で囲みます。",
       example:`function WorkCard(props) {
   return <h2>props.title</h2>;
@@ -68,7 +68,7 @@ function App() { return <WorkCard title="月面" />; }`,
       tests:[[t=>t.q("#root h2")?.textContent==="月面","タグの本文でprops.titleの値を読んでください。"],[t=>{const card=training.elements.find(e=>e.props?.title==="月面");if(!card)return false;training.mount(card.type,{title:"水鏡"});return t.q("#root h2")?.textContent==="水鏡";},"親から渡すtitleを変えた時も、同じ部品に新しい名前が出るようにします。"]],
     },
     {
-      title:"一つの部品に二つの名前を渡す",
+      title:"同じ部品を2回使い、別々の名前を表示する",
       explain:"部品を二度書くと、それぞれ別のpropsを受け取ります。sectionの中に並べれば、同じ形で異なる作品名を見せられます。",
       example:`function WorkCard({ title }) { return <article><h2>{title}</h2></article>; }
 function App() {
@@ -83,7 +83,7 @@ function App() {
       tests:[[t=>t.q("#root article h2")?.textContent==="朝の砂浜","一枚目を朝の砂浜のままにします。"],[t=>t.all("#root article h2").map(n=>n.textContent).join("/")==="朝の砂浜/坂の灯り","二枚目には別のtitleを渡します。"],[()=>{const a=training.elements.find(e=>e.props?.title==="朝の砂浜");return !!a && training.elements.some(e=>e.type===a.type && e.props?.title==="坂の灯り");},"二つの作品名を同じ種類の部品に渡してください。"]],
     },
     {
-      title:"childrenでカードの中身を差し替える",
+      title:"タグの間に書いた内容を部品に表示する（children）",
       explain:"部品の開始タグと終了タグで挟んだ内容はchildrenです。titleを見出し、childrenを紹介に使うと、親から両方を差し替えられます。{ title, children }はpropsからその二つを取り出す書き方です。",
       example:firstPair.replace("{children}</p>","説明</p>"),
       question:"<WorkCard title=\"森\">木版画</WorkCard>のchildrenは何ですか。",options:["森","WorkCard","木版画","title"],correct:2,feedback:"開始タグと終了タグで挟まれた木版画がchildrenです。",

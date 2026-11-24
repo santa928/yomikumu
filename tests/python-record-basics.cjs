@@ -9,8 +9,22 @@ async function verifyRecordBasics(browser, entry = pathToFileURL(path.resolve("p
   const pc = await browser.newPage();
   const phone = await browser.newPage({ viewport: { width: 375, height: 740 }, isMobile: true, hasTouch: true });
   try {
-    await pc.goto(entry + "#names/demo");
-    assert.equal(new URL(pc.url()).hash, "#names/demo", "目次から名簿の完成例を開ける");
+    await pc.goto(entry + "#54/demo/toc");
+    const contents = pc.locator("#contents");
+    for (const [route, title] of [
+      ["#55/demo", "条件で表示を変え、同じ処理を繰り返す"],
+      ["#56/demo", "リストで合計し、辞書で名前から値を探す"],
+      ["#names/demo", "空白を除き、同じ名前が出る回数を数える"],
+    ]) {
+      await contents.getByRole("heading", { name: title, exact: true }).waitFor();
+      assert.equal(await contents.getByRole("link", { name: title, exact: true }).count(), 0);
+      const link = contents.getByRole("link", { name: "「" + title + "」の完成例を見る", exact: true });
+      assert.equal(await link.getAttribute("href"), route);
+    }
+    await contents.getByRole("link", { name: "「空白を除き、同じ名前が出る回数を数える」の完成例を見る", exact: true }).click();
+    await pc.getByRole("heading", { name: "空白を除き、同じ名前が出る回数を数える", exact: true }).waitFor();
+    assert.equal(new URL(pc.url()).hash, "#names/demo", "目次から名前の集計の完成例を開ける");
+    assert.match(await pc.locator("#description").textContent(), /受付で入力した名前.*1行につき1回分の受付/);
     assert.equal(await pc.locator("#course-name").textContent(), "Python基礎");
     const status = pc.locator("#status");
     await pc.locator("#run").click();
@@ -61,7 +75,7 @@ async function verifyRecordBasics(browser, entry = pathToFileURL(path.resolve("p
     await phone.locator("#keyboard").tap();
     assert.equal(await phone.locator("#source").inputValue(), "");
     assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
-    console.log("名簿の完成例、別データでの採点、スマホの組み立てと白紙記述を確認");
+    console.log("基礎コースの目次、名前の集計、別データでの採点、スマホの組み立てと白紙記述を確認");
   } finally {
     await pc.close();
     await phone.close();

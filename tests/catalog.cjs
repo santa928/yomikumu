@@ -12,27 +12,49 @@ const expected = {
 (async () => {
   const browser = await chromium.launch();
   try {
-    const page = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });
     const home = process.env.COURSE_URL || pathToFileURL(path.resolve(__dirname, "../index.html")).href;
-    const errors = [];
-    page.on("pageerror", err => errors.push(err.message));
-    for (const [route, titles] of Object.entries(expected)) {
-      await page.goto(home + "#paths/" + route);
-      const entries = page.locator(".path-course");
-      const names = await entries.locator("h2").allTextContents();
-      assert.deepEqual(names.sort(), [...titles].sort());
-      for (const title of titles) {
-        const entry = entries.filter({ has: page.getByRole("heading", { name: title, exact: true }) });
-        const go = entry.getByRole("link", { name: /最初の一課題を開く|の続きを開く/ });
-        const expectedUrl = await go.getAttribute("href");
-        await Promise.all([page.waitForURL(new URL(expectedUrl, home).href), go.tap()]);
-        await page.locator("h1:visible").first().waitFor();
-        assert.ok(await page.evaluate(() => innerWidth + 1 >= document.documentElement.scrollWidth), title);
-        await page.goBack();
-        await entry.waitFor();
+    for (const width of [375, 1280]) {
+      const page = await browser.newPage({ viewport: { width, height: 812 }, hasTouch: width === 375 });
+      const errors = [];
+      page.on("pageerror", err => errors.push(err.message));
+      for (const [route, titles] of Object.entries(expected)) {
+        const pathPage = home + "#paths/" + route;
+        await page.goto(pathPage);
+        const entries = page.locator(".path-course");
+        assert.deepEqual((await entries.locator("h2").allTextContents()).sort(), [...titles].sort());
+        for (const title of titles) {
+          const entry = entries.filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+          const label = title + "の目次";
+          await entry.getByRole("link", { name: label, exact: true }).click();
+          const main = page.getByRole("main");
+          const heading = main.getByRole("heading", { level: 1, name: label, exact: true });
+          await heading.waitFor();
+          const groups = main.locator("ol > li").filter({ has: page.locator(":scope > h2") });
+          assert.ok(await groups.count() >= 2, title + "の章");
+          for (const group of await groups.all()) {
+            assert.ok(await group.locator(":scope > ol > li a:visible").count(), title + "の章から単元を選べる");
+          }
+          assert.equal(await main.locator("textarea:visible, iframe:visible, input:visible").count(), 0, label + "に演習を表示しない");
+          assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), label);
+          await groups.first().locator(":scope > ol > li a").first().click();
+          await main.getByRole("heading", {level: 1}).waitFor();
+          await page.getByRole("link", { name: label, exact: true }).first().click();
+          await heading.waitFor();
+          await page.getByRole("link", { name: "全コース目次", exact: true }).first().click();
+          await main.getByRole("heading", { level: 1, name: "全コース目次", exact: true }).waitFor();
+          await page.goto(pathPage);
+          const start = entry.getByRole("link", { name: /最初の一課題を開く|の続きを開く/ });
+          const dest = new URL(await start.getAttribute("href"), home).href;
+          await Promise.all([page.waitForURL(dest), start.click()]);
+          await main.getByRole("heading", { level: 1 }).waitFor();
+          assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), title);
+          await page.goBack();
+          await entry.waitFor();
+        }
       }
+      assert.deepEqual(errors, []);
+      await page.close();
+      console.log(width + "px: 全10コースの目次、章から単元への移動、コース／全体へ戻る操作、学習の再開を確認");
     }
-    assert.deepEqual(errors, []);
-    console.log("375pxの2つの学習パスから全9コースとJavaScript画面操作へ進み、元の目次に戻りました");
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

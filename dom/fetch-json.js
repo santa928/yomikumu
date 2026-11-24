@@ -121,8 +121,8 @@ function readingLocalGuide() {
 
 const readingUnit = {
   id: "fetch-json",
-  title: "JSONで読書棚を更新する",
-  intro: "サーバーに置いたJSONを読み、届いた本で読書棚を更新します。公開教材から開けばそのまま試せます。手元の index.html をダブルクリックして開くと、ブラウザの制限で JSON を取得できないため、手元ではウェブサーバー経由で開いてください。手元でデータを変える手順は「PCでJSONを書き換える」にあります。",
+  title: "サーバーからデータを取得して一覧に表示する",
+  intro: "JSONは文字や数、一覧をテキストにしてやり取りする形式です。練習ではサーバーに置いた本の一覧をブラウザから読み込み、画面に表示します。公開教材から開けばそのまま試せます。手元の index.html をダブルクリックして開くと、ブラウザの制限で JSON を取得できないため、手元ではウェブサーバー経由で開いてください。手元でデータを変える手順は「PCでJSONを書き換える」にあります。",
   guide: readingLocalGuide,
   setup: readingSetup,
   frame: readingFrame,
@@ -133,15 +133,15 @@ const readingUnit = {
   },
   steps: [
     {
-      title: "fetchで届いた応答番号を読む",
+      title: "応答の番号で、取得の結果を知る（fetch）",
       html: readingHtml,
-      explain: "fetchにファイル名を渡すと、ブラウザはサーバーにそのファイルを求めます。awaitで応答を待ち、response.statusで応答番号を読みます。見本は data/reading.json を指定しているので、棚を選び直して押しても200です。nextReadingFile()を使うと、代わりに選んだ棚のファイル名を渡せます。",
+      explain: "fetchにファイル名を渡すと、ブラウザはサーバーにそのファイルを求めます。awaitで返事を待ち、response.statusで応答番号を読みます。番号は返事の種類を表し、たとえば200なら取得成功、404ならファイルが見つからなかったことを表します。見本は data/reading.json を指定しているので、棚を選び直して押しても200です。nextReadingFile()を使うと、代わりに選んだ棚のファイル名を渡せます。",
       example: statusModel.replace("nextReadingFile()", '"data/reading.json"'),
       question: "200が入っているものはどれですか。",
       options: ["response.status", "ファイル名", "本の配列", "ボタンの文字"],
       correct: 0,
       feedback: "応答の番号はresponse.statusで読みます。",
-      task: "nextReadingFile()で選んだファイル名をfetchに渡し、応答番号を表示します。「空の棚」では200、「最初だけファイルが見つからない」の最初の操作では404です。",
+      task: "選択欄に対応するファイル名を返す nextReadingFile() は用意済みです。そのファイル名を fetch に渡し、応答番号を表示します。「空の棚」では200、「最初だけファイルが見つからない」の最初の操作では404です。",
       starter: readingClick + `
   result.textContent = response.ok;
 };`,
@@ -152,7 +152,7 @@ const readingUnit = {
       ],
     },
     {
-      title: "response.okで読み進めるか決める",
+      title: "取得に成功したかを調べる（response.ok）",
       html: readingHtml,
       explain: "ファイルが見つからないと、サーバーから 404（見つからない）という返事が届きます。返事は届いたので await fetch(...) の次の行へ進みますが、response.ok は false です。200番台なら true です。通信が切れて返事が届かなかった場合は、await fetch(...) がエラーになります。",
       example: readingClick + `
@@ -171,7 +171,7 @@ const readingUnit = {
       ],
     },
     {
-      title: "response.json()で本の配列を読む",
+      title: "届いたJSONを配列として読み込む",
       html: readingHtml,
       explain: 'JSONはデータを文字で書き表す形式です。配布時の data/reading.json の本文は ["雲の地図", "星の台所"] です。await response.json() で本文をJavaScriptの配列に変え、books[0] で最初の本を読めます。別の棚を選ぶと別のJSONが届きます。',
       example: dataModel.replace('books.join(" / ")', "books[0]"),
@@ -188,7 +188,7 @@ const readingUnit = {
       ],
     },
     {
-      title: "本が0冊の成功と404を分ける",
+      title: "一覧が空の場合とファイルがない場合を分ける",
       html: readingHtml,
       explain: "空の棚のJSONは [] です。200で応答が届き、配列のlengthが0です。404では、先にresponse.okを調べて失敗と分かるため、応答の本文を本の配列として読みません。",
       example: emptyModel,
@@ -206,7 +206,7 @@ const readingUnit = {
       ],
     },
     {
-      title: "失敗しても同じボタンで読み直す",
+      title: "練習：成功・失敗を表示して、もう一度取得できるようにする",
       html: readingHtml,
       explain: "押したら待機中の表示にし、ボタンを一時的に止めます。response.okがfalseの場合はthrowでcatchの処理へ進めます。成功しても失敗してもfinallyでボタンを戻せば、同じボタンから読み直せます。「最初だけファイルが見つからない」では、ひと押し目が404で、次は本がある棚を読みます。",
       example: finishModel,

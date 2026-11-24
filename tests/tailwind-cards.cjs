@@ -11,7 +11,7 @@ const url = process.env.TAILWIND_URL || pathToFileURL(path.resolve(__dirname, ".
     const page = await browser.newPage({ viewport: { width: 1100, height: 800 } });
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
-    await page.goto(url);
+    await page.goto(url + "#chapter/style");
     const frame = page.frameLocator("iframe").first();
     const mark = frame.getByRole("button", { name: "しおりをはさむ" });
     await mark.click();

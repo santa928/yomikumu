@@ -1,6 +1,6 @@
 "use strict";
 nextChapters.push({
-  id:"signup",title:"読書会に申し込み、誤入力を直して再送する",
+  id:"signup",title:"フォームをサーバーで受け付け、入力エラーから再送できるようにする",
   goal:"架空の表示名と人数で読書会に申し込みます。完成例を手元の /signup-lab で開き、4名を送ってから2名に直してみましょう。",
   examples:[
     ["/signup-lab　送信中","申込を送っています。ボタンは送信中です。"],
@@ -38,7 +38,7 @@ export async function reserve(previous, formData) {
 };
 nextLessons.push(
  {
-  chapter:"signup",id:"signup-send",title:"表示名と人数のフォームを送る",
+  chapter:"signup",id:"signup-send",title:"項目に名前を付けてフォームの値を送る",
   slides:[
    ["欄に名前を付けて送る","nameはサーバーに届く項目の名前です。ラベルは人が読む表示、nameは受け取り側が値を探すための指定です。「こまどり」と2を入れ、送信ボタンを押します。",'<label>架空の表示名 <input name="alias" /></label>\n<input name="seats" inputMode="numeric" />','サーバーでaliasを読むと「こまどり」、seatsを読むと文字列の「2」が届きます。'],
    ["フォームを送って受付結果を表示する","フォームのactionにはデータを受け取る処理が用意されています。ボタンだけでなく、欄でEnterを押しても送信できます。",'<form action={send}>\n  <input name="alias" />\n  <button type="submit">申込を送信</button>\n</form>',"正しい表示名・人数なら「こまどりさん、2名で受付済み」と出ます。"],
@@ -48,9 +48,9 @@ nextLessons.push(
   file:"app/signup-lab/fields.jsx",source:signupExamples.fields,answer:signupExamples.fields.replace('name="reader"','name="alias"'),
   task:"/signup-lab/fields の表示名を正しい項目名aliasで送ります。架空名「ことり」と2名を送り、サーバーが返す表示を確かめます。",hint:"サーバーが読むaliasと、表示名のinputのnameをそろえます。",
  },{
-  chapter:"signup",id:"signup-validate",title:"サーバーで送信値を検証する",
+  chapter:"signup",id:"signup-validate",title:"送られた名前や人数がルールに合うかサーバーで調べる",
   slides:[
-   ["届いた文字を調べる","キーボードを数字向けにしても、送られる値に数字以外が含まれる可能性があります。受け取ったサーバー側でも空白と範囲を確かめます。trim()は両端の空白を取り除きます。",'const seats = values.seats.trim();\nconst allowed = ["1", "2", "3"];\nallowed.includes(seats);','「 2 」は認められ、「0」「4」「1.5」「二」は人数エラーになります。'],
+   ["フォームから届いた人数を文字列として調べる","キーボードを数字向けにしても、送られる値に数字以外が含まれる可能性があります。受け取ったサーバー側でも空白と範囲を確かめます。trim()は両端の空白を取り除きます。",'const seats = values.seats.trim();\nconst allowed = ["1", "2", "3"];\nallowed.includes(seats);','「 2 」は認められ、「0」「4」「1.5」「二」は人数エラーになります。'],
    ["入力に誤りがあれば理由を返す","validateRegistrationは問題があれば理由を、通れば空文字を返します。表示名が空白だけの時も、受付に進む前に止めます。",'if (!values.alias.trim()) return "表示名を入力してください。";\nreturn "";',"表示名が空なら、人数が正しくても受付番号は出ません。"],
   ],
   quiz:["人数を 4 にして送信しました。サーバーが返すのは？",["4名で受付済み","1名に書き換えて受付","人数エラーと入力値","画面を閉じる"],2,"サーバーでも人数が 1〜3 の整数かを調べます。4 は範囲外なので、理由と入力値を返します。"],
@@ -58,17 +58,17 @@ nextLessons.push(
   file:"app/signup-lab/rules.js",source:signupExamples.rules,answer:signupExamples.rules.replace('!/^\\d+$/.test(values.seats.trim())','!["1", "2", "3"].includes(values.seats.trim())'),
   task:"/signup-lab/validation のサーバーで、表示名は空白以外、人数は前後の空白を除いた1、2、3だけを受け付けます。表示名が空の場合と、人数が範囲外の場合には、それぞれどの欄を直せばよいかを返してください。",hint:"数字かどうかに加え、許可された一桁かをサーバーで確認します。",
  },{
-  chapter:"signup",id:"signup-retain",title:"入力エラーでも表示名と人数を保つ",
+  chapter:"signup",id:"signup-retain",title:"入力エラーでも書いた内容を消さず、修正できるようにする",
   slides:[
    ["エラーの理由と入力値を一緒に返す","エラーの文だけでなく送られた値も返すと、やり直す人が全欄を入れ直さずに済みます。この教材ではretainがエラー時に戻す値を選びます。",'return { alias: values.alias, seats: values.seats };','「こよみ」と4を送ると、修正できる二つの欄に「こよみ」と4が残ります。'],
-   ["間違った一欄だけを直す","フォームは戻ったvaluesをdefaultValueとして表示します。人数だけを2に変えれば、同じ表示名で再送できます。",'<input name="alias" defaultValue={state.values.alias}/>','再送時には「こよみさん、2名で受付済み」が一度出ます。'],
+   ["送信前の入力を戻し、間違った欄だけ直せるようにする","フォームは戻ったvaluesをdefaultValueとして表示します。人数だけを2に変えれば、同じ表示名で再送できます。",'<input name="alias" defaultValue={state.values.alias}/>','再送時には「こよみさん、2名で受付済み」が一度出ます。'],
   ],
   quiz:["人数だけがエラーになりました。次にできるようにしたい操作は？",["両方とも必ず再入力","名前を残し人数だけ直す","画面を再起動","エラーのまま成功とする"],1,"両方の入力を保ち、利用者が間違った欄だけを直せるようにします。"],
   build:['return { alias: ①, seats: ② };',[["返す表示名",'""',"values.alias"],["返す人数","values.seats",'"1"']]],right:["values.alias","values.seats"],
   file:"app/signup-lab/retry.js",source:signupExamples.retain,answer:signupExamples.retain.replace('alias: ""','alias: values.alias'),
   task:"/signup-lab/retention で人数4を送った時、表示名・人数のどちらも元の入力を返してください。片方だけ直して再送し、受付が完了するか試します。",hint:"空文字を作らず、サーバーが受け取ったvaluesから名前と人数の両方を返します。",
  },{
-  chapter:"signup",id:"signup-action",title:"検証と受付をServer Actionにつなぐ",
+  chapter:"signup",id:"signup-action",title:"フォーム送信でサーバーの関数を呼ぶ（Server Action）",
   slides:[
    ["サーバーで実行する関数を用意する","Server Actionはフォームから呼べるサーバー側の関数です。ファイルの最初の'use server'とexport async functionで定義できます。useActionStateを使うフォームは前の状態とFormDataを渡します。",'"use server";\nexport async function reserve(previous, formData) {\n  const values = readValues(formData);\n  // ここで検証し、結果を返す\n}',"この関数は手元のNext.jsサーバー上で実行され、結果がブラウザへ返ります。"],
    ["通った申込だけに受付番号を付ける","readValuesとvalidateは値の読み取り・検証を担当します。errorReplyは理由と元の値を、acceptは受付結果を返します。ticketはこのフォームの受付番号を二重発行しないための識別子です。",'if (message) return errorReply(previous, values, message);\nreturn accept(previous, values, formData.get("ticket"));',"不正な値に受付番号は付きません。正しい再送に一つの受付番号が付きます。"],
@@ -78,7 +78,7 @@ nextLessons.push(
   file:"app/signup-lab/action.js",source:signupExamples.action,answer:signupExamples.action.replace('errorReply(previous, values, "受付の処理を書いてください。")','accept(previous, values, formData.get("ticket"))'),
   task:"/signup-lab/action のServer Actionを完成させます。入力に誤りがあれば理由を返し、入力が正しければ accept に前の状態・入力値・ticket を渡してください。",hint:"message があれば errorReply を返します。それ以外の場合は formData から ticket を取り出して accept に渡します。",
  },{
-  chapter:"signup",id:"signup-pending",title:"待機中・再入力・受付済みでボタンを切り替える",
+  chapter:"signup",id:"signup-pending",title:"送信中や受付後の二重送信を防ぐ",
   slides:[
    ["応答を待つ時は二重送信を止める","useActionStateが返すpendingは、サーバーからの応答を待つ間だけtrueです。この教材では受付に少し時間をかけ、送信中の表示と押せるかどうかを実際に見られます。",'const [state, send, pending] = useActionState(action, initial);\nconst accepted = state.kind === "accepted";',"クリック直後はpendingがtrueになり、応答時にfalseへ戻ります。"],
    ["結果によって次の操作を決める","エラーならpendingもacceptedもfalseです。条件を||で結ぶと、どちらか一つでもtrueのときボタンを無効にできます。",'<button disabled={pending || accepted}>\n  {pending ? "送信中" : accepted ? "受付済み" : "申込を送信"}\n</button>',"エラー時は再送可能、待機中と受付済みは送信できません。"],

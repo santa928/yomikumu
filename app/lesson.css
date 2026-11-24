@@ -75,6 +75,13 @@ a {
 .catalog a {
   font-weight: 700;
 }
+.chapter-lessons {
+  padding-inline-start: 1.5rem;
+}
+.chapter-lessons > li {
+  padding: .35rem 0;
+  border: 0;
+}
 .catalog p {
   margin: 3px 0;
 }

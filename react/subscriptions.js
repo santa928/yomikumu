@@ -90,13 +90,13 @@ const meterChecks=[
  [async t=>{training.click("#toggle");await t.wait(30);return station.count("south")===1 && t.q("#root p").textContent==="25℃";},"開き直しても購読は一件だけです。"],
 ];
 const reactSubscriptions = {
- id:"effects",title:"温度の通知を受け取り、閉じたら購読を解除する",
- intro:"温度計から値が届くたびに表示を更新します。別の部屋へ切り替えたり、表示を閉じたりした時は、古い温度計からの通知を止めます。",
+ id:"effects",title:"外から届くデータで表示を更新し、閉じたら通知を止める",
+ intro:"温度計から値が届くたびに表示を更新します。別の部屋へ切り替えたり、表示を閉じたりした時は、古い温度計からの通知を受け取るのをやめます。この「通知が届くたびに受け取る」仕組みを購読と呼びます。",
  setup:sensorFixture,
  demo:{html:monitorPage,code:roomMeter,tip:"北室を1上げてから部屋を切り替え、両方の温度計を操作してください。閉じる・開くを試し、購読中の件数も見比べます。"},
  steps:[
   {
-   title:"入力から計算できる表示を見分ける",
+   title:"入力した文字から文字数を計算して表示する",
    explain:"表示する文字数は入力した文字から毎回計算できます。別に保存したり、外へ問い合わせたりせず、描画するときにlengthを読みます。この後で、部品の外から届く通知との違いを試します。",
    example:computedValue.replace("const size = word.length;","const size = 0;"),
    question:"作品名が変わると必ず決まる値はどれですか。",options:["次の温度","まだ届かない通知","欄にある文字列の長さ","購読者の総数"],correct:2,feedback:"入力の文字列があれば、その時の長さは描画中に求められます。",
@@ -105,8 +105,8 @@ const reactSubscriptions = {
    tests:[[t=>{training.input("input","波");return t.q("#root p").textContent==="1文字";},"入力のlengthで表示を作ります。"],[t=>{training.input("input","波音");return t.q("#root p").textContent==="2文字";},"入力を変えると今の文字数を表示します。"]],
   },
   {
-   title:"一つの外部イベントと表示を同期する",html:monitorPage,
-   explain:"station.read で部屋の現在の温度を読みます。useEffect の中で station.subscribe に部屋と関数を渡すと、温度が変わるたびに関数が呼ばれます。末尾の [] は、部品を最初に表示したときに購読を始める指定です。購読を解除するときは stop() を呼びます。",
+   title:"温度が届くたびに表示を更新する（useEffect）",html:monitorPage,
+   explain:"station.read で部屋の現在の温度を読みます。useEffect の中で station.subscribe に部屋と関数を渡すと、温度が変わるたびに関数が呼ばれます。末尾の [] は、部品を表示し始めたときに購読を開始し、再表示のたびに登録し直さない指定です。stop を解除用の関数として React に渡しておくと、部品が取り外されたときに解除できます。",
    example:northMeter.replace("next => setValue(next)","next => setValue(18)"),
    question:"北室から19が届いたとき、何をstateに入れますか。",options:["前の18","受け取った19","購読者数","部屋名"],correct:1,feedback:"届いた値にstateを更新すると、温度表示も変わります。",
    task:"固定の18ではなく、届いた北室の温度で表示を更新します。南室の通知には反応させません。",
@@ -114,15 +114,15 @@ const reactSubscriptions = {
    tests:[[async t=>{await t.wait(30);return station.count("north")===1 && t.q("#root p").textContent==="18℃";},"北室の現在値を読み、一件だけ購読します。"],[t=>{training.click("#north-send");training.click("#south-send");return t.q("#root p").textContent==="19℃";},"受け取った北室の温度を使います。"]],
   },
   {
-   title:"切替と取り外しで前の購読を解除する",html:monitorPage,
+   title:"別の温度計へ切り替えたり閉じたりしたら、古い通知を止める",html:monitorPage,
    explain:"[room]と書くと、部屋が変わった時に前のeffectの後片付けをしてから新しく購読します。return stopで解除関数をReactへ渡します。同じ後片付けは部品を取り外した時にも呼ばれます。",
    example:roomMeter.replace("return stop;","// 解除関数をまだ返していない"),
    question:"開く→閉じる→同じ部屋を再度開く順で、購読件数はどうなりますか。",options:["1→1→2","0→1→0","1→0→1","2→1→2"],correct:2,feedback:"閉じたら0件、開いたら一件になります。閉じる前の購読は残しません。",
-   task:"effectの最後でstopを返し、切替と閉じる操作で古い購読が解除されるようにします。",
+   task:"部屋を切り替えたら前の温度計からの通知を止め、表示を閉じたら通知が一件も残らないようにします。useEffect の中から解除用の関数 stop を返してください。",
    build:reactBuild(roomMeter,["return stop;","// 解除しない"],["}, [room]);","}, []);"]),tests:meterChecks,
   },
   {
-   title:"同じ購読処理を自作のHookで共用する",html:monitorPage,
+   title:"通知の開始と停止をまとめて再利用する（カスタムHook）",html:monitorPage,
    explain:"useで始まる関数にstateとeffectをまとめると、同じ処理を複数の部品で呼べます。これをカスタムHookと呼びます。それぞれの呼び出しが別々のstateと購読を持ちます。",
    example:twoMeters.replace('useTemperature("south")','useTemperature("north")'),
    question:"北室の温度が上がると、南室の温度表示はどうなりますか。",options:["北の値に置き換わる","消える","両方1ずつ増える","南の現在値を保つ"],correct:3,feedback:"South は南室の通知だけを購読しています。北室の温度が上がっても、南室の表示は変わりません。",
@@ -131,7 +131,7 @@ const reactSubscriptions = {
    tests:[[async t=>{await t.wait(30);return station.count("north")===1 && station.count("south")===1;},"各部屋で一件ずつ購読します。"],[t=>{training.click("#north-send");return t.all("#root p").map(n=>n.textContent).join("/")==="19℃/24℃";},"北室の更新は北側だけに反映します。"],[t=>{training.click("#south-send");return t.all("#root p").map(n=>n.textContent).join("/")==="19℃/25℃";},"南室の更新も独立して表示します。"],[async t=>{training.mount(()=>null);await t.wait(20);return station.count("north")===0 && station.count("south")===0;},"両方の部品を取り外した時は、それぞれの購読を解除します。"]],
   },
   {
-   title:"二つの窓口の受付件数を表示する",html:monitorPage.replaceAll("温度計","受付").replaceAll("室","窓口"),
+   title:"2つの通知を別々に受け取り、閉じた側だけ停止する",html:monitorPage.replaceAll("温度計","受付").replaceAll("室","窓口"),
    explain:"この練習では、ボタンを押すと各窓口の件数が1増えます。現在の件数を読む処理と、通知の購読・解除を一つのカスタム Hook にまとめて、北と南の両方で使います。",
    example:northMeter,
    question:"南窓口だけを閉じた時、残す購読はどれですか。",options:["両方","北だけ","南だけ","どちらも閉じる"],correct:1,feedback:"表示を続ける北窓口の購読は保ち、南の部品を取り外したときに南だけ解除します。",

@@ -1,6 +1,7 @@
 "use strict";
 
 readingChapters.push({
+  id: "responsive",
   title: "画面幅に合わせてカードを並べ、文字色をそろえる",
   intro: "見本の幅を切り替え、2枚のカードが縦並びから横並びに変わるところを確かめます。最後は作ったページを保存し、PCのブラウザで開きます。",
   sample: "shelf/index.html", widths: true
@@ -49,7 +50,7 @@ const shelfSteps = [
     quiz: ["--color-river の色を文字に使う名前は？", ["river-text", "text-river", "bg-river", "p-river"], 1, "text- にテーマの色名を続けると文字に効きます。"]
   },
   {
-    id: "reuse", title: "二冊に同じ名前の色を使う",
+    id: "reuse", title: "定義した色を複数のカードで使い回す",
     why: "特集の色が変わったときに全冊へ届くよう、同じ名前を使い回します。ここでは --color-dusk に #613e57 を定義済みです。二冊目にも一冊目と同じ文字色のクラスを加えます。",
     base: { theme: dusk },
     example: { part: "other", before: "", after: "text-dusk", base: { card: "text-dusk" } },
@@ -66,7 +67,7 @@ const shelfSteps = [
     quiz: ["二冊の色を次回一か所から変えるには？", ["書名を同じにする", "ボタンを消す", "二冊に別々の色番号を直書き", "二冊とも同じテーマ色を使う"], 3, "共通の名前を使うと、その定義を変えたときに両方へ届きます。"]
   },
   {
-    id: "local-shelf", title: "自分の読書棚をビルドして開く",
+    id: "local-shelf", title: "PCでCSSを生成し、作ったページをブラウザで開く",
     why: "ブラウザに渡すのは完成したCSSです。CLI はコマンドで道具を動かす方法。ここではビルド（HTMLから必要なCSSを生成）を npm run build という名前でまとめています。最後に手元の index.html を開くと、ブラウザが隣の shelf.css を読みます。",
     example: { part: "shelf", before: "flex flex-col gap-4", after: "flex flex-col gap-4 sm:flex-row", width: 680, base: { card: "text-dusk", other: "text-dusk", theme: dusk } },
     result: "画面幅が640px以上になると、2枚のカードが横一列に並びます。二冊の文字色は同じです。",

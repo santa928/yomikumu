@@ -45,28 +45,45 @@ function saveFile(name, content, type) {
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
+function lessonList(i) {
+  return `<ol class="chapter-lessons">${readingUnits.filter(unit => unit.chapter === i).map(unit => {
+    const state = progress.units[unit.id] || {};
+    const done = views.slice(1).map((v,n) => state[v+"Done"] && viewNames[n+1]).filter(Boolean);
+    if (state.localDone) done.push("手元のCSS");
+    return `<li><a href="#${addr(unit, "slide")}">${unit.title}</a>${done.length ? `<small>　確認済み · ${done.join("、")}</small>` : ""}</li>`;
+  }).join("")}</ol>`;
+}
+
+function chapterPage(i) {
+  const chapter = readingChapters[i];
+  document.title = chapter.title + "｜よみくむ";
+  main.innerHTML = `<p class="kind">章の目次</p><h1>${chapter.title}</h1><p>${chapter.intro}</p>
+    <h2>この章の課題</h2>${lessonList(i)}
+    <h2>完成例を試す</h2>
+    <div class="sample-window"><iframe class="reading-frame" src="${chapter.sample}" title="${chapter.title}の完成例"></iframe></div>
+    ${chapter.widths ? widthTools() : ""}
+    <a class="review" href="${chapter.sample}">完成例を広い画面で操作する</a>`;
+  if (chapter.widths) {
+    const frame = main.querySelector(".sample-window iframe");
+    bindWidths(main.querySelector("[data-widths]"), 300, width => {
+      frame.style.maxWidth = "none";
+      frame.style.width = width + "px";
+    });
+  }
+}
+
 function catalogue() {
+  document.title = "Tailwind CSSの目次｜よみくむ";
   const previous = readingUnits.find(unit => progress.last.split("/")[0] === unit.id);
-  main.innerHTML = `<p class="kind">Web制作の選択コース</p><h1>読書カードと Tailwind CSS</h1>
-    <p>HTML の中に短い名前を書いて、読書カードの見た目を作ります。CSS の文字と余白を試したあとに選べます。JavaScript へは全コース目次から直接進めます。</p>
+  main.innerHTML = `<p class="kind">Web制作の選択コース</p><h1>Tailwind CSSの目次</h1>
+    <p>HTML の class に用意された短い名前を書き、余白・色・並び方を変えます。例では本の紹介をカードとして表示します。CSS の文字と余白を試したあとに選べます。JavaScript へは全コース目次から直接進めます。</p>
     ${previous ? `<a class="next" href="#${progress.last}">前回の続きへ · ${previous.title}</a>` : ""}
-    ${readingChapters.map((chapter, i) => `<section><h2>${chapter.title}</h2><p>${chapter.intro}</p>
-      <div class="sample-window"><iframe class="reading-frame" src="${chapter.sample}" title="${chapter.title}の完成例"></iframe></div>
-      ${chapter.widths ? widthTools() : ""}
-      <a class="review" href="${chapter.sample}">完成例を広い画面で操作する</a>
-      <ol class="catalog">${readingUnits.filter(unit => unit.chapter === i).map(unit => {
-        const state = progress.units[unit.id] || {};
-        const done = views.slice(1).map((v,n) => state[v+"Done"] && viewNames[n+1]).filter(Boolean);
-        if (state.localDone) done.push("手元のCSS");
-        return `<li><a href="#${addr(unit, "slide")}">${unit.title}</a>${done.length ? `<small>　確認済み · ${done.join("、")}</small>` : ""}</li>`;
-      }).join("")}</ol></section>`).join("")}
+    <ol class="catalog catalog-chapters">${readingChapters.map((chapter, i) => `<li>
+      <h2><a href="#chapter/${chapter.id}">${chapter.title}</a></h2><p>${chapter.intro}</p>${lessonList(i)}
+    </li>`).join("")}</ol>
     <details><summary>進捗と下書きの引き継ぎ</summary><p>記述したクラス名と途中の選択をファイルに保存できます。読み込むとこのコースの進捗を置き換えます。</p>
     <button id="export" type="button">進捗を保存</button><label>進捗を読み込む <input id="import" type="file" accept=".json,application/json"></label>
     <p role="status" id="transfer"></p></details>`;
-  main.querySelectorAll("[data-widths]").forEach(tools => {
-    const frame = tools.previousElementSibling.querySelector("iframe");
-    bindWidths(tools, 300, width => { frame.style.maxWidth = "none"; frame.style.width = width + "px"; });
-  });
   document.getElementById("export").onclick = () => saveFile("reading-progress.json", JSON.stringify(progress), "application/json");
   document.getElementById("import").onchange = async e => {
     try {
@@ -76,7 +93,7 @@ function catalogue() {
       progress = data;
       save();
       catalogue();
-      document.querySelector("main details").open = true;
+      document.getElementById("transfer").closest("details").open = true;
       document.getElementById("transfer").textContent = "読み込みました。";
     } catch { document.getElementById("transfer").textContent = "このコースの進捗ファイルを選んでください。"; }
   };
@@ -236,6 +253,10 @@ function practice(unit, mode, state) {
 
 function navigate() {
   const [id, name] = location.hash.slice(1).split("/");
+  if (id === "chapter") {
+    const i = readingChapters.findIndex(chapter => chapter.id === name);
+    if (i !== -1) { chapterPage(i); return; }
+  }
   const unit = readingUnits.find(item => item.id === id);
   if (!unit) { catalogue(); return; }
   const view = views.includes(name) ? name : "slide";
@@ -243,11 +264,19 @@ function navigate() {
   progress.last = addr(unit, view);
   save();
   window.YomikumuPaths?.remember("tailwind", progress.last);
-  main.innerHTML = `<p class="kind">${readingChapters[unit.chapter].title}</p><h1>${unit.title}</h1>${tabs(unit, view)}`;
+  const chapter = readingChapters[unit.chapter];
+  document.title = unit.title + "｜よみくむ";
+  main.innerHTML = `<p class="kind">${chapter.title}</p><h1>${unit.title}</h1>
+    <a class="review" href="#chapter/${chapter.id}">この章の目次</a>${tabs(unit, view)}`;
   if (view === "slide") slide(unit);
   else if (view === "quiz") quizView(unit, state);
   else practice(unit, view, state);
 }
-window.addEventListener("hashchange", () => { navigate(); main.focus(); });
+window.addEventListener("hashchange", () => {
+  navigate();
+  const heading = main.querySelector("h1");
+  heading.tabIndex = -1;
+  heading.focus();
+});
 document.querySelector(".skip").onclick = event => { event.preventDefault(); main.focus(); };
 navigate();

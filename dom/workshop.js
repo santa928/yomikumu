@@ -1,10 +1,13 @@
 "use strict";
 const workshop = window.courseWorkshop || {
-  id: "dom", heading: "ブラウザで動かすJavaScript", language: "JavaScript",
+  id: "dom", heading: "JavaScriptでWebページを操作する", language: "JavaScript",
+  catalogTitle: "JavaScriptの画面操作の目次",
+  intro: "JavaScriptの変数・条件分岐・配列・関数を使って、ボタンや入力欄のあるWebページを作ります。ブラウザがHTMLを読み取って作るページの構造をDOMと呼びます。まずは画面の見出しや一覧を探し、表示を書き換えましょう。各単元は、完成例を操作してから、短い見本・結果の予測・自分で試す練習へ進みます。",
   units: [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit, readingUnit],
   frame: domFrame, prepare: limitDomLoops,
 };
 const domUnits = workshop.units;
+const catalogTitle = workshop.catalogTitle || workshop.heading + "の目次";
 const domMain = document.querySelector("main");
 const domStateKey = "yomikumu/" + workshop.id + "/v1";
 let domState = { last: "", tasks: {} };
@@ -37,6 +40,19 @@ function section(title) {
   area.append(node("h2", title));
   return area;
 }
+function lessonLinks(u) {
+  const list = node("ol");
+  list.className = "catalog";
+  for (const [i, s] of u.steps.entries()) {
+    const li = node("li");
+    const key = u.id + "/" + (i + 1);
+    const progress = domState.tasks[key] || {};
+    li.append(route(s.title, key));
+    if (progress.tap || progress.built || progress.passed) li.append(node("small", [progress.tap && "予測正解", progress.built && "組み立て達成", progress.passed && "コード達成"].filter(Boolean).join("・")));
+    list.append(li);
+  }
+  return list;
+}
 const nav = document.querySelector("#units");
 for (const u of domUnits) nav.append(route(u.title, u.id));
 if (matchMedia("(min-width: 721px)").matches) nav.parentElement.open = true;
@@ -51,12 +67,16 @@ function renderDom() {
     else a.removeAttribute("aria-current");
   }
   if (!unit) {
-    domMain.append(node("h1", workshop.heading));
+    document.title = catalogTitle + "｜よみくむ";
+    domMain.append(node("h1", catalogTitle));
+    if (workshop.intro) domMain.append(node("p", workshop.intro));
     const list = node("ol");
     list.className = "catalog";
     for (const u of domUnits) {
       const li = node("li");
-      li.append(route(u.title, u.id), node("p", u.intro));
+      const chapter = node("h2");
+      chapter.append(route(u.title, u.id));
+      li.append(chapter, node("p", u.intro), lessonLinks(u));
       list.append(li);
     }
     domMain.append(list);
@@ -70,25 +90,18 @@ function renderDom() {
   window.YomikumuPaths?.remember(workshop.id, key);
   saveDom();
   document.title = (step?.title || unit.title) + "｜よみくむ";
-  const chapter = node("p", step ? unit.title : workshop.heading);
-  chapter.className = "kind";
-  domMain.append(chapter, node("h1", step?.title || unit.title));
+  const breadcrumb = node("nav");
+  breadcrumb.className = "toc-breadcrumb";
+  breadcrumb.setAttribute("aria-label", "現在地");
+  breadcrumb.append(route(catalogTitle, "contents"));
+  if (step) breadcrumb.append(route(unit.title, id));
+  domMain.append(breadcrumb, node("h1", step?.title || unit.title));
   if (!step) {
     domMain.append(node("p", unit.intro));
     const demo = section("完成例を試す");
     demo.append(node("p", unit.demo.tip), frameFor("操作できる完成例", unit.demo.html, unit.demo.code, [], unit.setup));
-    const list = node("ol");
-    list.className = "catalog";
-    for (const [i, s] of unit.steps.entries()) {
-      const li = node("li");
-      const progress = domState.tasks[id + "/" + (i + 1)] || {};
-      li.append(route(s.title, id + "/" + (i + 1)));
-      if (progress.tap || progress.built || progress.passed) li.append(node("small", [progress.tap && "予測正解", progress.built && "組み立て達成", progress.passed && "コード達成"].filter(Boolean).join("・")));
-      list.append(li);
-    }
-    domMain.append(demo);
+    domMain.append(node("h2", "この単元の目次"), lessonLinks(unit), demo);
     if (unit.guide) domMain.append(unit.guide());
-    domMain.append(node("h2", "小課題"), list);
     return;
   }
   const state = domState.tasks[key] ||= {};

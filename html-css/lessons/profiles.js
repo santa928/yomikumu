@@ -9,7 +9,7 @@ const pairTheme = authorTheme.replace("navy", "teal");
 
 const profileLessons = [
   {
-    id: "bio-lines", title: "紹介文の行と行を少し離す", topic: "CSS",
+    id: "bio-lines", title: "文字サイズ・書体・行間を調整する", topic: "CSS",
     goal: "文字の大きさ・書体・行間を一つずつ変えて違いを見分ける。",
     slides: [
       {
@@ -43,7 +43,7 @@ const profileLessons = [
     },
   },
   {
-    id: "name-colors", title: "文字とその背景を一組で選ぶ", topic: "CSS",
+    id: "name-colors", title: "文字が読みやすい背景色を選ぶ", topic: "CSS",
     goal: "同じ文字色でも、背景によって読み取りやすさが変わることを確かめる。",
     slides: [
       {
@@ -71,7 +71,7 @@ const profileLessons = [
     },
   },
   {
-    id: "picked-mark", title: "選択中の名札に線を足す", topic: "CSS",
+    id: "picked-mark", title: "選択中の項目を色だけに頼らず示す", topic: "CSS",
     goal: "色の違いが分かりにくくても、選択中の人を文字と線で見つけられるようにする。",
     slides: [
       {
@@ -99,7 +99,7 @@ const profileLessons = [
     },
   },
   {
-    id: "shared-ink", title: "二人の名前に同じ色を渡す", topic: "CSS",
+    id: "shared-ink", title: "共通の文字色を一か所で管理する", topic: "CSS",
     goal: "色を一か所に書き、そこを変えるだけで複数の名前に反映する。",
     slides: [
       {
@@ -128,7 +128,7 @@ const profileLessons = [
     },
   },
   {
-    id: "author-pair", title: "別の二人を同じカードで紹介する", topic: "HTML と CSS",
+    id: "author-pair", title: "共通の見た目を再利用して紹介カードを作る", topic: "HTML と CSS",
     goal: "二人の紹介カードを作り、片方の目印を残したまま、共通の色を一度に変える。",
     slides: [
       {

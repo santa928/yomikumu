@@ -36,7 +36,7 @@ async function verifyPaths(browser, base) {
     await pc.getByLabel("main.py のコード").fill('print("受付")');
     await pc.getByRole("button", { name: "別の条件でも採点" }).click();
     await pc.locator("#status").filter({ hasText: "すべての条件" }).waitFor();
-    await pc.getByRole("link", { name: "学習パス一覧へ", exact: true }).click();
+    await pc.getByRole("link", { name: "全コース目次", exact: true }).click();
     await pc.getByRole("link", { name: "前回の続きへ　Python基礎" }).waitFor();
     if (process.env.SCREENSHOT_DIR) await pc.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "paths-pc.png") });
     await pc.getByText("進捗と下書きの引き継ぎ", { exact: true }).click();
@@ -52,9 +52,9 @@ async function verifyPaths(browser, base) {
     await phone.getByRole("link", { name: "前回の続きへ　Python基礎" }).tap();
     await phone.getByRole("button", { name: "キーボードで書く" }).tap();
     assert.equal(await phone.getByLabel("main.py のコード").inputValue(), 'print("受付")');
-    await phone.getByRole("link", { name: "学習パス一覧へ", exact: true }).tap();
+    await phone.getByRole("link", { name: "全コース目次", exact: true }).tap();
     await phone.getByRole("link", { name: /Webで作品を紹介する/ }).tap();
-    await phone.getByRole("heading", { name: "自分の作品をページにしよう" }).waitFor();
+    await phone.getByRole("heading", { name: "Web制作のコース一覧" }).waitFor();
     assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     if (process.env.SCREENSHOT_DIR) await phone.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, "paths-phone.png") });
     await phone.getByRole("link", { name: "HTML / CSSの続きを開く" }).tap();

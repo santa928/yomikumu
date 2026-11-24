@@ -8,7 +8,7 @@ const sumPoints = 'function sum(cards) {\n  return cards.reduce((total, card) =>
 
 const javascriptTransformLessons = [
   {
-    id: "js-map-names", topic: "一覧から作る", title: "全問の題名だけを並べる",
+    id: "js-map-names", topic: "一覧から作る", title: "map で一覧を別の形に変換する",
     goal: "各問を同じ方法で変換し、件数と順番を保った表示用の一覧を作る。",
     slides: [
       { title: "map で各カードの題名を取り出す", body: "カードの配列から「月」「舟」「星」という題名だけの配列を作ります。map は左の配列を順番に読み、矢印の右で返した値を一件ずつ新しい配列に並べます。", code: paperQuestions + "\nconst names = cards.map(card => card.title);\nconsole.log(names);" },
@@ -22,7 +22,7 @@ const javascriptTransformLessons = [
       expected: () => [["月","舟","星"],[]], hints: ["題名だけを、月・舟・星の順に並べて返しましょう。","カードが0件のときは、空の配列を返しましょう。"] },
   },
   {
-    id: "js-filter-kind", topic: "一覧を絞る", title: "選んだ種類の問題だけを残す",
+    id: "js-filter-kind", topic: "一覧を絞る", title: "filter で条件に合う項目だけを選ぶ",
     goal: "一件ずつ条件を確かめ、条件に合ったカードを元の順で残す。",
     slides: [
       { title: "種類が「紙」のカードを選ぶ", body: "filter はカードを一件ずつ調べ、矢印の右の式が true になったカードを新しい配列に残します。=== は左右が同じ値・同じ種類かを調べる記号です。「紙」のカードは二件あるので、残るのは月と星です。", code: paperQuestions + '\nconst paper = cards.filter(card => card.kind === "紙");\nconsole.log(paper.map(card => card.title));' },
@@ -37,7 +37,7 @@ const javascriptTransformLessons = [
       expected: () => [["月","星"],["舟"],[],["月","舟","星"]], hints: ["紙の二件を元の順で残しましょう。","紙はできました。木が選ばれたときは舟だけを残しましょう。","布の問題はないので空の配列です。","元の全件も後から見られるようにしましょう。"] },
   },
   {
-    id: "js-points-total", topic: "一覧を集計する", title: "ゼロから全問の点を合計する",
+    id: "js-points-total", topic: "一覧を集計する", title: "reduce で一覧の数値を合計する",
     goal: "いままでの合計に一問の点を足し、空の一覧にも合計を返す。",
     slides: [
       { title: "いままでの合計と次の一件", body: "reduce は、いままでの結果と今の一件を関数に渡します。右端の 0 が出発点です。最初は 0 に2、次は2に5、最後は7に3を足して10になります。", code: paperQuestions + "\nconst total = cards.reduce((total, card) => total + card.points, 0);\nconsole.log(total);" },
@@ -50,12 +50,12 @@ const javascriptTransformLessons = [
       expected: () => [10,0,7], hints: ["三問の2・5・3点だけを足しましょう。","三問はできました。空の一覧では合計0を返します。","一件だけでも、その一問の点を合計として返します。"] },
   },
   {
-    id: "js-copy-card", topic: "元の問題を残す", title: "一枚の配点を変えた新しい配列を作る",
+    id: "js-copy-card", topic: "元の問題を残す", title: "元の配列を変えず、一件だけ変更する",
     goal: "一覧と変更する一問をコピーして、元の問題集の点を残す。",
     slides: [
-      { title: "名前を付け直しても同じカード", body: "const next = card; は同じ一枚のカードを二つの名前で読めるようにします。next.points を書き換えた後に card.points を読むと、元の点も変わっています。この見本では card.points も6と表示されます。", code: 'const card = { title: "星", points: 3 };\nconst next = card;\nnext.points = 6;\nconsole.log(card.points);' },
-      { title: "点を変える一枚を写す", body: "{ ...card, points: 6 } の三つの点は、card の項目を新しいオブジェクトへ写す指定です。その後で points だけを上書きします。元の card と新しい next を順に表示し、それぞれの points を比べましょう。", code: 'const card = { title: "星", points: 3 };\nconst next = { ...card, points: 6 };\nconsole.log(card);\nconsole.log(next);' },
-      { title: "一覧の中から変える一枚を選ぶ", body: "map で新しい一覧を作り、題名が合うカードだけ新しいコピーに替えます。ほかは元のカードを読みます。実行すると、元の一覧では舟が5点、新しい一覧では8点と分かります。", setup: paperQuestions, code: updatedPoints + '\nconst next = changePoints(cards, "舟", 8);\nconsole.log(cards.map(card => card.points));\nconsole.log(next.map(card => card.points));' },
+      { title: "別の変数に入れても同じオブジェクトを指す", body: "const next = card; は同じ一枚のカードを二つの名前で読めるようにします。next.points を書き換えた後に card.points を読むと、元の点も変わっています。この見本では card.points も6と表示されます。", code: 'const card = { title: "星", points: 3 };\nconst next = card;\nnext.points = 6;\nconsole.log(card.points);' },
+      { title: "コピーしたオブジェクトだけ点数を変える", body: "{ ...card, points: 6 } の三つの点は、card の項目を新しいオブジェクトへ写す指定です。その後で points だけを上書きします。元の card と新しい next を順に表示し、それぞれの points を比べましょう。", code: 'const card = { title: "星", points: 3 };\nconst next = { ...card, points: 6 };\nconsole.log(card);\nconsole.log(next);' },
+      { title: "配列から変更する一件を選ぶ", body: "map で新しい一覧を作り、題名が合うカードだけ新しいコピーに替えます。ほかは元のカードを読みます。実行すると、元の一覧では舟が5点、新しい一覧では8点と分かります。", setup: paperQuestions, code: updatedPoints + '\nconst next = changePoints(cards, "舟", 8);\nconsole.log(cards.map(card => card.points));\nconsole.log(next.map(card => card.points));' },
     ],
     quiz: { prompt: "元の星が3点のまま、新しい星を6点にする書き方は？", options: ["card.points = 6;", "const next = card;", "const next = { ...card, points: 6 };", "card = 6;"], correct: 2,
       reasons: ["元の一枚に直接書き込みます。","同じ一枚を別名で読むだけです。","新しい一枚に項目を写して点だけ変えます。","カードのコピーは作っていません。"] },
@@ -67,7 +67,7 @@ const javascriptTransformLessons = [
       expected: () => [[2,8,3],[2,5,3],["月","舟","星"],["紙","木","紙"]], hints: ["新しい配列では舟だけが8点になります。","更新後の点は合っています。元の舟は5点のままになるよう、一枚をコピーしましょう。","点の変更で作品名も残るようにしましょう。","点と名前はできました。種類もコピーします。"] },
   },
   {
-    id: "js-revise-set", topic: "問題集の仕上げ", title: "種類で絞り込み、配点を変えた前後の合計を比べる",
+    id: "js-revise-set", topic: "問題集の仕上げ", title: "一覧を絞り込み、一件を変更して合計を比べる",
     goal: "選んだ種類の問題と合計を確かめ、全件へ戻ったとき元の点数が残るようにする。",
     slides: [
       { title: "種類を選び、全件に戻る", body: "「表示する種類」を選ぶと、該当する題名と合計点が変わります。まず風景、次に布を選び、最後に「すべて」に戻してみましょう。元の川・灯・森はいつでも読めます。", setup: shelfFixture + "\n" + listKind + "\n" + sumPoints, variant: { name: "kind", label: "表示する種類", options: ["すべて", "風景", "道具", "布"] }, code: 'const shown = byKind(cards, kind);\nconsole.log(shown.map(card => card.title));\nconsole.log(sum(shown));' },

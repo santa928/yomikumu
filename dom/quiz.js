@@ -92,13 +92,13 @@ const seaFinished = [
   [t=>{t.click("#left");t.click("#next");return t.q("#question").textContent==="結果" && t.q("#score").textContent==="1点";},"二問目に間違えても得点は変えず、二問の後に結果へ進みます。"],
 ];
 const quizDomUnit = {
-  id:"quiz-project",title:"得点と再挑戦のあるクイズを仕上げる",
+  id:"quiz-project",title:"練習：回答・採点・再挑戦をつないでクイズを作る",
   intro:"海のクイズで、答えを選ぶと得点が変わり、「次へ」で次の問題に進む仕組みを作ります。最後は、正解すると2点の絵の具クイズを作ります。",
   demo:{html:quizHtml,code:seaQuiz,tip:"一問目で「灯台」を二度押してから次へ進みます。二問目で「桟橋」を選び、結果を見て再挑戦してください。"},
   steps:[
     {
-      title:"配列から一問目と選択肢を表示する",html:quizHtml,
-      explain:"一問の文章・選択肢・正答の番号を一組のデータにします。items[0]が一問目、item.choices[0]が左の答えです。見本は二問目を読みます。",
+      title:"問題データの配列から、一問目と選択肢を表示する",html:quizHtml,
+      explain:"一問の文章・選択肢・正解の選択肢の番号を一組のデータにします。items[0]が一問目、item.choices[0]が左の答えです。見本は二問目を読みます。",
       example:firstQuestion.replace("items[0]","items[1]"),
       question:"最初の問題と左右の選択肢を同じ一件から表示するには、何を先に決めますか。",options:["最終得点","押した回数","items[0]","結果画面の色"],correct:2,feedback:"今表示する一件を決め、そのtextとchoicesを同じ一件から取り出します。",
       task:"items から選ぶ位置を変え、一問目「夜の海を照らすのは？」と、左右の選択肢「灯台」「小舟」を表示してください。",
@@ -115,8 +115,8 @@ const quizDomUnit = {
       tests:[[t=>t.q("#next").disabled,"回答前は次へを無効にします。"],[t=>{t.click("#right");return !t.q("#next").disabled;},"どちらかを選んだら次へ進めます。"],[t=>{t.click("#next");return t.q("#question").textContent==="風を受けて進むのは？" && t.q("#next").disabled;},"二問目を表示して、再び回答を待ちます。"]],
     },
     {
-      title:"正答した一回だけ得点を加える",html:quizHtml,
-      explain:"answeredはこの問題に回答したかを覚えます。二度目のクリックは先頭のreturnで止めます。choiceが正答の番号と等しい時だけ加点します。",
+      title:"同じ問題では正解しても一度だけ加点する",html:quizHtml,
+      explain:"answeredはこの問題に回答したかを覚えます。二度目のクリックは先頭のreturnで止めます。choiceが正解の選択肢の番号と等しい時だけ加点します。",
       example:scoreOnce.replace("answered = true;", "answered = false;"),
       question:"「灯台」を素早く二回押しても1点にするには何を覚えますか。",options:["選択肢の文字数","この問題に回答したか","次の問題名","ボタンの幅"],correct:1,feedback:"一回目を受けた時に回答済みにして、次の押下で同じ得点が入るのを防ぎます。",
       task:"最初の回答で answered を更新し、正答を二度押しても1点だけ加わるようにしてください。",
@@ -133,7 +133,7 @@ const quizDomUnit = {
       tests:seaFinished,
     },
     {
-      title:"再挑戦で問題番号と得点を初期化する",html:quizHtml,
+      title:"再挑戦で一問目と0点に戻す",html:quizHtml,
       explain:"次の挑戦には、問題番号、得点、回答済みかどうかを引き継ぎません。番号と得点を戻してdrawを呼ぶと、操作できる最初の問題が描かれます。",
       example:seaQuiz.replace('  score = 0;\n  draw();','  // 前回の得点が残る\n  draw();'),
       question:"前回1点の後、再挑戦の最初に表示するものはどれですか。",options:["結果と1点","一問目と0点","二問目と0点","一問目と1点"],correct:1,feedback:"新しい挑戦は一問目から0点で始め、再び回答を受け付けます。",
@@ -142,7 +142,7 @@ const quizDomUnit = {
       tests:[...seaFinished,[t=>{t.click("#again");return t.q("#question").textContent==="夜の海を照らすのは？" && t.q("#score").textContent==="0点" && !t.q("#left").disabled && t.q("#next").disabled;},"再挑戦で一問目と0点に戻し、最初の回答を受け付けます。"],[t=>{t.click("#right");return t.q("#score").textContent==="0点" && !t.q("#next").disabled;},"新しい挑戦で誤答を選ぶと0点のまま次へ進めます。"]],
     },
     {
-      title:"二問の絵の具クイズを作る",html:quizHtml,
+      title:"総合練習：二問のクイズを採点し、結果を表示する",html:quizHtml,
       explain:"見本は、配列から海のクイズの一問目を表示します。練習では絵の具の問題を二問用意し、回答すると採点し、最後に結果を表示するクイズを作ります。",
       example:firstQuestion,
       question:"新しいルールは正答2点です。正答を連打し、二問目に誤答した最終得点はどれですか。",options:["0点","1点","2点","4点"],correct:2,feedback:"二度押しても一問の正答は2点。誤答には加点しません。",

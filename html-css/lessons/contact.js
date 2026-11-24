@@ -10,17 +10,17 @@ const resetNote = '<button type="reset">メモを消す</button>';
 
 const contactLessons = [
   {
-    id: "museum-link", title: "別のサイトの案内を開く", topic: "HTML",
+    id: "museum-link", title: "同じページへのリンクと外部リンクを使い分ける", topic: "HTML",
     goal: "同じページの見出しへ行くリンクと、別のサイトを開くリンクを使い分ける。",
     slides: [
       {
-        title: "二つの行き先を試す",
+        title: "同じページ内と別サイトへのリンクを試す",
         body: "「受付へ」を押すと下の見出しへ移ります。「東京国立博物館」を押すと、実際の公式サイトが別のタブで開きます。教材のタブに戻って、二つの href を見比べましょう。",
         html: '<a href="#desk">受付へ</a>\n<p><a href="https://www.tnm.jp/">東京国立博物館</a></p>\n<h2>展示室</h2>\n<p>作品は二階です。</p>\n<h2 id="desk">受付</h2>',
         previewHeight: 115,
       },
       {
-        title: "リンクの文字と住所を分ける",
+        title: "リンクの表示文字と移動先を分ける",
         body: "href の引用符の中に、行き先の住所（URL）を書きます。別のサイトには https:// から始まる住所を使えます。タグの間には、押す人が行き先を想像できる名前を書きます。",
         html: '<a href="https://www.tnm.jp/">東京国立博物館の案内</a>',
       },
@@ -40,7 +40,7 @@ const contactLessons = [
     },
   },
   {
-    id: "sign-image", title: "案内板を絵と言葉で伝える", topic: "HTML",
+    id: "sign-image", title: "画像を表示し、代わりに読める説明を付ける", topic: "HTML",
     goal: "受付の矢印を表示し、絵が見えないときにも行き先を伝える。",
     slides: [
       {
@@ -69,7 +69,7 @@ const contactLessons = [
     },
   },
   {
-    id: "field-name", title: "名前を押して入力欄に移る", topic: "HTML",
+    id: "field-name", title: "ラベルを押して入力欄に移れるようにする", topic: "HTML",
     goal: "入力欄とその名前を結び、文字を押しても入力を始められるようにする。",
     slides: [
       {
@@ -98,7 +98,7 @@ const contactLessons = [
     },
   },
   {
-    id: "clear-form", title: "ボタンで練習用のメモを消す", topic: "HTML",
+    id: "clear-form", title: "ボタンでフォームを最初の状態に戻す", topic: "HTML",
     goal: "何をするボタンかを決め、ひとまとまりの入力だけを最初の状態に戻す。",
     slides: [
       {
@@ -127,7 +127,7 @@ const contactLessons = [
     },
   },
   {
-    id: "contact-card", title: "展示窓口のカードを作る", topic: "HTML",
+    id: "contact-card", title: "画像・リンク・入力欄のある案内を作る", topic: "HTML",
     goal: "一枚の案内で受付の方向を伝え、公式サイトを開いたり自分用のメモを試したりできるようにする。",
     slides: [
       {

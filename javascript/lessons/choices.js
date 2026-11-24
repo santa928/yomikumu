@@ -7,7 +7,7 @@ const numberLoop = 'for (let number = 1; number <= questionCount; number = numbe
 
 const javascriptChoiceLessons = [
   {
-    id: "js-compare", topic: "境目を決める", title: "ちょうどの点数を含める",
+    id: "js-compare", topic: "境目を決める", title: "比較で「指定した数以上」を判定する",
     goal: "「以上」を一つの式にし、境目の前と後の真偽を試す。",
     slides: [
       { title: "3点ちょうども「3点以上」に含まれる？", body: "initialScore >= 3 は、開始点が3以上かを調べる式です。開始点を2にして実行すると false、3にすると true と表示されます。>= は左右の数が等しい場合も含みます。", code: "console.log(initialScore >= 3);", variableStart: true, inputs: [2, 3, 4] },
@@ -21,10 +21,10 @@ const javascriptChoiceLessons = [
       expected: start => [start >= 4], hints: ["4点が true、3点が false になる境目を作りましょう。"] },
   },
   {
-    id: "js-two-doors", topic: "条件で分ける", title: "条件に応じて一方の案内を出す",
-    goal: "真偽を見て、入場と待機のどちらか一つを表示する。",
+    id: "js-two-doors", topic: "条件で分ける", title: "if と else でどちらか一方の処理を実行する",
+    goal: "条件に合えば「入場」、合わなければ「待機」と表示する。",
     slides: [
-      { title: "条件に合うときだけ表示する", body: "if の丸かっこに条件、続く波かっこの中に実行する行を置きます。3点なら「入場」が出ます。2点ではその行を飛ばすので、コンソールの出力は空です。", code: 'if (initialScore >= 3) {\n  console.log("入場");\n}', variableStart: true, inputs: [2, 3] },
+      { title: "条件に合うときだけ表示する", body: "クイズで3点以上取ると次の部屋に進める、という例です。if の丸かっこに条件、続く波かっこの中に実行する行を置きます。3点なら「入場」が出ます。2点ではその行を飛ばすので、コンソールの出力は空です。", code: 'if (initialScore >= 3) {\n  console.log("入場");\n}', variableStart: true, inputs: [2, 3] },
       { title: "条件が false のときは「待機」を表示する", body: "else の中には、条件が false のときに実行する行を置きます。開始点を2にして実行すると「待機」と表示されます。", code: 'if (initialScore >= 3) {\n  console.log("入場");\n} else {\n  console.log("待機");\n}', variableStart: true, inputs: [2, 3] },
     ],
     quiz: { prompt: "if の条件が false のときに進むのはどこ？", options: ["if の中だけ", "両方の中", "最初からやり直す", "else の中"], correct: 3,
@@ -35,7 +35,7 @@ const javascriptChoiceLessons = [
       expected: start => [start >= 4 ? "通過" : "待機"], hints: ["4点以上では「通過」、4点に届かないときは「待機」を出しましょう。"] },
   },
   {
-    id: "js-three-messages", topic: "条件の順番", title: "点数に合う三つのメッセージを選ぶ",
+    id: "js-three-messages", topic: "条件の順番", title: "条件を順に調べて三つの処理から一つを選ぶ",
     goal: "条件を上から確かめ、点数に合うメッセージを一つだけ表示する。",
     slides: [
       { title: "二番目の条件はいつ調べる？", body: "最初の条件に合わなかったとき、else if でもう一つの条件を調べます。5点以上で「金」、3点以上で「銀」、それ以外で「銅」です。点数を選んで三つの表示を試せます。",
@@ -51,7 +51,7 @@ const javascriptChoiceLessons = [
       expected: start => [start >= 6 ? "合格" : start >= 3 ? "もう一歩" : "再挑戦"], hints: ["合格を先に選び、残りから3点以上を選びましょう。6点と3点ちょうどの案内も確かめます。"] },
   },
   {
-    id: "js-numbers", topic: "同じ手順を繰り返す", title: "出題する数だけ問題番号を表示する",
+    id: "js-numbers", topic: "同じ手順を繰り返す", title: "処理を繰り返して連続した番号を表示する",
     goal: "一回分の表示を繰り返し、問題数がゼロのときは何も出さない。",
     slides: [
       { title: "まず一問分だけ書く", body: "最初の番号は1です。一行に表示したら番号を1増やすと、同じ表示の行で二問目も書けます。問題が増えるたびに、この二行を手で足すのは大変です。", code: "let number = 1;\nconsole.log(number);\nnumber = number + 1;\nconsole.log(number);" },

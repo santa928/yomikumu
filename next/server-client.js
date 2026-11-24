@@ -2,7 +2,7 @@
 
 nextChapters.push({
   "id": "client",
-  "title": "サーバーで本を読み、ブラウザでお気に入りを切り替える",
+  "title": "データはサーバーで読み、クリックはブラウザで扱う",
   "goal": "/client-lab で本を選び、お気に入りに追加してから外してみましょう。本のデータを読む処理はサーバーで、ボタンの操作に応じて表示を変える処理はブラウザで実行します。",
   "examples": [
     [
@@ -22,7 +22,7 @@ nextChapters.push({
 
 nextLessons.push({
   "id": "server-book",
-  "title": "本の JSON ファイルをサーバーで読む",
+  "title": "サーバーでファイルを読み、その内容をページに表示する",
   "slides": [
     [
       "inventory.json から一冊を読み込む",
@@ -75,7 +75,7 @@ nextLessons.push({
   "answer": "import { readBook } from \"../book-store\";\n\nexport default async function Reading({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(book || \"bridge\");\n  return <h1>{selected.title}</h1>;\n}"
 }, {
   "id": "book-props",
-  "title": "本の題名と冊数を子コンポーネントに渡す",
+  "title": "サーバーから表示用のデータを子の部品に渡す",
   "slides": [
     [
       "ブラウザが使う値に絞る",
@@ -128,7 +128,7 @@ nextLessons.push({
   "answer": "import { readBook } from \"../book-store\";\nimport BookLabel from \"./BookLabel\";\n\nexport default async function Shelf({ searchParams }) {\n  const { book } = await searchParams;\n  const selected = await readBook(book || \"bridge\");\n  return <BookLabel title={selected.title} copies={selected.copies} />;\n}"
 }, {
   "id": "client-switch",
-  "title": "クリックでボタンの状態を切り替える",
+  "title": "クリックで変わる表示をブラウザ側の部品にする",
   "slides": [
     [
       "クリックに反応する部品を作る",
@@ -181,7 +181,7 @@ nextLessons.push({
   "answer": "\"use client\";\nimport { useState } from \"react\";\n\nexport default function Switch() {\n  const [saved, setSaved] = useState(false);\n  return <button type=\"button\" aria-pressed={saved} onClick={() => setSaved(value => !value)}>\n    {saved ? \"栞あり\" : \"栞なし\"}\n  </button>;\n}"
 }, {
   "id": "client-count",
-  "title": "お気に入りの切替回数を更新する",
+  "title": "ブラウザ側の部品でクリック回数を記録する",
   "slides": [
     [
       "お気に入りと押した回数を分ける",

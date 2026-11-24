@@ -10,16 +10,16 @@ const { chromium } = require("playwright");
     const page = await browser.newPage();
     const home = process.env.COURSE_URL || pathToFileURL(path.resolve("index.html")).href;
     await page.goto(home + "#paths/web");
-    await page.getByRole("heading", {name:"自分の作品をページにしよう"}).waitFor();
+    await page.getByRole("heading", {name:"Web制作のコース一覧"}).waitFor();
     await page.waitForFunction(() => typeof pathCourses !== "undefined");
     const entries = [
       ["画像とフォームを直す", "#repair-image/1"],
-      ["JSONを使う画面操作へ", "dom/index.html#fetch-json"],
-      ["JSONの読み込みを直す", "dom/index.html#fetch-json"],
-      ["共有する型を変える", "typescript/index.html#practical"],
-      ["並べ替えで移るメモを直す", "react/index.html#book-memos"],
+      ["ファイルから読み込んだデータを画面に表示する", "dom/index.html#fetch-json"],
+      ["データの読み込みに失敗したときの表示を直す", "dom/index.html#fetch-json"],
+      ["複数のファイルで使う型を一か所で変更する", "typescript/index.html#practical"],
+      ["一覧を並べ替えてもメモが元の本に残るようにする", "react/index.html#book-memos"],
       ["詳細ページと検索を作る", "next/index.html#catalog-practice"],
-      ["生成されない色を調べる", "tailwind/index.html#status-colors/slide"],
+      ["ボタンに指定した色がつかない原因を調べる", "tailwind/index.html#status-colors/slide"],
     ];
     for (const [label, href] of entries) {
       const link = page.getByRole("link", {name:label, exact:true});

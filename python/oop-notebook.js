@@ -9,13 +9,13 @@
   const rejected = "book = Log(6)\ntry:\n    book.pages = -2\nexcept ValueError:\n    print('見直し')\nprint(book.pages)";
   const obs = (name, expr, value, before) => check(name, "", { observe: expr, value, before });
   pythonChapters.push({
-    id: "65", title: "読書記録のページ数を更新し、一覧をコピーする",
+    id: "65", title: "クラスの値の読み書きとコピーを制御する",
     goal: "読書記録のページ数を更新するときに、負の値を防ぎます。記録の件数を len で調べたり、元の記録を残して一覧をコピーしたりする方法も試します。",
     demo: { prompt: "元の記録は6ページです。9を入力すると9に更新され、-1を入力すると「見直し」に続いて元の6が表示されます。", input: "9",
       code: prop + "\nbook = Log(6)\ntry:\n    book.pages = int(input())\nexcept ValueError:\n    print('見直し')\nprint(book.pages)" },
     lessons: [
       {
-        title: "普通の属性のように読む", text: "@property を付けたメソッドは、book.pages と書くだけで読み出せます。実際の保存値 _pages の先頭の下線は、クラスの内側で使うという慣習を示します。",
+        title: "property で値の読み方を決める", text: "@property を付けたメソッドは、book.pages と書くだけで読み出せます。実際の保存値 _pages の先頭の下線は、クラスの内側で使うという慣習を示します。",
         code: read + "\nbook = Log(6)\nprint(book.pages)", output: "6",
         quiz: ["このプロパティの読み方は？", ["book.pages()", "book.pages", "pages(book())", "book[pages]"], 1, "丸かっこを付けない通常の属性の形で読みます。"],
         guide: exercise("保存したページ数をそのまま返すよう、余分な加算を直しましょう。", read.replace("return self._pages", "return self._pages + 1"), read, [obs("二冊の実際の値", "[Log(0).pages, Log(6).pages]", [0, 6])], "pages の return で、保存してある self._pages を返します。"),
@@ -29,21 +29,21 @@
         write: exercise("上限を設け、0～10ページだけを許す Log を書きましょう。範囲外の更新は ValueError です。", "", prop.replace("value < 0", "value < 0 or value > 10"), [obs("両端は有効", "[low.pages, high.pages, invalid]", [0, 10, 2])], "下限・上限を調べてから _pages を書き換えます。", { after: "low = Log(4)\nhigh = Log(4)\nlow.pages = 0\nhigh.pages = 10\ninvalid = 0\nfor n in [-1, 11]:\n    try:\n        low.pages = n\n    except ValueError:\n        invalid += 1" }),
       },
       {
-        title: "失敗直後も前の値を保つ", text: "6ページの記録に -2 を代入しようとすると「見直し」と表示されます。setter では値を保存する前に検査しているので、そのあと book.pages を読むと6が残っています。",
+        title: "不正な値を拒み、元の値を保つ", text: "6ページの記録に -2 を代入しようとすると「見直し」と表示されます。setter では値を保存する前に検査しているので、そのあと book.pages を読むと6が残っています。",
         code: prop + "\n" + rejected, output: "見直し\n6",
         quiz: ["6ページに −2 を入れようとして拒まれた直後に読む値は？", ["−2", "0", "6", "None"], 2, "保存前に止めたので、もとの6ページが残ります。"],
         guide: exercise("失敗直後に読み直す値を表示しましょう。誤った候補の −2 をそのまま表示する行を直します。", rejected.replace("print(book.pages)", "print(-2)"), rejected, [check("失敗直後の6", "見直し\n6\n", { before: prop, observe: "book.pages", value: 6 })], "最後に book.pages を読めば、実際に残った値が分かります。"),
         write: exercise("準備済みの Log(4) を book に作り、負の −1 の書き込みを試します。ValueError のときは残った値を表示し、その後 8 に直して表示しましょう。", "", "book = Log(4)\ntry:\n    book.pages = -1\nexcept ValueError:\n    print(book.pages)\nbook.pages = 8\nprint(book.pages)", [check("失敗と復帰", "4\n8\n", { before: prop, observe: "book.pages", value: 8 })], "例外を受けた場所で保存値を表示し、その後に有効な値を入れます。"),
       },
       {
-        title: "len に件数を返す", text: "len(Shelf([])) は、作った Shelf の __len__ を呼びます。返すのは0以上の整数です。表示用の文章はここでは返しません。空なら0、一冊なら1になります。",
+        title: "len で返す件数をクラスで決める", text: "len(Shelf([])) は、作った Shelf の __len__ を呼びます。返すのは0以上の整数です。表示用の文章はここでは返しません。空なら0、一冊なら1になります。",
         code: size + "\nprint(len(Shelf([])))\nprint(len(Shelf(['雲'])))", output: "0\n1",
         quiz: ["空の棚の __len__ が返すものは？", ["文字の '空'", "空リスト", "整数の0", "None"], 2, "len の役割は件数を一つの整数で伝えることです。"],
         guide: exercise("一冊多く数える Shelf を直し、入っている件数を返しましょう。", size.replace("len(self.titles)", "len(self.titles) + 1"), size, [obs("空・一冊・二冊", "[len(Shelf([])), len(Shelf(['月'])), len(Shelf(['月','舟']))]", [0, 1, 2])], "__len__ の戻り値から余分な1を取り除きます。"),
         write: exercise("marks の一覧を持つ Stamp を作ります。len(Stamp(一覧)) で実際のスタンプ件数を返すようにしましょう。", "", "class Stamp:\n    def __init__(self, marks):\n        self.marks = marks\n    def __len__(self):\n        return len(self.marks)", [obs("三枚・空", "[len(Stamp([1,2,3])), len(Stamp([]))]", [3, 0])], "一覧自体の件数を __len__ から返します。"),
       },
       {
-        title: "str に読みやすい表示を返す", text: "s に2冊分の書名を入れると、print(s) は「本棚2」、print(len(s)) は2を表示します。__str__ では冊数を str(len(self)) で文字列に変え、「本棚」とつなげて返しています。",
+        title: "str や print に渡す表示を決める", text: "s に2冊分の書名を入れると、print(s) は「本棚2」、print(len(s)) は2を表示します。__str__ では冊数を str(len(self)) で文字列に変え、「本棚」とつなげて返しています。",
         code: label + "\ns = Shelf(['雲','海'])\nprint(s)\nprint(len(s))", output: "本棚2\n2",
         quiz: ["__str__ から返す種類は？", ["整数", "本棚そのもの", "関数", "文字列"], 3, "人に見せる文字を返し、件数は __len__ が担当します。"],
         guide: exercise("本棚の見出しを「記録」に変えて、記録2などと表示しましょう。", label, label.replace("'本棚'", "'記録'"), [obs("表示と件数", "[str(Shelf(['月','舟'])), len(Shelf([]))]", ["記録2", 0])], "__str__ の文字を変え、整数の __len__ はそのままにします。"),

@@ -24,7 +24,7 @@ const javascriptFunctionLessons = [
       expected: () => ["受付開始","受付開始"], hints: ["まず announce() を一回呼びましょう。","一行目は表示できました。もう一度 announce() を呼んで二行目を表示しましょう。"] },
   },
   {
-    id: "js-parameter", topic: "関数に値を渡す", title: "同じ関数に違う点数を渡す",
+    id: "js-parameter", topic: "関数に値を渡す", title: "関数に値を渡し、同じ計算に使う",
     goal: "丸かっこの中の値が、呼ぶたびに関数の中で使えることを確かめる。",
     slides: [
       { title: "呼ぶたび違う点を受け取る", body: "stamp(2) の 2 は、関数に渡す値（引数）です。function stamp(points) の points は、値を受け取る名前（仮引数）です。stamp(2) の回は points が2、stamp(5) の回は5になります。", code: "function stamp(points) {\n  console.log(points);\n}\nstamp(2);\nstamp(5);" },
@@ -39,7 +39,7 @@ const javascriptFunctionLessons = [
       expected: start => [start + 2, start + 4], hints: ["一回目に受け取った数へ2を足しましょう。","一回目はできました。二回目も、その回に渡された数に2を足します。"] },
   },
   {
-    id: "js-return", topic: "関数から値を返す", title: "返ってきた点を次の計算に使う",
+    id: "js-return", topic: "関数から値を返す", title: "関数の結果を return で返し、次の計算に使う",
     goal: "コンソールに表示する操作と、呼び出し元が使える値を返す操作を見分ける。",
     slides: [
       { title: "表示した数が total に入らない理由", body: "最初に出る 5 は、関数の中の console.log が表示した数です。ただし return がないので、呼び出し元の total に 5 は入りません。最後の console.log(total) には、値が返されなかったことを示す undefined が出ます。", code: "function bonus(n) {\n  console.log(n + 2);\n}\nconst total = bonus(3);\nconsole.log(total);" },
@@ -71,7 +71,7 @@ const javascriptFunctionLessons = [
       expected: start => [start + 4,start], hints: ["一行目には round() が返した得点を表示しましょう。","得点は表示できました。二行目は開始点です。"] },
   },
   {
-    id: "js-arrow", topic: "関数の別の書き方", title: "短い計算を矢印で書く",
+    id: "js-arrow", topic: "関数の別の書き方", title: "短い計算を矢印関数で書く",
     goal: "一つの値を受けて一つの数を返す処理を、矢印関数に書き換える。",
     slides: [
       { title: "引数から返す式に向けて矢印を書く", body: "n => n + 1 は、左で受け取った n を使って右の式の値を返す関数です。const next にこの関数を入れれば next(2) のように呼べます。=> という形から矢印関数と呼びます。", code: "const next = n => n + 1;\nconsole.log(next(2));" },
@@ -86,7 +86,7 @@ const javascriptFunctionLessons = [
       expected: start => [start * 2,(start + 1) * 2], hints: ["受け取った点を二度足した数を返しましょう。","一回目はできました。違う引数でもその点を2倍にしましょう。"] },
   },
   {
-    id: "js-award", topic: "採点の仕上げ", title: "二種類の問題を一つの採点関数で扱う",
+    id: "js-award", topic: "採点の仕上げ", title: "二つの値を関数に渡し、合計を返す",
     goal: "同じ関数に違う加点を渡し、一問目の得点から二問目の合計を計算して見出しに表示する。",
     slides: [
       { title: "今の点と増える点を一緒に渡す", body: "丸かっこの中をカンマで区切れば、二つの値を渡せます。award(3, 2) では score が3、bonus が2です。返された点を次の問題の開始点にすると、一続きの採点になります。", code: "function award(score, bonus) {\n  return score + bonus;\n}\nconst first = award(3, 2);\nconsole.log(first);\nconsole.log(award(first, 1));" },

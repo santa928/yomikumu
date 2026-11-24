@@ -118,29 +118,28 @@ async function performTS(lesson, source, section, { execute = true, practice = f
     }
   } catch (e) { if (current === requestTS) typeNote.textContent = "検査を完了できませんでした。" + e.message; }
 }
+function chapterRouteTS(ch, i) {
+  return ch.practical ? "practical" : "chapter-" + (i + 1);
+}
+function lessonLinksTS(i) {
+  return `<ol class="catalog">${tsLessons.filter(u=>u.chapter===i).map(u=>{
+    const st = stateTS.units[u.id] || {};
+    const done = ["quiz","tap","write"].filter(v => st[v+"Done"]).map(v => viewLabels[v]);
+    return `<li><a href="#${u.id}/slide">${escTS(u.title)}</a> <small>${done.join("、")}</small></li>`;
+  }).join("")}</ol>`;
+}
 function tsCatalogue() {
+  document.title = "TypeScriptの目次｜よみくむ";
   const prev = tsLessons.find(s => s.id === stateTS.last.split("/")[0]);
-  const resume = stateTS.last === "practical" ? "複数ファイルで採点を改修する" : prev?.title;
-  main.innerHTML = `<p class="kind">Web制作 · JavaScriptの次へ</p><h1>クイズから始めるTypeScript</h1>
-    <p>クイズの得点や回答に型を付けます。数値と文字列を取り違えたとき、型検査でどの行にエラーが出るかを確かめましょう。</p>
+  const resume = stateTS.last === "practical" ? "複数ファイルで型を共有し、採点機能を直す" : prev?.title;
+  main.innerHTML = `<p class="kind">Web制作 · JavaScriptの次へ</p><h1>TypeScriptの目次</h1>
+    <p>JavaScriptの変数・関数・配列を使ったことがある方向けです。TypeScriptでは、値が数値なのか文字列なのかといった種類（型）をコードに書き、実行する前に値の使い方の間違いを見つけられます。練習ではクイズの得点・問題・回答を使います。型検査で見つかる間違いと、実行結果を見ないと分からない間違いを比べましょう。</p>
     ${resume ? `<a class="next" href="#${stateTS.last}">前回の続きへ · ${resume}</a>` : ""}
-    ${tsChapters.map((ch,i) => `<section><h2>${ch.title}</h2><p>${ch.intro}</p>
-    ${ch.practical ? '<a class="next" href="#practical">採点を改修する実習へ</a>' : `<div class="ts-tools">
-    ${ch.demo.map((text,n) => `<button type="button" data-ch="${i}" data-n="${n}">${text}</button>`).join("")}</div><div data-show></div>`}
-    <ol class="catalog">${tsLessons.filter(u=>u.chapter===i).map(u=>{
-      const st = stateTS.units[u.id] || {};
-      const done = ["quiz","tap","write"].filter(v => st[v+"Done"]).map(v => viewLabels[v]);
-      return `<li><a href="#${u.id}/slide">${u.title}</a> <small>${done.join("、")}</small></li>`;
-    }).join("")}</ol></section>`).join("")}
+    <ol class="catalog">${tsChapters.map((ch,i) => `<li>
+      <h2><a href="#${chapterRouteTS(ch,i)}">${escTS(ch.title)}</a></h2>
+      <p>${escTS(ch.intro)}</p>${lessonLinksTS(i)}</li>`).join("")}</ol>
     <details><summary>進捗と下書きの引き継ぎ</summary><button id="save-ts" type="button">進捗を保存</button>
     <label>現在の進捗を置き換えるファイル <input type="file" id="load-ts" accept=".json"></label><p role="status" id="transfer-ts"></p></details>`;
-  for (const button of main.querySelectorAll("[data-ch]")) button.onclick = () => {
-    const chapter = tsChapters[Number(button.dataset.ch)];
-    const source = chapter.code(Number(button.dataset.n));
-    const box = button.closest("section").querySelector("[data-show]");
-    box.innerHTML = "<pre>" + escTS(source) + "</pre>" + panelTS();
-    performTS(chapter, source, box);
-  };
   document.getElementById("save-ts").onclick = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(stateTS)], {type:"application/json"}));
     Object.assign(document.createElement("a"), { href:url, download:"quiz-types-progress.json" }).click();
@@ -154,6 +153,20 @@ function tsCatalogue() {
       stateTS = data; persistTS(); tsCatalogue(); main.querySelector("details").open = true;
       document.getElementById("transfer-ts").textContent = "進捗を読み込みました。";
     } catch { document.getElementById("transfer-ts").textContent = "このコースの進捗ファイルを選んでください。"; }
+  };
+}
+function renderTSChapter(chapter, i) {
+  document.title = chapter.title + "｜よみくむ";
+  main.innerHTML = `<nav class="toc-breadcrumb" aria-label="現在地"><a href="#contents">TypeScriptの目次</a></nav>
+    <h1>${escTS(chapter.title)}</h1><p>${escTS(chapter.intro)}</p>
+    <h2>この単元の目次</h2>${lessonLinksTS(i)}
+    <section><h2>完成例を試す</h2><div class="ts-tools">${chapter.demo.map((text,n) =>
+      `<button type="button" data-n="${n}">${escTS(text)}</button>`).join("")}</div><div data-show></div></section>`;
+  for (const button of main.querySelectorAll("[data-n]")) button.onclick = () => {
+    const source = chapter.code(Number(button.dataset.n));
+    const box = main.querySelector("[data-show]");
+    box.innerHTML = "<pre>" + escTS(source) + "</pre>" + panelTS();
+    performTS(chapter, source, box);
   };
 }
 function tsSlide(lesson) {
@@ -227,13 +240,18 @@ function routeTS() {
     return;
   }
   const [id,name] = location.hash.slice(1).split("/");
+  const chapter = tsChapters.findIndex((ch,i) => !ch.practical && chapterRouteTS(ch,i) === id);
+  if (chapter !== -1) { renderTSChapter(tsChapters[chapter], chapter); return; }
   const u = tsLessons.find(s=>s.id===id);
   if (!u) { tsCatalogue(); return; }
   const view = Object.hasOwn(viewLabels,name) ? name : "slide";
   const rec = stateTS.units[id] ||= {};
   stateTS.last = id + "/" + view; persistTS();
   window.YomikumuPaths?.remember("typescript",stateTS.last);
-  main.innerHTML = `<p class="kind">${tsChapters[u.chapter].title}</p><h1>${u.title}</h1><div class="ts-tools">
+  document.title = u.title + "｜よみくむ";
+  main.innerHTML = `<nav class="toc-breadcrumb" aria-label="現在地"><a href="#contents">TypeScriptの目次</a>
+    <a href="#${chapterRouteTS(tsChapters[u.chapter],u.chapter)}">${escTS(tsChapters[u.chapter].title)}</a></nav>
+    <h1>${escTS(u.title)}</h1><div class="ts-tools">
    ${Object.entries(viewLabels).map(([v,l]) => `<a href="#${id}/${v}" ${v===view ? 'aria-current="page"' : ""}>${l}</a>`).join("")}</div>`;
   if (view === "slide") tsSlide(u);
   else if (view === "quiz") tsQuiz(u,rec);

@@ -4,8 +4,8 @@
   const rows = (a, b, c) => [[], [7], [2, 4, 8]].map((data, i) =>
     check(["空の記録", "一件の記録", "三件の記録"][i], [a, b, c][i], { before: "rows = " + JSON.stringify(data) }));
   pythonChapters.push({
-    id: "60", title: "読書記録を一件ずつ渡す",
-    goal: "読書記録のリストから値を一つずつ取り出します。同じリストから二つのイテレーターを作ると、それぞれ別の位置まで読み進められます。",
+    id: "60", title: "イテレーターで値を一つずつ取り出す",
+    goal: "読書時間のリストから、必要なときに一つずつ値を取り出します。そのために読んでいる位置を覚える仕組みが、イテレーターです。同じリストから二つのイテレーターを作ると、それぞれ別の位置まで読み進められます。",
     demo: { prompt: "完成例では、入力した数と、それに2を足した数を順に取り出せます。3を入力すると、a からは3と5、まだ何も取り出していない b からは3が表示されます。", input: "3",
       code: "def supply(first):\n    yield first\n    yield first + 2\nfirst = int(input())\na = supply(first)\nb = supply(first)\nprint(next(a))\nprint(next(a))\nprint(next(b))" },
     lessons: [

@@ -11,7 +11,7 @@ const emailForm = (attributes) =>
 const repairLessons = [
   {
     id: "repair-image",
-    title: "移動した画像の場所を直す",
+    title: "画像が表示されない原因を調べてファイルの場所を直す",
     topic: "既存ページを直す",
     goal: "表示できない画像の名前を調べ、今あるフォルダーを指定する。",
     slides: [
@@ -55,7 +55,7 @@ const repairLessons = [
   },
   {
     id: "repair-color",
-    title: "どの指定が文字色を決めたか確かめる",
+    title: "意図しない文字色の原因をCSSから探す",
     topic: "既存ページを直す",
     goal: "二つの見出しのうち、開催中の展示だけを緑にする。",
     slides: [
@@ -105,7 +105,7 @@ const repairLessons = [
   },
   {
     id: "form-entry",
-    title: "入力した値に送信する項目名を付ける",
+    title: "フォームで送る値に項目名を付ける",
     topic: "フォームを直す",
     goal: "入力した値を email という名前で受け取れるようにする。",
     slides: [
@@ -147,7 +147,7 @@ const repairLessons = [
   },
   {
     id: "form-email",
-    title: "空欄とアドレスの形式違いを見分ける",
+    title: "メール欄が空の場合と書式が違う場合を見分ける",
     topic: "フォームを直す",
     goal: "連絡先が空のときと形式が合わないときに送信を止める。",
     slides: [

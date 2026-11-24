@@ -30,7 +30,7 @@ async function download(page, filename) {
     const phone = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });
     await phone.goto(base + "#catalog-practice");
     const heading = await phone.locator("main h1").textContent();
-    assert.equal(heading, "おすすめの本に詳細・検索・ページ送りを加える");
+    assert.equal(heading, "一覧に詳細ページ・検索・ページ送りを加える");
     assert.equal(await phone.getByRole("link", { name: "一覧の本を詳細へのリンクにする", exact: true }).count(), 1);
     for (const { id, slots } of steps) {
       await phone.goto(base + "#" + id + "/slide/1");

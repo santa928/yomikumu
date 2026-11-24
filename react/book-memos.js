@@ -36,7 +36,7 @@ function App() {
 const misplacedMemo = memoShelf.replace("key={book.id}", "key={index}");
 
 const reactBookMemos = {
-  id: "book-memos", title: "並べ替えても同じ本にメモを残す",
+  id: "book-memos", title: "並べ替えても入力が同じ本に残るようにする（key）",
   intro: "同じ題名の本が2冊あります。片方にだけメモを書き、順番を逆にしてみましょう。管理番号を見れば、書いたメモが同じ本に残ったか確かめられます。",
   demo: {code: memoShelf, tip: "A17に「金曜に返す」と書き、順番を逆にします。どちらの本にメモが付いていますか。"},
   steps: [
@@ -53,7 +53,7 @@ const reactBookMemos = {
       tests: [[t => t.all("#root li").map(row => row.textContent).join("/") === "星の地図（A17）/星の地図（B24）", "2冊の管理番号をそれぞれ表示します。"]],
     },
     {
-      title: "並べ替えで別の本に移るメモを直す",
+      title: "配列の位置ではなく管理番号を key にする",
       explain: "見本で A17 にだけメモを書いて順番を逆にすると、メモは B24 の欄に移ります。key は React が前回の行を見分ける手掛かりです。今の key は配列の位置なので、一番上の欄が別の本になっても前の入力が残ります。",
       example: misplacedMemo,
       showPieceLines: true,

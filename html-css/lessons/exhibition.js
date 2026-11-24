@@ -3,7 +3,7 @@
 const exhibitionLessons = [
   {
     id: "heading-levels",
-    title: "展示案内に見出しを付ける",
+    title: "HTMLで見出しの階層を作る",
     topic: "HTML",
     goal: "ページの名前、章、その中の話題を三段の見出しにする。",
     slides: [
@@ -41,7 +41,7 @@ const exhibitionLessons = [
   },
   {
     id: "material-list",
-    title: "持ち物を一つずつ並べる",
+    title: "順番を問わない箇条書きを作る",
     topic: "HTML",
     goal: "説明の段落と、順番を入れ替えてもよい持ち物リストを分ける。",
     slides: [
@@ -72,7 +72,7 @@ const exhibitionLessons = [
   },
   {
     id: "making-steps",
-    title: "作る手順に番号を付ける",
+    title: "順番が大切な手順を番号付きで並べる",
     topic: "HTML",
     goal: "順番が大切な手順を並べ、途中に一手加えても番号が続くようにする。",
     slides: [
@@ -139,7 +139,7 @@ const exhibitionLessons = [
   },
   {
     id: "work-section",
-    title: "展示の章に作品紹介を入れる",
+    title: "章と独立した記事をHTMLで区別する",
     topic: "HTML",
     goal: "章の話題と、そこから取り出しても伝わる作品紹介をそれぞれ囲む。",
     slides: [
@@ -170,7 +170,7 @@ const exhibitionLessons = [
   },
   {
     id: "word-emphasis",
-    title: "大切な注意と、言い方の強調を伝える",
+    title: "重要な注意と読み方の強調を使い分ける",
     topic: "HTML",
     goal: "文の中で、重要な注意と特に力を込めて読む言葉を区別する。",
     slides: [

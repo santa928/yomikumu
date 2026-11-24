@@ -88,7 +88,7 @@ export default async function Recommendations({ searchParams }) {
 
   nextChapters.push({
     id: "catalog-practice",
-    title: "おすすめの本に詳細・検索・ページ送りを加える",
+    title: "一覧に詳細ページ・検索・ページ送りを加える",
     goal: "水辺の図書室に「おすすめの本」の棚を加えます。スマホでは表示例を見てコードを組み立て、PCでは同じ図書室を Docker で起動して作ったページを操作します。",
     examples: [
       ["/recommendations/reed", "葦の小舟\n葦を編んだ小舟が、ゆっくり流れを下ります。"],
@@ -110,7 +110,7 @@ export default async function Recommendations({ searchParams }) {
     source: title, answer: title.replace("<span>{book.title}</span>", '<Link href={"/recommendations/" + book.id}>{book.title}</Link>'),
     hint: "span を Link に替えます。href は /recommendations/ と book.id を + でつなぎます。",
   }, {
-    id: "catalog-detail", chapter: "catalog-practice", title: "詳細ページを新しく作る",
+    id: "catalog-detail", chapter: "catalog-practice", title: "URLの識別子で選んだ本の詳細を表示する",
     slides: [
       ["一覧とは別に詳細用ファイルを作る", "おすすめの一覧用 page.jsx は用意してあります。PCでは「PC記述」の「PCで起動して採点する手順」から ZIP を保存して展開します。app/recommendations に [id] フォルダーを作り、中に page.jsx を追加します。角かっこもフォルダー名に含めます。", "app/recommendations/page.jsx       → /recommendations\napp/recommendations/[id]/page.jsx  → /recommendations/reed", "詳細用のファイルを追加する前は /recommendations/reed が開けません。追加した後は、同じ [id] フォルダーで /recommendations/dusk も開けます。"],
       ["本の id でリンク先を作る", "一覧のリンクは、本のデータに付けた短い識別名 id を URL の末尾につなげます。book.title がリンクの文字、href が開く住所です。", '<Link href={"/recommendations/" + book.id}>{book.title}</Link>', "id が reed の本を押すと /recommendations/reed に進みます。"],

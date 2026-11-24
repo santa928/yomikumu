@@ -16,8 +16,8 @@ const custom = { shelf: "gap-[1rem] flex-col min-[640px]:flex-row flex", theme: 
     const page = await browser.newPage();
     const errors = [];
     page.on("pageerror", e => errors.push(e.message));
-    await page.goto(url);
-    const specimen = page.frameLocator("iframe").nth(1);
+    await page.goto(url + "#chapter/responsive");
+    const specimen = page.frameLocator("iframe").first();
     await specimen.locator("summary").first().click();
     assert.equal(await specimen.locator("details").first().getAttribute("open"), "");
     const position = () => specimen.locator("article").evaluateAll(items => items.map(item => [item.offsetLeft, item.offsetTop]));

@@ -9,7 +9,7 @@ const auditFile = 'import { cards } from "./questions.js";\nimport { check } fro
 
 const javascriptModuleLessons = [
   {
-    id: "js-file-value", title: "隣のファイルから題名を読む", topic: "ファイルを分ける",
+    id: "js-file-value", title: "別ファイルから値を読み込む", topic: "ファイルを分ける",
     goal: "questions.js にある題名を main.js で読み込み、コンソールに表示する。",
     slides: [
       { title: "questions.js の title をほかのファイルでも使う", body: "展示の題名を questions.js に置きました。export は「この名前をほかのファイルでも使えます」という印です。main.js を開くと、ここで用意した title を読んで表示する行があります。", filename: "questions.js", files: { "main.js": printTitle }, code: 'export const title = "月の切手";' },
@@ -26,7 +26,7 @@ const javascriptModuleLessons = [
       moduleTrial: { files: { "questions.js": 'export const title = "水辺の舟";' }, values: ["水辺の舟"], hint: "最初の題名は表示できました。questions.js の題名が変わっても、その title を読み込んで表示しましょう。" } },
   },
   {
-    id: "js-file-score", title: "score.js の関数を main.js から呼ぶ", topic: "ファイルを分ける",
+    id: "js-file-score", title: "別ファイルから関数を読み込んで呼ぶ", topic: "ファイルを分ける",
     goal: "score.js の関数を読み込み、二組の点数をそれぞれ合計する。",
     slides: [
       { title: "export で関数をほかのファイルでも使う", body: "score.js には、今の点とボーナスを足す関数を書きます。function の前に export を付けると、別のファイルから score という名前で呼べます。", filename: "score.js", files: { "main.js": addScores }, code: "export function score(now, bonus) {\n  return now + bonus;\n}" },
@@ -41,21 +41,21 @@ const javascriptModuleLessons = [
       expected: () => [5,6], hints: ["2点に3を加えて5を返しましょう。","一回目はできました。別の引数でも渡された二つの点を足しましょう。"] },
   },
   {
-    id: "js-throw", title: "負の配点をエラーにする", topic: "間違いを知らせる",
+    id: "js-throw", title: "無効な値を検出し、理由付きでエラーを出す", topic: "間違いを知らせる",
     goal: "正常な値は返し、負の配点だけは理由を付けて呼び出し元に知らせる。",
     slides: [
-      { title: "配点に負の数が渡されたら？", body: "check は0以上の点数をそのまま返します。負の数なら throw で処理を中断します。new Error の丸かっこの中に、エラーの理由を書きます。", filename: "score.js", files: { "main.js": 'import { check } from "./score.js";\nconsole.log(check(3));' }, code: validatePoints },
+      { title: "問題にマイナスの点が設定されていたら？", body: "配点は、問題に正解したときに加える点数です。この例では0点以上だけを認めます。check は0以上ならその数を返し、マイナスの数なら throw で処理を中断します。new Error の丸かっこの中に、エラーの理由を書きます。", filename: "score.js", files: { "main.js": 'import { check } from "./score.js";\nconsole.log(check(3));' }, code: validatePoints },
       { title: "エラーのファイル名・行番号・理由を読む", body: "今度は -1 を渡します。score.js で理由を送る行に来たため、普通の戻り値は表示されません。ファイル名、行、理由を読んでください。", filename: "main.js", files: { "score.js": validatePoints }, code: 'import { check } from "./score.js";\nconsole.log(check(-1));' },
     ],
     quiz: { prompt: "負の点を見つけた時点で通常の採点を終え、理由を送る行は？", options: ['console.log("負の点");', "return 0;", "const points = 0;", 'throw new Error("負の点");'], correct: 3,
       reasons: ["文字は出ますが処理はそのまま続きます。","正常な0点に見えてしまいます。","元の問題の異常を知らせられません。","通常の計算を中断し、その理由を呼んだ側へ送ります。"] },
-    exercise: { field: "javascript", filename: "score.js", files: { "main.js": tryPoints }, task: "0点は正常な配点です。負の数だけ理由「配点は0以上です」を送り、3と0はそのまま返すように条件を直してください。用意した呼び出し元が順に結果を表示します。",
+    exercise: { field: "javascript", filename: "score.js", files: { "main.js": tryPoints }, task: "0点は使えます。マイナスの点数だけ理由「配点は0以上です」を送り、3と0はそのまま返すように条件を直してください。用意した呼び出し元が順に結果を表示します。",
       code: validatePoints.replace("points < 0","points <= 0"), answer: validatePoints, review: 0, hint: "0を異常に含めず、0より小さい場合を調べます。",
       build: { code: validatePoints.replace("points < 0", "points ① 0").replace("throw new Error", "② new Error"), slots: [["異常にする範囲", "<", "<="], ["理由を送って止める指定", "return", "throw"]] },
       expected: () => [3,"配点は0以上です",0], hints: ["正常な3点をそのまま返しましょう。","負の点では「配点は0以上です」というエラーを出しましょう。","負の点の扱いはできました。0点は正常なので数の0を返します。"] },
   },
   {
-    id: "js-catch", title: "エラーの理由を表示し、次の配点を調べる", topic: "間違いを知らせる",
+    id: "js-catch", title: "エラーを受け止め、理由を表示して次の処理へ進む", topic: "間違いを知らせる",
     goal: "使えない一問の理由を表示し、その次の正常な問題へ進む。",
     slides: [
       { title: "try で関数を呼び、catch でエラーを受け取る", body: "try の中で関数を呼び、問題が起きたときだけ catch に進みます。catch (error) で受け取ったエラーの理由は、error.message で読めます。", filename: "main.js", files: { "score.js": validatePoints }, code: 'import { check } from "./score.js";\ntry {\n  console.log(check(-2));\n} catch (error) {\n  console.log(error.message);\n}' },
@@ -69,7 +69,7 @@ const javascriptModuleLessons = [
       moduleTrial: { files: { "score.js": validatePoints.replace("配点は0以上です", "原稿を確認") }, values: [3,"原稿を確認",0], hint: "点は合っています。エラーメッセージが変わっても、その回の error.message を表示しましょう。" } },
   },
   {
-    id: "js-file-audit", title: "問題集を読み込み、一問の配点を直す", topic: "ファイルの中の値を調べる",
+    id: "js-file-audit", title: "別ファイルのデータを調べ、間違った値を直す", topic: "ファイルの中の値を調べる",
     goal: "読んだ値と予想した値を比べ、別ファイルの誤った配点だけを修正する。",
     slides: [
       { title: "読み込めたのに、合計が違う", body: "ファイル名と公開名が合っているのでプログラムは動いています。舟は2点、窓は5点で、正しい合計は7点です。予想、各問の点、実際の合計の順に出すと、違いが窓の配点にあると分かります。", filename: "main.js", files: { "questions.js": deskFile.replace("points: 5","points: 3") }, code: 'import { cards } from "./questions.js";\nconsole.log("予想", 7);\nfor (const card of cards) console.log(card.title, card.points);\nconsole.log("実際", cards[0].points + cards[1].points);' },

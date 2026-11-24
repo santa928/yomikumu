@@ -19,8 +19,8 @@
   }
   const yesNo = (expr, value, label) => check(label, "", { observe: expr, value });
   pythonChapters.push({
-    id: "62", engine: "cpython", title: "型付きの読書記録を検証して集計する",
-    goal: "読書時間が0以上の整数かを確かめ、条件に合う記録の合計を表示します。",
+    id: "62", engine: "cpython", title: "記録の値が正しいか確かめ、合計する",
+    goal: "読書時間を1件分のデータにまとめ、入力が0以上の整数かをプログラムで確かめます。条件に合う時間を合計してから、空の入力や不正な値でも想定どおりに動くかをテストします。",
     demo: { prompt: "入力した時間と60分の記録のうち、30分以上のものを合計します。15、30、-1を順に試しましょう。最後の1は記録を閉じた回数です。", input: "30", files: archive,
       code: "from archive import Notes, valid\nnotes = Notes([int(input()), 60])\n" + aggregate(30) + "\nprint(notes.closed)" },
     lessons: [
@@ -32,14 +32,14 @@
         write: exercise("冊数 count に整数の注釈を付け、0を入れて表示しましょう。", "", "count: int = 0\nprint(count)", [check("冊数0と型注釈", "0\n", { observe: "__annotations__.get('count') is int", value: true })], "count: int = 0 と書くと、初期値と型の両方が読めます。"),
       },
       {
-        title: "dataclass で一件を作る", text: "Record(15) で15分の読書記録を作り、entry.minutes で15を取り出します。class Record の上に @dataclass を付けると、項目名と型に合わせて、値を受け取って保存する処理が用意されます。",
+        title: "dataclass で記録の項目をまとめる", text: "Record(15) で15分の読書記録を作り、entry.minutes で15を取り出します。class Record の上に @dataclass を付けると、項目名と型に合わせて、値を受け取って保存する処理が用意されます。",
         code: record + "\nentry = Record(15)\nprint(entry.minutes)", output: "15",
         quiz: ["entry = Record(20) のあと、読書時間の20を取り出す式は？", ["Record.minutes(20)", "entry.minutes", "entry[20]", "dataclass(20)"], 1, "entry に一件が入っていれば、ドットの後に項目名を書いて取り出せます。"],
         guide: exercise("Record を作る引数を20に変え、entry の minutes を表示しましょう。", record + "\nentry = Record(15)\nprint(entry.minutes)", record + "\nentry = Record(20)\nprint(entry.minutes)", [check("読書20分", "20\n", { observe: "[entry.minutes, Record(0).minutes]", value: [20, 0] })], "作成する Record(…) の中身を変更します。"),
         write: exercise("pages という整数項目を一つ持つ dataclass の BookLog を作りましょう。採点が0ページと18ページの記録を作ります。", "", "from dataclasses import dataclass\n@dataclass\nclass BookLog:\n    pages: int", [yesNo("[BookLog(0).pages, BookLog(18).pages, hasattr(BookLog, '__dataclass_fields__')]", [0, 18, true], "二つの記録を作成")], "class の前に @dataclass、内側に pages: int を置きます。"),
       },
       {
-        title: "注釈に加えて一件を調べる", text: "isinstance(n, int) は n が整数として扱えるかを調べます。and は二つの条件が両方 True のときだけ True。0分を許し、負の分と数字の文字を拒む検証を作ります。ここでは入力は整数または文字です。",
+        title: "入力が0以上の整数か実行中に調べる", text: "isinstance(n, int) は n が整数として扱えるかを調べます。and は二つの条件が両方 True のときだけ True。0分を許し、負の分と数字の文字を拒む検証を作ります。ここでは入力は整数または文字です。",
         code: valid + '\nprint(valid(0))\nprint(valid(-1))\nprint(valid("2"))', output: "True\nFalse\nFalse",
         quiz: ["0以上の整数を許す検査で、境界を確かめる入力は？", ["5と6だけ", "0と−1", "空リストだけ", "2と3だけ"], 1, "0を許し、すぐ隣の−1を拒むことを個別に見ます。"],
         guide: exercise("0分を除いてしまう見本を直し、0以上の整数だけを許す valid を作りましょう。", valid.replace(">= 0", "> 0"), valid, [yesNo("valid(3)", true, "正の数"), yesNo("valid(0)", true, "0分を含む"), yesNo("[valid(-1), valid('2')]", [false, false], "不正な値")], "種類を調べる条件を残し、0に等しい場合を許します。"),
@@ -53,7 +53,7 @@
         write: exercise("負の読書時間を拒むことを assert で検査してください。負の値を許す誤実装で止まるテストにします。", "", "assert valid(-1) == False", [check("正しい検証", "", { before: valid }), check("負の値を許す誤りを検出", "", { before: "def valid(n):\n    return isinstance(n, int)", error: "AssertionError" })], "期待する False を、負の具体例で確かめます。"),
       },
       {
-        title: "記録を1件ずつ調べ、処理の最後に閉じる", text: "with notes as rows: で読書記録のリストを受け取り、1件ずつ時間を調べます。不正な値なら raise ValueError(...) で例外を起こします。最後に表示する notes.closed は終了処理の回数です。正常なときも例外が起きたときも1になります。",
+        title: "記録を一つずつ検査し、with で後片付けする", text: "with notes as rows: で読書記録のリストを受け取り、1件ずつ時間を調べます。不正な値なら raise ValueError(...) で例外を起こします。最後に表示する notes.closed は終了処理の回数です。正常なときも例外が起きたときも1になります。",
         files: archive, code: "from archive import Notes, valid\nnotes = Notes([0, 15])\n" + aggregate(0) + "\nprint(notes.closed)", output: "15\n1",
         quiz: ["不正な記録で raise した場合、with の後片付けは？", ["行われない", "二度行う", "with を抜けるときに一度行う", "次の実行まで待つ"], 2, "with を抜ける途中で Notes の終了処理が動きます。"],
         guide: exercise("合計の初期値を直し、0分以上の記録をすべて合計しましょう。数字以外・負の入力には「記録を確認」と表示します。", aggregate(0).replace("total = 0", "total = 1"), aggregate(0), totals(0, ["0", "105", "記録を確認", "0"]), "一件も読まないときの結果から、合計の初期値を決めます。", { files: archive }),

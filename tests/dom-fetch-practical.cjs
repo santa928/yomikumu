@@ -88,7 +88,7 @@ load.addEventListener("click", async () => {
     try {
       const page = await browser.newPage();
       await page.goto(process.env.DOM_URL);
-      const entry = page.getByRole("link", { name: "JSONで読書棚を更新する" });
+      const entry = page.locator('a[href="#fetch-json"]');
       assert.equal(await entry.count(), 2, "DOM目次と単元ナビから新単元へ進める");
       await entry.last().click();
       await page.getByText("PCでJSONを書き換える", { exact: true }).click();

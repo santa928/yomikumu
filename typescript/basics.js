@@ -1,7 +1,7 @@
 "use strict";
 
 const tsChapters = [{
-  title: "得点とクイズの問題に型を付ける",
+  title: "数値・文字列・オブジェクトに型を付ける",
   intro: "TypeScript は JavaScript に「この値は何に使えるか」を確認する型検査を足した言語です。たとえば得点を number（数値）と決めると、数字に見える文字を入れた間違いを実行前に見つけられます。まず points の値を 1 から 3 に変えて、表示される得点を確かめましょう。",
   demo: ["正解1点を表示", "正解3点を表示"],
   code: n => `const points: number = ${n ? 3 : 1};\nconsole.log("正解 " + points + "点");`
@@ -13,7 +13,7 @@ const trial = (expr, want, hint) => ({ expr, want, hint });
 
 tsLessons.push(
   {
-    id: "infer", chapter: 0, title: "変数の初期値から型を知る",
+    id: "infer", chapter: 0, title: "最初に入れた値から変数の型が決まる（型推論）",
     why: "let points = 0 と書くと、TypeScript は初期値の 0 から points の型を number（数値）と判断します。これを型推論と呼びます。引用符で囲んだ数字は文字列なので、points に代入すると型エラーになります。",
     before: 'let points = 0;\npoints = "2";\nconsole.log(points);',
     after: 'let points = 0;\npoints = 2;\nconsole.log(points);', change: "2行目の引用符を外す",
@@ -24,7 +24,7 @@ tsLessons.push(
     probes: [trial("points", 4, "点は数になりました。今回の得点は 4 にします。")]
   },
   {
-    id: "annotate", chapter: 0, title: "得点の変数に型注釈を書く",
+    id: "annotate", chapter: 0, title: "変数に入れられる値の種類を書く（型注釈）",
     why: "変数名の後に : number と書くと、代入できる値は数値に限られます。let score: number = 1 では : number が型注釈、1 が初期値です。",
     before: "let score = 1;\nconsole.log(score);", after: "let score: number = 1;\nconsole.log(score);", change: "score に数の注釈を付ける",
     question: ["let score: number = 1 の初期値は？", ["score", "number", "1", "let"], 2, "等号の右が最初に入れる値です。"],
@@ -35,7 +35,7 @@ tsLessons.push(
     probes: [trial("score", 3, "型は合っています。今回の初期値を 3 にします。")]
   },
   {
-    id: "check-run", chapter: 0, title: "型検査の後で得点を計算する",
+    id: "check-run", chapter: 0, title: "型検査と、実行結果の確認を分ける",
     why: "型検査で確かめるのは、この例では「結果が数値か」です。「正しい得点か」までは確かめられません。2 - 1 は数値の 1 になるので型検査を通りますが、欲しい結果は 2 + 1 の 3 です。二つを実行して比べましょう。",
     before: "const total: number = 2 - 1;\nconsole.log(total);", after: "const total: number = 2 + 1;\nconsole.log(total);", change: "引き算を足し算に変える",
     question: ["2点に1点を足したいのに 2 - 1 と書いたら？", ["型検査が必ず止める", "型は通り、実行すると1になる", "3が出る", "文字になる"], 1, "2 - 1 の結果も数値ですが、実行すると欲しかった 3 とは違う 1 が表示されます。"],
@@ -45,7 +45,7 @@ tsLessons.push(
     probes: [trial("total", 6, "数として型検査は通りました。足した後に6点になるよう式を見直します。")]
   },
   {
-    id: "shape", chapter: 0, title: "一問にそろえる項目を決める",
+    id: "shape", chapter: 0, title: "オブジェクトに必要な項目と型を決める",
     why: '問題文 text と配点 points を持つオブジェクトの型を Question と名付けます。interface の中に text: string と points: number を書きます。type Question = { … } という型別名でも同じ形を表せます。',
     before: 'interface Question { text: string; points: number }\nconst book: Question = { text: "池", points: 1 };\nconsole.log(book.text);',
     after: 'type Question = { text: string; points: number };\nconst book: Question = { text: "池", points: 1 };\nconsole.log(book.text);', change: "同じ形を型別名で書く",
