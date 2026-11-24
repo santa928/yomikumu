@@ -6,6 +6,9 @@
   <title>Python基礎 | よみくむ</title>
   <link rel="stylesheet" href="../app/lesson.css">
   <link rel="stylesheet" href="python.css">
+  <link rel="stylesheet" href="../app/course-contents.css">
+  <script defer src="../app/course-guide.js"></script>
+  <script defer src="../app/course-contents.js"></script>
   <script defer src="vendor/skulpt/runtime.js"></script>
   <script defer src="cpython.js"></script>
   <script defer src="runtime.js"></script>
@@ -38,9 +41,10 @@
       <a id="course-toc" href="#54/demo/toc">Python基礎の目次</a>
     </nav>
     <p id="position" hidden></p><h1 id="title" tabindex="-1"></h1>
-    <nav id="catalog" aria-labelledby="title" hidden>
-      <p id="catalog-intro"></p><ol id="contents"></ol>
-    </nav>
+    <div id="catalog" hidden>
+      <div id="catalog-intro"></div>
+      <nav aria-labelledby="title"><ol id="contents"></ol></nav>
+    </div>
     <div id="lesson-content" hidden>
     <p id="description"></p>
     <details class="environment" id="csv-kit" hidden>

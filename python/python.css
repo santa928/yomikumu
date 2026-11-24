@@ -3,15 +3,15 @@
 #content h2 { font-size: 1.25rem; }
 #content h3 { font-size: 1rem; margin-bottom: .35rem; }
 #course-toc { margin-left: 1rem; }
-#catalog:not([hidden]) { display: block; }
+#catalog > nav { display: block; }
 #contents, #contents ol { padding-inline-start: 1.65rem; }
 #contents > li { margin-block: 1.25rem; }
 #contents h2 { display: inline; line-height: 1.55; }
 #contents ol { margin-top: .25rem; }
-#contents a { display: inline-flex; align-items: center; min-height: 44px; }
+#contents a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; }
 #contents > li > a { margin-inline-start: 1.65rem; font-size: .9rem; }
 #position { color: #4b624e; font-size: .9rem; margin-bottom: .4rem; }
-#content section { margin: 1.3rem 0; padding: clamp(.8rem,3vw,1.4rem); border: 1px solid #c1cdbd; background: #fffdf6; border-radius: .4rem; }
+#lesson-content section { margin: 1.3rem 0; padding: clamp(.8rem,3vw,1.4rem); border: 1px solid #c1cdbd; background: #fffdf6; border-radius: .4rem; }
 #content label, #content legend { display: block; font-weight: 700; }
 #content pre, #provided { white-space: pre-wrap; overflow-wrap: anywhere; background: #edf1e9; border-left: .22rem solid #62836c; padding: .7rem 1rem; line-height: 1.65; min-height: 2.6rem; }
 #content textarea, #line { display: block; width: 100%; font: 1rem/1.55 ui-monospace, monospace; padding: .55rem; color: #152e25; background: #fff; border: 1px solid #64796b; border-radius: .25rem; }

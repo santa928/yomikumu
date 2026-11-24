@@ -62,7 +62,7 @@ async function run() {
     // 採点関数の登録漏れを見落とすと、その演習は誤答でも「正解」になり得る。
     const gradedIds = await page.evaluate(() => Object.keys(htmlCssExerciseGraders));
     assert.deepEqual(gradedIds.sort(), [...expectedIds].sort());
-    await page.getByRole("link", { name: "最初のスライドへ →" }).click();
+    await page.getByRole("link", { name: /^最初の課題：/ }).click();
     await page.getByRole("button", { name: "次の作品を表示" }).click();
     await page.frameLocator("main iframe").getByRole("heading", { name: "夕方の港" }).waitFor();
     await page.getByRole("button", { name: "最初の作品に戻す" }).click();
@@ -606,7 +606,7 @@ async function run() {
     await phone.getByRole("button", { name: "この記録を読み込む" }).click();
     await phone.getByText("読み込みました。目次に進捗を反映しました。").waitFor();
     assert.equal(await phone.getByText("四択をクリア ・ 記述をクリア").count(), expectedIds.length);
-    await phone.getByRole("link", { name: "前回の続きへ →" }).click();
+    await phone.getByRole("link", { name: "前回の続きへ", exact: true }).click();
     await phone.getByLabel("HTML", { exact: true }).waitFor();
     assert.equal(await phone.getByLabel("HTML", { exact: true }).inputValue(), artwork);
     const touch = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });

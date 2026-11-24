@@ -75,15 +75,17 @@ function chapterPage(i) {
 function catalogue() {
   document.title = "Tailwind CSSの目次｜よみくむ";
   const previous = readingUnits.find(unit => progress.last.split("/")[0] === unit.id);
-  main.innerHTML = `<p class="kind">Web制作の選択コース</p><h1>Tailwind CSSの目次</h1>
-    <p>HTML の class に用意された短い名前を書き、余白・色・並び方を変えます。例では本の紹介をカードとして表示します。CSS の文字と余白を試したあとに選べます。JavaScript へは全コース目次から直接進めます。</p>
-    ${previous ? `<a class="next" href="#${progress.last}">前回の続きへ · ${previous.title}</a>` : ""}
+  main.innerHTML = `<h1>Tailwind CSSの目次</h1>
     <ol class="catalog catalog-chapters">${readingChapters.map((chapter, i) => `<li>
       <h2><a href="#chapter/${chapter.id}">${chapter.title}</a></h2><p>${chapter.intro}</p>${lessonList(i)}
     </li>`).join("")}</ol>
     <details><summary>進捗と下書きの引き継ぎ</summary><p>記述したクラス名と途中の選択をファイルに保存できます。読み込むとこのコースの進捗を置き換えます。</p>
     <button id="export" type="button">進捗を保存</button><label>進捗を読み込む <input id="import" type="file" accept=".json,application/json"></label>
     <p role="status" id="transfer"></p></details>`;
+  main.querySelector("h1").after(CourseContents.intro("tailwind", "#padding/slide", previous && {
+    label: "前回の続きへ · " + previous.title, href: "#" + progress.last,
+  }));
+  main.querySelector(".catalog").after(CourseContents.footer("tailwind", "../index.html"));
   document.getElementById("export").onclick = () => saveFile("reading-progress.json", JSON.stringify(progress), "application/json");
   document.getElementById("import").onchange = async e => {
     try {

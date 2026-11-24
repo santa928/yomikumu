@@ -88,44 +88,6 @@ a {
 .catalog small {
   color: #375740;
 }
-.path-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-.path-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 1rem;
-  border: 1px solid #bcc8b7;
-  border-radius: 0.6rem;
-  background: #f6f7ee;
-  text-decoration: none;
-}
-.path-card strong {
-  font-size: 1.12rem;
-  text-decoration: underline;
-}
-.path-card img {
-  width: 100%;
-  height: 5.5rem;
-  object-fit: cover;
-}
-.path-sample {
-  display: grid;
-  align-items: center;
-  height: 5.5rem;
-  padding: 0.8rem;
-  color: #34533c;
-  background: #e8ecde;
-}
-.path-course {
-  margin: 1.5rem 0;
-  padding: 1.5rem 0 0;
-  border-top: 1px solid #c6cebf;
-}
 .studio-steps {
   padding-left: 1.6rem;
 }
@@ -413,4 +375,165 @@ textarea {
     padding: 10px 16px;
     gap: 16px;
   }
+}
+
+/* Learning directory. Keep study actions, optional questions, and account-free
+   transfer tools in distinct regions; lesson-page action styles stay unchanged. */
+main:has(.path-course), main:has(.family-cards) {
+  --paper-rule: #c9d3c6;
+  --muted-ink: #415c4c;
+  background: #fffef9;
+}
+main:has(.path-course) > .kind, main:has(.family-cards) > .kind {
+  color: #74603a;
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .045em;
+}
+main:has(.path-course) > h1 + p, main:has(.family-cards) > h1 + p {
+  max-width: 41em;
+  line-height: 1.85;
+  margin: .75rem 0 1.2rem;
+}
+.path-course {
+  scroll-margin-top: 12px;
+  border-top: 1px solid var(--paper-rule);
+  padding: clamp(1.3rem, 2.8vw, 2.15rem) 0;
+}
+.path-course h2 {
+  line-height: 1.36;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  letter-spacing: -.02em;
+}
+.path-course h2:focus-visible {
+  /* Heading receives focus when navigating to a card. Mark the destination,
+     not the entire width of the page as if it were a selected form control. */
+  outline: none;
+  text-decoration: underline;
+  text-decoration-color: #9c723d;
+  text-underline-offset: .2em;
+  text-decoration-thickness: 2px;
+}
+.course-definition code, .course-example p code, .course-toc-intro code {
+  color: #304b3c; background: #e6ebdf;
+  padding: .05em .24em; border-radius: .2em;
+}
+.course-role, .family-count {
+  margin: 0 0 .4rem;
+  color: #436448;
+  font-size: .81rem;
+  font-weight: 700;
+}
+.course-definition { margin: .7rem 0 1.1rem; line-height: 1.85; }
+.course-example {
+  background: #f2f5ed;
+  border-left: 3px solid #91a978;
+  padding: .75rem 1rem;
+  border-radius: 0 .35rem .35rem 0;
+}
+.course-example h3, .course-example p { margin: 0; }
+.course-example h3, .course-prerequisite strong {
+  font-weight: 700;
+  font-size: .85rem;
+  color: #3c573b;
+}
+.course-example h3 { margin-bottom: .25rem; }
+.course-prerequisite { margin: .95rem 0; }
+.course-prerequisite strong { display: block; }
+.course-actions { display: flex; align-items: stretch; flex-wrap: wrap; gap: .65rem 1rem; }
+.course-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 44px;
+  margin: 0;
+  font-size: .96rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.course-actions .next::after, .family-card strong::after {
+  content: "";
+  display: inline-block;
+  width: .38em;
+  height: .38em;
+  margin: 0 .1em .08em .15em;
+  border-right: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+  flex: none;
+}
+.course-contents-link { padding: .45rem .2rem; font-weight: 650; }
+.course-support { margin-top: .7rem; font-size: .92rem; }
+.course-support details { margin: .15rem 0 0; }
+.course-support summary, .path-jump summary, .path-tools summary { width: fit-content; min-height: 44px; padding: .6rem .15rem; }
+.course-support summary { color: var(--muted-ink); }
+.course-support details[open] { padding: 0 .8rem .75rem; background: #f7f8f1; border-radius: .4rem; }
+.course-support details[open] summary { font-weight: 700; }
+.spacing-samples { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-start; margin-top: .7rem; }
+.spacing-samples figure { display: grid; justify-items: start; gap: .18rem; }
+.spacing-samples figcaption { font-size: .8rem; color: #405543; }
+.spacing-samples span { color: #2d4836; background: #fffcf1; border: 1px dashed #94a486; font-size: .86rem; }
+.spacing-samples .p-2 { padding: .5rem; }
+.spacing-samples .p-4 { padding: 1rem; }
+.path-tools {
+  margin: .8rem 0 0;
+  border: 1px solid #d5dbd5;
+  border-radius: .5rem;
+  background: #f3f5f1;
+  padding: 1rem 1.15rem;
+}
+.path-tools h2 { font-size: 1.05rem; }
+.path-tools p { margin: .3rem 0; color: #405448; font-size: .93rem; }
+.path-tools details { margin: .3rem 0 0; }
+.path-tools summary { font-size: .93rem; font-weight: 600; }
+.family-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.3rem 0 2rem; }
+.family-card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: 1px solid #bdcbbb;
+  border-radius: .7rem;
+  padding: 1.1rem 1.1rem .85rem;
+  background: #f4f7ef;
+  text-decoration: none;
+}
+.family-python { background: #fbf4e4; border-color: #dccda9; }
+.family-python .family-count { color: #6a5125; }
+.family-card strong { font-size: 1.19rem; line-height: 1.5; text-decoration: underline; text-decoration-thickness: 1px; }
+.family-description { display: block; color: #405347; margin: .55rem 0 1rem; font-size: .92rem; }
+.family-preview {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .4rem;
+  padding: .55rem .15rem .1rem; margin-top: auto; border-top: 1px solid #c9d5c6;
+}
+.family-preview code { color: #365844; font-size: .83rem; }
+.family-preview span { font-weight: 650; font-size: 1rem; }
+.family-python .family-preview { border-color: #dfd3ba; }
+.all-courses-index h2 { font-size: 1.35rem; }
+.all-courses-index > p { margin: .25rem 0; color: var(--muted-ink); }
+.all-courses-index h3 { font-size: .9rem; margin: 1.1rem 0 .35rem; }
+.course-index { display: flex; flex-wrap: wrap; gap: .35rem .5rem; list-style: none; margin: 0; padding: 0; }
+.course-index a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  border: 1px solid #ccd6c6; border-radius: .35rem; padding: .4rem .75rem; background: #fafbf6; font-size: .92rem;
+}
+.path-jump { margin: 0 0 1.25rem; }
+.path-jump summary { color: #335a43; font-weight: 650; }
+.path-jump[open] .course-index { margin: .35rem 0; }
+.all-courses-index { margin: 0 0 1.8rem; }
+@media (hover: hover) {
+  .family-card:hover, .course-index a:hover { border-color: #6b8b6d; background: #edf3e7; }
+  .family-python:hover { border-color: #a88b50; background: #f8edd3; }
+  .course-actions .next:hover { background: #1b412f; }
+  .course-actions .course-contents-link:hover { text-decoration-thickness: 2px; }
+}
+@media (max-width: 600px) {
+  .family-cards { grid-template-columns: 1fr; gap: .8rem; }
+  .course-actions { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: start; gap: .5rem; }
+  .course-actions .next { max-width: 100%; }
+  .course-support { margin-top: .15rem; }
+  .course-example { padding: .7rem .85rem; }
+}
+
+.path-course .course-role:has(a) { display: flex; align-items: center; flex-wrap: wrap; }
+.course-role a { display: inline-flex; align-items: center; min-height: 44px; margin-right: .2rem; }
+@media (min-width: 721px) {
+  .layout > .path-nav { position: sticky; top: 1rem; align-self: start; }
 }

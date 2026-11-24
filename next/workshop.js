@@ -104,8 +104,12 @@ function pcSetup(lesson, message) {
 }
 
 function catalog() {
-  title("Web制作の選択コース", "Next.jsの目次", "本の紹介サイトを題材に、URLとページをつなぎ、サーバーでデータを読み取ったり、入力を受け付けたりします。スマホでは表示例を読んでコードを組み立てます。PC では Docker で Next.js を起動して自分のコードを試せます。");
-  if (state.last) screen.append(jump("前回の続きへ", state.last, "next"));
+  document.title = "Next.jsの目次｜よみくむ";
+  screen.append(el("h1", "Next.jsの目次"));
+  const previous = typeof state.last === "string" && [...nextLessons, ...nextChapters].find(item => item.id === state.last.split("/")[0]);
+  screen.append(CourseContents.intro("next", "#" + nextLessons[0].id + "/slide/1", previous && {
+    label: "前回の続きへ · " + previous.title, href: "#" + state.last,
+  }));
   const chapters = el("ol", undefined, "catalog");
   for (const chapter of nextChapters) {
     const row = el("li");
@@ -114,7 +118,7 @@ function catalog() {
     row.append(heading, el("p", chapter.goal), lessonList(chapter));
     chapters.append(row);
   }
-  screen.append(chapters);
+  screen.append(chapters, CourseContents.footer("next", "../index.html"));
 }
 function lessonList(chapter) {
   const list = el("ol", undefined, "chapter-lessons");
@@ -258,8 +262,14 @@ function render() {
   nav.append(jump("この章の目次", lesson.chapter), jump("見本", id + "/slide/1"), jump("四択", id + "/quiz"), jump("タップで組む", id + "/tap"), jump("PC記述", id + "/write"));
   const next = nextLessons[nextLessons.indexOf(lesson) + 1];
   if (next) nav.append(jump("次へ　" + next.title, next.id + "/slide/1"));
+  else nav.append(jump("Next.jsの目次へ戻る", "contents"));
   screen.append(nav);
 }
 document.getElementById("skip").onclick = event => { event.preventDefault(); screen.focus(); };
-window.addEventListener("hashchange", () => { render(); screen.querySelector("h1").focus(); });
+window.addEventListener("hashchange", () => {
+  render();
+  const heading = screen.querySelector("h1");
+  heading.tabIndex = -1;
+  heading.focus();
+});
 render();

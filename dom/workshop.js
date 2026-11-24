@@ -2,7 +2,6 @@
 const workshop = window.courseWorkshop || {
   id: "dom", heading: "JavaScriptでWebページを操作する", language: "JavaScript",
   catalogTitle: "JavaScriptの画面操作の目次",
-  intro: "JavaScriptの変数・条件分岐・配列・関数を使って、ボタンや入力欄のあるWebページを作ります。ブラウザがHTMLを読み取って作るページの構造をDOMと呼びます。まずは画面の見出しや一覧を探し、表示を書き換えましょう。各単元は、完成例を操作してから、短い見本・結果の予測・自分で試す練習へ進みます。",
   units: [elementsUnit, eventsUnit, stateUnit, loadingUnit, keyboardDomUnit, quizDomUnit, readingUnit],
   frame: domFrame, prepare: limitDomLoops,
 };
@@ -69,7 +68,12 @@ function renderDom() {
   if (!unit) {
     document.title = catalogTitle + "｜よみくむ";
     domMain.append(node("h1", catalogTitle));
-    if (workshop.intro) domMain.append(node("p", workshop.intro));
+    const [previousId, previousPart] = typeof domState.last === "string" ? domState.last.split("/") : [];
+    const previous = domUnits.find(item => item.id === previousId);
+    const previousTitle = previous && (previousPart ? previous.steps[Number(previousPart) - 1]?.title : previous.title);
+    domMain.append(CourseContents.intro(workshop.id, "#" + domUnits[0].id + "/1", previousTitle && {
+      label: "前回の続きへ · " + previousTitle, href: "#" + domState.last,
+    }));
     const list = node("ol");
     list.className = "catalog";
     for (const u of domUnits) {
@@ -79,7 +83,7 @@ function renderDom() {
       li.append(chapter, node("p", u.intro), lessonLinks(u));
       list.append(li);
     }
-    domMain.append(list);
+    domMain.append(list, CourseContents.footer(workshop.id, "../index.html"));
     return;
   }
   const frameFor = unit.frame || workshop.frame;
@@ -298,6 +302,7 @@ function renderDom() {
   else {
     const following = domUnits[domUnits.indexOf(unit) + 1];
     if (following) links.append(route("次の単元へ　" + following.title, following.id));
+    else links.append(route(catalogTitle + "へ戻る", "contents"));
   }
   if (step.reflection) {
     const noteLabel = node("label", step.reflection);

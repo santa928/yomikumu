@@ -22,7 +22,7 @@ async function verifyRecordBasics(browser, entry = pathToFileURL(path.resolve("p
       assert.equal(await link.getAttribute("href"), route);
     }
     await contents.getByRole("link", { name: "「空白を除き、同じ名前が出る回数を数える」の完成例を見る", exact: true }).click();
-    await pc.getByRole("heading", { name: "空白を除き、同じ名前が出る回数を数える", exact: true }).waitFor();
+    await pc.getByRole("heading", { level: 1, name: "空白を除き、同じ名前が出る回数を数える", exact: true }).waitFor();
     assert.equal(new URL(pc.url()).hash, "#names/demo", "目次から名前の集計の完成例を開ける");
     assert.match(await pc.locator("#description").textContent(), /受付で入力した名前.*1行につき1回分の受付/);
     assert.equal(await pc.locator("#course-name").textContent(), "Python基礎");
