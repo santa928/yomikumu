@@ -18,7 +18,7 @@ async function verifyPaths(browser, base) {
     await html.getByRole("radio", { name: "見出しの文字" }).check();
     await html.getByRole("button", { name: "答えを確かめる" }).click();
     await html.getByRole("status").filter({ hasText: "そうです" }).waitFor();
-    await html.getByRole("link", { name: "最初の一課題を開く" }).click();
+    await html.getByRole("link", { name: /^最初の課題：/ }).click();
     assert.ok(pc.url().endsWith("#first-edit/1"));
     await pc.goto(base + "#first-edit/type");
     await pc.getByRole("textbox").fill("<h1>雨の図書館</h1>");
@@ -29,7 +29,7 @@ async function verifyPaths(browser, base) {
     await py.getByRole("radio", { name: "ゆき" }).check();
     await py.getByRole("button", { name: "答えを確かめる" }).click();
     await py.getByRole("status").filter({ hasText: "そうです" }).waitFor();
-    await py.getByRole("link", { name: "最初の一課題を開く" }).click();
+    await py.getByRole("link", { name: /^最初の課題：/ }).click();
     await pc.getByRole("heading", { name: "文字を表示する", exact: true }).waitFor();
     await pc.getByRole("button", { name: "入口", exact: true }).click();
     await pc.getByRole("link", { name: "見本を変えてみる" }).click();

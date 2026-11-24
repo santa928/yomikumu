@@ -132,14 +132,16 @@ function tsCatalogue() {
   document.title = "TypeScriptの目次｜よみくむ";
   const prev = tsLessons.find(s => s.id === stateTS.last.split("/")[0]);
   const resume = stateTS.last === "practical" ? "複数ファイルで型を共有し、採点機能を直す" : prev?.title;
-  main.innerHTML = `<p class="kind">Web制作 · JavaScriptの次へ</p><h1>TypeScriptの目次</h1>
-    <p>JavaScriptの変数・関数・配列を使ったことがある方向けです。TypeScriptでは、値が数値なのか文字列なのかといった種類（型）をコードに書き、実行する前に値の使い方の間違いを見つけられます。練習ではクイズの得点・問題・回答を使います。型検査で見つかる間違いと、実行結果を見ないと分からない間違いを比べましょう。</p>
-    ${resume ? `<a class="next" href="#${stateTS.last}">前回の続きへ · ${resume}</a>` : ""}
+  main.innerHTML = `<h1>TypeScriptの目次</h1>
     <ol class="catalog">${tsChapters.map((ch,i) => `<li>
       <h2><a href="#${chapterRouteTS(ch,i)}">${escTS(ch.title)}</a></h2>
       <p>${escTS(ch.intro)}</p>${lessonLinksTS(i)}</li>`).join("")}</ol>
     <details><summary>進捗と下書きの引き継ぎ</summary><button id="save-ts" type="button">進捗を保存</button>
     <label>現在の進捗を置き換えるファイル <input type="file" id="load-ts" accept=".json"></label><p role="status" id="transfer-ts"></p></details>`;
+  main.querySelector("h1").after(CourseContents.intro("typescript", "#infer/slide", resume && {
+    label: "前回の続きへ · " + resume, href: "#" + stateTS.last,
+  }));
+  main.querySelector(".catalog").after(CourseContents.footer("typescript", "../index.html"));
   document.getElementById("save-ts").onclick = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(stateTS)], {type:"application/json"}));
     Object.assign(document.createElement("a"), { href:url, download:"quiz-types-progress.json" }).click();
@@ -150,8 +152,10 @@ function tsCatalogue() {
       if (!e.target.files[0]) return;
       const data = JSON.parse(await e.target.files[0].text());
       if (!validateTS(data)) throw Error();
-      stateTS = data; persistTS(); tsCatalogue(); main.querySelector("details").open = true;
-      document.getElementById("transfer-ts").textContent = "進捗を読み込みました。";
+      stateTS = data; persistTS(); tsCatalogue();
+      const transfer = document.getElementById("transfer-ts");
+      transfer.closest("details").open = true;
+      transfer.textContent = "進捗を読み込みました。";
     } catch { document.getElementById("transfer-ts").textContent = "このコースの進捗ファイルを選んでください。"; }
   };
 }

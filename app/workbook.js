@@ -63,8 +63,11 @@ function navFor(active) {
   group.open = window.matchMedia("(min-width: 721px)").matches;
   group.append(node("summary", "すべての単元"));
   const courseName = isJs ? "JavaScript" : "HTML / CSS";
-  nav.replaceChildren(link("全コース目次", "paths", "nav-home"), link(courseName + "の目次", isJs ? "javascript" : "home", "nav-home"));
-  if (active === "home" || active === "javascript") return;
+  const isContents = active === "home" || active === "javascript";
+  nav.replaceChildren(link("全コース目次", "paths", "nav-home"),
+    isContents ? CourseContents.familyLink(isJs ? "javascript" : "html", "", true)
+      : link(courseName + "の目次", isJs ? "javascript" : "home", "nav-home"));
+  if (isContents) return;
   nav.append(group);
   const entries = isJs ? javascriptLessons.map(l => [l.id, l.title]) :
     [...lessons.map(l => [l.id, l.title]), ["studio", "卒業制作"]];
@@ -157,23 +160,14 @@ function transfer() {
 
 function home(isJs = false) {
   const units = isJs ? javascriptLessons : lessons;
-  heading(
-    isJs ? "JavaScript 入門" : "HTML / CSS 入門",
-    isJs ? "JavaScriptの目次" : "HTML / CSSの目次",
-    isJs ? "ボタンを押して見出しの文字を変えてみましょう。次に、クイズの問題を一覧にし、答えに合わせて点を足す方法を学びます。" :
-      "HTMLで作品名や画像を載せ、CSSで文字の大きさや作品の並べ方を変えます。最後は自分で作ったページをHTMLファイルとして保存します。",
-  );
   const state = readProgress();
   const course = isJs ? "javascript" : "html";
-  const saved = savedPath();
-  const resume = pathHref(course, saved.positions[course]);
-  content.append(
-    pathLink(
-      resume ? "前回の続きへ →" : "最初のスライドへ →",
-      resume || "#" + unitRoute(units[0].id),
-      "next",
-    ),
-  );
+  const title = (isJs ? "JavaScript" : "HTML / CSS") + "の目次";
+  const resume = pathHref(course, savedPath().positions[course]);
+  document.title = title + "｜よみくむ";
+  const h = node("h1", title);
+  h.tabIndex = -1;
+  content.append(h, CourseContents.intro(course, "#" + unitRoute(units[0].id), resume && { href: resume }));
   const sections = isJs ? {
     "js-sign": "値を表示し、変数で計算する", "js-compare": "条件に応じて処理を分ける",
     "js-call": "処理を関数にまとめる", "js-return-action": "関数の中の値を次の呼び出しに残す",
@@ -213,7 +207,10 @@ function home(isJs = false) {
     list.append(item);
   }
   if (isJs) {
-    content.append(pathLink("次のコース：JavaScriptの画面操作の目次", "dom/index.html", "review"), transfer());
+    content.append(CourseContents.footer(course, "", {
+      reason: "条件や関数を書けるようになったら、ボタンや入力を使ってWebページを動かしてみましょう。",
+      label: "JavaScriptの画面操作の目次へ", href: "dom/index.html",
+    }), transfer());
     return;
   }
   list = chapter("卒業制作");
@@ -224,7 +221,10 @@ function home(isJs = false) {
   );
   if (state.units.studio?.writeDone) last.append(node("small", "卒業制作をクリア"));
   list.append(last);
-  content.append(pathLink("次のコース：JavaScriptの目次", "#javascript", "review"), transfer());
+  content.append(CourseContents.footer(course, "", {
+    reason: "ページを作れるようになったら、ボタンを押したときに文字が変わる動きを付けてみましょう。",
+    label: "JavaScriptの目次へ", href: "#javascript",
+  }), transfer());
 }
 
 // Returning to a draft is part of the review flow, even after opening another slide.
@@ -755,7 +755,7 @@ document.getElementById("skip").addEventListener("click", (e) => {
 });
 window.addEventListener("hashchange", () => {
   render();
-  content.querySelector("h1").focus();
+  if (!focusPathCard()) content.querySelector("h1").focus();
 });
 adoptPaddingDraft();
 if (location.pathname.endsWith("/padding.html")) {
@@ -771,3 +771,4 @@ if (location.pathname.endsWith("/padding.html")) {
   }
 }
 render();
+focusPathCard();

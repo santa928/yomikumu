@@ -13,18 +13,26 @@ const { chromium } = require("playwright");
     await page.getByRole("heading", {name:"Web制作のコース一覧"}).waitFor();
     await page.waitForFunction(() => typeof pathCourses !== "undefined");
     const entries = [
-      ["画像とフォームを直す", "#repair-image/1"],
-      ["ファイルから読み込んだデータを画面に表示する", "dom/index.html#fetch-json"],
-      ["データの読み込みに失敗したときの表示を直す", "dom/index.html#fetch-json"],
-      ["複数のファイルで使う型を一か所で変更する", "typescript/index.html#practical"],
-      ["一覧を並べ替えてもメモが元の本に残るようにする", "react/index.html#book-memos"],
-      ["詳細ページと検索を作る", "next/index.html#catalog-practice"],
-      ["ボタンに指定した色がつかない原因を調べる", "tailwind/index.html#status-colors/slide"],
+      ["html", "HTML / CSS", "#repair-image/1", /^#repair-image\/1$/],
+      ["dom", "JavaScriptの画面操作", "dom/index.html#fetch-json", /^#fetch-json$/],
+      ["typescript", "TypeScript", "typescript/index.html#practical", /^#practical$/],
+      ["react", "React", "react/index.html#book-memos", /^#book-memos$/],
+      ["next", "Next.js", "next/index.html#catalog-practice", /^#catalog-practice$/],
+      ["tailwind", "Tailwind CSS", "tailwind/index.html#status-colors/slide", /^#status-colors\/slide$/],
     ];
-    for (const [label, href] of entries) {
-      const link = page.getByRole("link", {name:label, exact:true});
-      assert.equal(await link.count(), 1, label);
-      assert.equal(await link.getAttribute("href"), href);
+    for (const [id, title, path, lessonRoute] of entries) {
+      const entry = page.locator(`.path-course[data-course="${id}"]`);
+      await entry.getByRole("link", { name: title + "の目次", exact: true }).click();
+      const main = page.getByRole("main");
+      await main.getByRole("heading", { level: 1, name: title + "の目次", exact: true }).waitFor();
+      const lesson = main.locator("a[href]").filter({visible: true});
+      const hrefs = await lesson.evaluateAll(links => links.map(link => link.getAttribute("href")));
+      const href = hrefs.find(href => lessonRoute.test(href));
+      assert.ok(href, title + "の目次から実習を選べる");
+      const target = new URL(path, home).href;
+      await Promise.all([page.waitForURL(target), main.locator(`a[href="${href}"]`).click()]);
+      await page.getByRole("main").getByRole("heading", { level: 1 }).waitFor();
+      await page.goto(home + "#paths/web");
     }
     await page.goto(new URL("react/index.html#book-memos/2", home).href);
     const shortExample = page.locator("#example > pre");
@@ -64,6 +72,6 @@ const { chromium } = require("playwright");
     // 旧形式の進捗を追加で取り込んでも新しい実習の下書きを残す。
     await phone.evaluate(() => restoreStores({typescript:{last:"",units:{},version:1}}));
     assert.equal(await phone.evaluate(() => exportStores().typescript.practical["types.ts"]), draft);
-    console.log("6分野の入口とTypeScript実習の下書きの引き継ぎを確認");
+    console.log("6分野の目次から実習への導線とTypeScript実習の下書きの引き継ぎを確認");
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -47,6 +47,8 @@ const workbookScripts = [
   "app/path-location.js",
   "typescript/practical-draft.js",
   "app/path-progress.js",
+  "app/course-guide.js",
+  "app/course-contents.js",
   "app/learning-paths.js",
   "app/workbook.js",
 ];

@@ -3,11 +3,7 @@
 const $ = id => document.getElementById(id);
 const courseNames = { python: "Python基礎", "python-practice": "Python実践", "python-oop": "Python OOP" };
 const courseTocs = { python: "54/demo/toc", "python-practice": "59/demo/toc", "python-oop": "63/demo/toc" };
-const catalogIntros = {
-  python: "文字の表示から始め、条件分岐や繰り返しを使って入力を集計するところまで学びます。",
-  "python-practice": "リストから必要なデータを選び、CSVのような表データを読み取って集計・テストします。",
-  "python-oop": "クラスでデータと操作をまとめ、処理の組み合わせや関数への機能追加を学びます。",
-};
+const courseStarts = { python: "54/1/slide", "python-practice": "63/1/slide/practice", "python-oop": "63/1/slide" };
 const classIntro = "63/1/slide";
 const classEntryCourses = { basics: "python", practice: "python-practice" };
 let courseId, state, classEntry;
@@ -77,6 +73,12 @@ function showToc() {
       list.append(row);
     }
     item.append(title, list);
+    if (entry === "practice" || (courseId === "python-oop" && unit.id === "63")) {
+      const skip = entry === "practice"
+        ? link("クラスを学習済みなら集計の練習へ", "59/1/slide")
+        : link("クラスを学習済みならOOPの続きへ", "63/4/slide");
+      item.append(skip);
+    }
     if (!intro) {
       const demoLink = link("完成例を見る", unit.id + "/demo");
       demoLink.setAttribute("aria-label", "「" + unit.title + "」の完成例を見る");
@@ -131,14 +133,19 @@ function routeToCourse(focusTitle = false) {
   $("course-toc").href = "#" + courseTocs[navCourse];
   $("course-toc").textContent = tocTitle;
   $("course-toc").hidden = openToc;
+  $("course-toc").parentElement.querySelector(".course-toc-parent")?.remove();
+  if (openToc) $("course-toc").before(CourseContents.familyLink(navCourse, "../index.html", true));
   $("catalog").hidden = !openToc;
   $("lesson-content").hidden = $("position").hidden = openToc;
   if (openToc) {
     $("title").textContent = tocTitle;
-    $("catalog-intro").textContent = catalogIntros[navCourse];
+    const resume = window.YomikumuPaths?.read().positions[navCourse];
+    $("catalog-intro").replaceChildren(CourseContents.intro(navCourse, "#" + courseStarts[navCourse], resume && { href: "#" + resume }));
+    $("catalog").querySelector(".course-toc-footer")?.remove();
+    $("catalog").append(CourseContents.footer(navCourse, "../index.html"));
     document.title = tocTitle + " | よみくむ";
     showToc();
-    $("title").focus();
+    if (focusTitle) $("title").focus();
     return;
   }
   $("contents").replaceChildren();
@@ -256,7 +263,7 @@ function showSteps(inClassIntro) {
   nav.replaceChildren();
   const path = chapter.id + "/" + number + "/";
   const nextClass = inClassIntro && number === 3 && view === "write";
-  const practice = (nextClass || classEntry === "practice") && coursePosition("python-practice");
+  const practice = ((nextClass && classEntry === "basics") || classEntry === "practice") && coursePosition("python-practice");
   const basics = classEntry === "basics" && coursePosition("python");
   const beforeWith = chapter.id === "61" && number === 3 && view === "write";
   const introDone = beforeWith && window.YomikumuPaths?.completedPythonClassIntro();
@@ -277,7 +284,8 @@ function showSteps(inClassIntro) {
     nav.append(review);
     if (view === "guide") next = link("自分で解く課題へ", path + "write");
     else if (nextClass) {
-      if (practice === "61/3/write") next = link("Python実践の with の練習へ戻る", "61/4/slide");
+      if (!classEntry) next = link("Python OOPの続きへ", "63/4/slide");
+      else if (practice === "61/3/write") next = link("Python実践の with の練習へ戻る", "61/4/slide");
       else if (practice) next = link("Python実践の続きへ", practice);
       else next = link("Python実践へ", "59/1/slide");
     } else if (beforeWith && !introDone) next = link("クラス入門へ（with の処理を書く前に）", classIntro, "practice");
@@ -286,17 +294,17 @@ function showSteps(inClassIntro) {
       const nextChapter = pythonChapters[pythonChapters.indexOf(chapter) + 1];
       if (nextChapter && family(nextChapter.id) === courseId) next = link("次の章「" + nextChapter.title + "」へ", nextChapter.id + "/demo");
       else if (courseId === "python") next = link("クラス入門へ（実践・OOP共通）", classIntro, "basics");
-      else { next = element("a", "全コース目次へ戻る"); next.href = "../index.html#paths"; }
+      else next = link(courseNames[courseId] + "の目次に戻る", courseTocs[courseId]);
     }
   }
   next.className = "next";
   nav.append(next);
-  if (nextClass) nav.append(link("Python OOPの続きへ", "63/4/slide"));
+  if (nextClass && classEntry) nav.append(link("別コース：Python OOPへ", "63/4/slide"));
   else if (practice) nav.append(link("Python実践の続きへ戻る", practice));
   if (basics) nav.append(link("Python基礎の続きへ戻る", basics));
   if (beforeWith && !introDone) nav.append(link("クラスを学習済みなら with の練習へ", "61/4/slide"));
   if (introDone || (chapter.id === "61" && number === 4)) nav.append(link("クラス入門を読み直す", classIntro, "practice"));
-  if (view !== "demo") nav.append(link(classEntry ? "OOPの完成例へ" : "完成例を試す", chapter.id + "/demo"));
+  if (view !== "demo" && !classEntry) nav.append(link("完成例を試す", chapter.id + "/demo"));
 }
 function stopForEdit() {
   if (!execution) return;

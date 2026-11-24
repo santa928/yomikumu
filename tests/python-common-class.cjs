@@ -12,18 +12,24 @@ async function follow(page, link, destination, touch = false) {
   await Promise.all([page.waitForURL(destination), touch ? link.tap() : link.click()]);
 }
 
+async function exposeLink(link) {
+  await link.waitFor({ state: "attached" });
+  const details = link.locator("xpath=ancestor::details[not(@open)][1]/summary");
+  if (await details.count()) await details.click();
+}
+
 async function fromCoursePicker(browser) {
   const page = await browser.newPage({ viewport: { width: 375, height: 812 }, hasTouch: true });
   try {
     await page.goto(home + "#paths/python");
-    const practice = page.locator(".path-course").filter({
-      has: page.getByRole("heading", { name: "Python実践", exact: true }),
-    });
-    await follow(page, practice.getByRole("link", { name: "最初の一課題を開く" }), workbook + "#63/1/slide/practice", true);
+    const practice = page.locator('.path-course[data-course="python-practice"]');
+    await follow(page, practice.getByRole("link", { name: /^最初の課題：/ }), workbook + "#63/1/slide/practice", true);
     await page.getByRole("heading", { name: "Book クラスで1冊分の記録を作る" }).waitFor();
     assert.equal(await page.locator("#course-name").textContent(), "Python クラス入門");
     await page.goto(home + "#paths/python");
-    await follow(page, practice.getByRole("link", { name: /クラスを学習済み/ }), workbook + "#59/1/slide", true);
+    const skip = practice.getByText(/クラスを学習済み/, { selector: "a" });
+    await exposeLink(skip);
+    await follow(page, skip, workbook + "#59/1/slide", true);
   } finally { await page.close(); }
 }
 
@@ -84,12 +90,11 @@ async function afterCompletedIntro(browser) {
     await follow(page, steps.getByRole("link", { name: "クラス入門を読み直す" }), workbook + "#63/1/slide/practice");
     await page.goto(workbook + "#63/3/write/practice");
     await page.goto(home + "#paths/python");
-    const practice = page.locator(".path-course").filter({
-      has: page.getByRole("heading", { name: "Python実践", exact: true }),
-    });
+    const practice = page.locator('.path-course[data-course="python-practice"]');
     assert.equal(await practice.getByRole("link", { name: "Python実践の続きを開く" }).getAttribute("href"),
       "python/index.html#63/3/write/practice");
-    const next = practice.getByRole("link", { name: "クラスを学習済みなら実践へ" });
+    const next = practice.getByText("クラスを学習済みなら実践へ", { selector: "a", exact: true });
+    await exposeLink(next);
     assert.equal(await next.count(), 1);
     await follow(page, next, workbook + "#59/1/slide");
   } finally { await page.close(); }
@@ -104,8 +109,8 @@ async function independentResume(browser) {
     await pc.goto(workbook + "#67/5/write");
     await pc.locator("#source").fill(oopDraft);
     await pc.goto(home + "#paths/python");
-    await pc.locator(".path-course").filter({ has: pc.getByRole("heading", { name: "Python実践", exact: true }) })
-      .getByRole("link", { name: "最初の一課題を開く" }).click();
+    await pc.locator('.path-course[data-course="python-practice"]')
+      .getByRole("link", { name: /^最初の課題：/ }).click();
     await pc.getByRole("link", { name: "見本を変えてみる" }).click();
     await pc.getByRole("link", { name: "自分で解く課題へ" }).click();
     await pc.getByRole("link", { name: "次のスライドへ" }).click();

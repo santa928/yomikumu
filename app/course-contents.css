@@ -1,0 +1,75 @@
+/* Styles limited to individual course contents; exercises keep their own layout. */
+main .course-toc-intro {
+  margin-block: 1rem 2rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid #c1cdbd;
+  border-inline-start: 4px solid #59795f;
+  border-radius: 0.5rem;
+  background: #f1f4e9;
+}
+main .course-toc-intro h2,
+main .course-toc-footer h2 {
+  font-size: 1.14rem;
+  line-height: 1.45;
+}
+.course-toc-intro p {
+  margin-block: 0.35rem 1rem;
+}
+.course-toc-extra {
+  margin-block: .5rem 0;
+}
+.course-toc-extra summary {
+  min-height: 44px;
+  padding-block: .55rem;
+  font-weight: 650;
+}
+.course-toc-extra dl {
+  margin-block: 0;
+}
+.course-toc-intro dt {
+  font-weight: 700;
+}
+.course-toc-intro dd {
+  margin-inline-start: 0;
+}
+.course-toc-intro dd + dt {
+  margin-block-start: 0.7rem;
+}
+.course-toc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem 1rem;
+}
+.course-toc-actions a,
+.course-toc-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.course-toc-actions .next {
+  margin-top: 0;
+  text-wrap: balance;
+  word-break: auto-phrase;
+}
+main .course-toc-footer {
+  border-block-start: 1px solid #c1cdbd;
+  margin-block-start: 2rem;
+  padding-block: 1rem 0;
+}
+.course-toc-footer p {
+  margin-block: 0.4rem 0;
+}
+.course-toc-footer .course-toc-back {
+  display: flex;
+  width: fit-content;
+  text-underline-offset: .22em;
+}
+/* The course is already open on a TOC. Use its second nav slot for the parent instead. */
+.layout:has(> main .course-toc-intro) > nav > [data-toc-current],
+.layout:has(> main .course-toc-intro) > nav > .chapter-menu,
+.layout:not(:has(> main .course-toc-intro)) > nav > .course-toc-parent {
+  display: none;
+}
